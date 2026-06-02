@@ -23,7 +23,7 @@
           <h1>轻量仓库执行系统</h1>
         </div>
         <div class="header-actions">
-          <span class="sync-chip" id="syncStatus">本机演示</span>
+          <span class="sync-chip" id="syncStatus">连接中</span>
           <div class="account-badge" id="accountBadge">未登录</div>
           <button class="ghost-button hidden" id="installAppButton" type="button">安装</button>
           <button class="ghost-button" id="logoutButton" type="button">退出</button>
@@ -44,7 +44,7 @@
         <button class="secondary-button" id="resetAdminButton" type="button">重置管理员密码</button>
       </section>
 
-      <section class="connection-banner hidden" id="connectionBanner" aria-live="polite">
+      <section class="connection-banner hidden" id="connectionBanner" aria-live="polite" style="display: none;">
         服务器未连接，当前只能查看已缓存数据；入库、出库、移库、盘点和主数据维护已暂停。
       </section>
 

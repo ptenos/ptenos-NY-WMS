@@ -11,6 +11,7 @@ let sessionAuth = loadSessionAuth();
 if (!sessionAuth.token || sessionAuth.userId !== state.currentUserId) state.currentUserId = "";
 let operationType = "in";
 let apiAvailable = false;
+let apiSyncAttempted = false;
 let remoteSaveTimer = null;
 let currentStockRows = [];
 let selectedOperationVersion = null;
@@ -171,6 +172,7 @@ function saveState(sync = true) {
 }
 
 async function initApiSync() {
+  apiSyncAttempted = false;
   try {
     const healthResponse = await fetch("/api/health", { headers: { Accept: "application/json" } });
     const healthData = await healthResponse.json().catch(() => null);
@@ -181,11 +183,13 @@ async function initApiSync() {
     Object.assign(state, migrateState({ ...defaultState(), ...(await response.json()) }));
     state.currentUserId = currentUserId;
     apiAvailable = true;
+    apiSyncAttempted = true;
     localStorage.setItem(storeKey, JSON.stringify(state));
     setSyncStatus(syncStatusText());
     render();
   } catch {
     apiAvailable = false;
+    apiSyncAttempted = true;
     setSyncStatus(syncStatusText());
     renderRuntimeState();
   }
@@ -219,6 +223,7 @@ function setSyncStatus(text) {
 }
 
 function syncStatusText() {
+  if (!apiSyncAttempted) return "连接中";
   if (apiAvailable) return "服务器同步";
   return serverRequired ? "服务器未连接" : "本机演示";
 }
@@ -230,10 +235,11 @@ function requireLiveServer(action = "操作") {
 }
 
 function renderRuntimeState() {
-  const blocked = serverRequired && !apiAvailable;
+  const blocked = serverRequired && apiSyncAttempted && !apiAvailable;
+  const pending = serverRequired && !apiSyncAttempted;
   $("#connectionBanner")?.classList.toggle("hidden", !blocked || !currentUser());
   $$(".server-write").forEach((button) => {
-    button.disabled = blocked || button.dataset.logicDisabled === "1";
+    button.disabled = pending || blocked || button.dataset.logicDisabled === "1";
   });
   $("#seedDemo")?.classList.toggle("hidden", serverRequired || !isAdmin());
   $("#resetAdminButton")?.classList.toggle("hidden", serverRequired);
@@ -1675,6 +1681,7 @@ function emptyHtml() {
 function render() {
   renderUserSelect();
   renderPermissions();
+  if (!apiSyncAttempted) setSyncStatus(syncStatusText());
   renderRuntimeState();
   renderOptions();
   renderMetrics();
