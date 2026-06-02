@@ -11,6 +11,8 @@ let sessionAuth = loadSessionAuth();
 if (!sessionAuth.token || sessionAuth.userId !== state.currentUserId) state.currentUserId = "";
 let operationType = "in";
 let apiAvailable = false;
+let apiSyncAttempted = false;
+let apiConnectionState = "connecting";
 let remoteSaveTimer = null;
 let currentStockRows = [];
 let selectedOperationVersion = null;
@@ -176,6 +178,8 @@ async function initApiSync() {
     const healthData = await healthResponse.json().catch(() => null);
     if (!healthResponse.ok || !healthData?.ok) throw new Error("API unavailable");
     apiAvailable = true;
+    apiSyncAttempted = true;
+    apiConnectionState = "connected";
     try {
       const response = await fetch("/api/state?lite=1", { headers: { Accept: "application/json" } });
       if (response.ok) {
@@ -191,6 +195,8 @@ async function initApiSync() {
     render();
   } catch {
     apiAvailable = false;
+    apiSyncAttempted = true;
+    apiConnectionState = "failed";
     setSyncStatus(syncStatusText());
     renderRuntimeState();
   }
@@ -224,7 +230,9 @@ function setSyncStatus(text) {
 }
 
 function syncStatusText() {
-  if (apiAvailable) return "服务器同步";
+  if (apiConnectionState === "connecting" && !apiSyncAttempted) return "连接中";
+  if (apiAvailable || apiConnectionState === "connected") return "服务器已连接";
+  if (apiConnectionState === "failed") return serverRequired ? "服务器连接失败" : "本机演示";
   return serverRequired ? "服务器未连接" : "本机演示";
 }
 
@@ -2332,7 +2340,6 @@ function login() {
 }
 
 async function loginAsync() {
-  if (!requireLiveServer("登录")) return;
   const userId = $("#loginUserInput").value.trim();
   const password = $("#loginPasswordInput").value;
   const button = $("#loginButton");
@@ -2349,6 +2356,9 @@ async function loginAsync() {
     Object.assign(state, migrateState({ ...defaultState(), ...(data.state || {}) }));
     state.currentUserId = data.user.id;
     saveSessionAuth(data.user.id, data.token, data.expiresAt, data.mustChangePassword);
+    apiAvailable = true;
+    apiSyncAttempted = true;
+    apiConnectionState = "connected";
     $("#loginPasswordInput").value = "";
     saveState();
     render();
