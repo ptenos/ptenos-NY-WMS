@@ -1,8 +1,8 @@
-console.log("runtime boot debug-bind-20260603");
+console.log("runtime boot parsefix-20260603");
 window.__runtimeBooted = true;
 const storeKey = "wms-lite-state-v4";
 const authKey = "wms-lite-auth-v2";
-const channel = "BroadcastChannel" in window ? new BroadcastChannel("wms-lite-sync") : null;
+const channel = typeof BroadcastChannel === "function" ? new BroadcastChannel("wms-lite-sync") : null;
 const serverRequired = location.protocol !== "file:";
 const materialCache = new Map();
 const locationCache = new Map();
@@ -32,7 +32,7 @@ const wmsLocalStorage = safeStorage("localStorage");
 const wmsSessionStorage = safeStorage("sessionStorage");
 
 const state = loadState();
-const frontendBuildVersion = "runtime-boot-debug-20260603";
+const frontendBuildVersion = "runtime-parsefix-20260603";
 let sessionAuth = loadSessionAuth();
 if (!sessionAuth.token || sessionAuth.userId !== state.currentUserId) state.currentUserId = "";
 let operationType = "in";
@@ -962,32 +962,31 @@ async function submitCount(event) {
       render();
       return showToast("盘点已调整");
     }
+
+    const row = findStock(sku, batch, location, status);
+    const beforeQty = row ? row.qty : 0;
+    if (row) {
+      row.qty = qty;
+      touchStock(row);
+    } else if (qty > 0) {
+      upsertStock({ sku, batch, location, status, qty });
+    }
+
+    addLog({ type: "adjust", sku, batch, qty, beforeQty, location, targetLocation: "", status, note });
+    removeZeroStock();
+    refreshLocationUsage();
+    saveState();
+    event.target.reset();
+    selectedCountVersion = null;
+    selectedCountStock = null;
+    $("#countMaterialNameInput").value = "";
+    $("#selectedCountInfo").classList.add("hidden");
+    $("#selectedCountInfo").innerHTML = "";
+    render();
+    updateCountPreview();
+    showToast("盘点已调整");
   } catch (error) {
     return showToast(error.message);
-  }
-
-  const row = findStock(sku, batch, location, status);
-  const beforeQty = row ? row.qty : 0;
-  if (row) {
-    row.qty = qty;
-    touchStock(row);
-  } else if (qty > 0) {
-    upsertStock({ sku, batch, location, status, qty });
-  }
-
-  addLog({ type: "adjust", sku, batch, qty, beforeQty, location, targetLocation: "", status, note });
-  removeZeroStock();
-  refreshLocationUsage();
-  saveState();
-  event.target.reset();
-  selectedCountVersion = null;
-  selectedCountStock = null;
-  $("#countMaterialNameInput").value = "";
-  $("#selectedCountInfo").classList.add("hidden");
-  $("#selectedCountInfo").innerHTML = "";
-  render();
-  updateCountPreview();
-  showToast("盘点已调整");
   } finally {
     setFormSubmitting(event.target, false);
   }
