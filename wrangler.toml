@@ -2,3 +2,8 @@ name = "ptenos-ny-wms"
 compatibility_date = "2025-04-08"
 pages_build_output_dir = "cloudflare-dist"
 compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "WMS_DB"
+database_name = "wms-lite-db"
+database_id = "9818d452-034d-4553-bdca-7d8f5545c125"
