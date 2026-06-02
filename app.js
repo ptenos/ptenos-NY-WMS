@@ -159,7 +159,7 @@ function migrateState(data) {
 
 function ensureAdminAccount() {
   if (serverRequired) {
-    showToast("姝ｅ紡鏈嶅姟涓嶈兘鍦ㄦ墜鏈虹閲嶇疆绠＄悊鍛樺瘑鐮侊紝璇峰湪璐﹀彿鏉冮檺閲屼慨鏀瑰瘑鐮?);
+    showToast("正式服务不能在手机端重置管理员密码，请在账号权限里修改密码");
     return;
   }
   let admin = state.users.find((user) => String(user.id).toLowerCase() === "admin");
