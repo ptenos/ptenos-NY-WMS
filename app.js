@@ -175,7 +175,7 @@ async function initApiSync() {
     const healthResponse = await fetch("/api/health", { headers: { Accept: "application/json" } });
     const healthData = await healthResponse.json().catch(() => null);
     if (!healthResponse.ok || !healthData?.ok) throw new Error("API unavailable");
-    const response = await fetch("/api/state?lite=1", { headers: { Accept: "application/json" } });
+    const response = await fetch("/api/state", { headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error("API unavailable");
     const currentUserId = sessionAuth.token && sessionAuth.userId === state.currentUserId ? state.currentUserId : "";
     Object.assign(state, migrateState({ ...defaultState(), ...(await response.json()) }));
