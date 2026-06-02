@@ -727,7 +727,9 @@ function syncOperationSelection() {
 async function submitCount(event) {
   event.preventDefault();
   if (event.target.dataset.submitting === "1") return;
-  const material = findMaterial($("#countSkuInput").value);
+  const inputSku = normalize($("#countSkuInput").value);
+  const selected = selectedCountStock && selectedCountStock.sku === inputSku ? selectedCountStock : null;
+  const material = selected ? { sku: selected.sku, name: selected.name } : findMaterial($("#countSkuInput").value);
   const sku = material?.sku || "";
   const batch = normalize($("#countBatchInput").value);
   const status = $("#countStatusInput").value;
@@ -743,7 +745,20 @@ async function submitCount(event) {
 
   setFormSubmitting(event.target, true);
   try {
-  const operationPayload = { type: "count", sku, batch, status, qty: rawQty, location, note, expectedVersion: selectedCountVersion };
+  const operationPayload = {
+    type: "count",
+    sku: selectedCountStock?.sku || sku,
+    batch: selectedCountStock?.batch || batch,
+    status: selectedCountStock?.status || status,
+    qty: rawQty,
+    location,
+    note,
+    expectedVersion: selectedCountVersion,
+    sourceSku: selectedCountStock?.sku || sku,
+    sourceBatch: selectedCountStock?.batch || batch,
+    sourceLocation: selectedCountStock?.location || location,
+    sourceStatus: selectedCountStock?.status || status
+  };
   try {
     const remote = await postOperation(operationPayload);
     if (remote) {

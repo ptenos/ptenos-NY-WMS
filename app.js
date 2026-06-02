@@ -841,8 +841,8 @@ async function submitCount(event) {
   event.preventDefault();
   if (event.target.dataset.submitting === "1") return;
   const inputSku = normalize($("#countSkuInput").value);
-  const material = findMaterial($("#countSkuInput").value) ||
-    (selectedCountStock?.sku === inputSku ? { sku: selectedCountStock.sku, name: selectedCountStock.name } : null);
+  const selected = selectedCountStock && selectedCountStock.sku === inputSku ? selectedCountStock : null;
+  const material = selected ? { sku: selected.sku, name: selected.name } : findMaterial($("#countSkuInput").value);
   const sku = material?.sku || "";
   const batch = normalize($("#countBatchInput").value);
   const status = $("#countStatusInput").value;
@@ -863,21 +863,20 @@ async function submitCount(event) {
 
   setFormSubmitting(event.target, true);
   try {
-  const operationPayload = {
-    type: "count",
-    sku,
-    batch,
-    status,
-    qty: rawQty,
-    location,
-    note,
-    expectedVersion: selectedCountVersion,
-    sourceSku: selectedCountStock.sku,
-    sourceBatch: selectedCountStock.batch,
-    sourceLocation: selectedCountStock.location,
-    sourceStatus: selectedCountStock.status
-  };
-  try {
+    const operationPayload = {
+      type: "count",
+      sku: selectedCountStock.sku,
+      batch: selectedCountStock.batch,
+      status: selectedCountStock.status,
+      qty: rawQty,
+      location,
+      note,
+      expectedVersion: selectedCountVersion,
+      sourceSku: selectedCountStock.sku,
+      sourceBatch: selectedCountStock.batch,
+      sourceLocation: selectedCountStock.location,
+      sourceStatus: selectedCountStock.status
+    };
     const remote = await postOperation(operationPayload);
     if (remote) {
       selectedCountVersion = null;
