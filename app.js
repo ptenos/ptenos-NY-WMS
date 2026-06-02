@@ -6,6 +6,7 @@ const materialCache = new Map();
 const locationCache = new Map();
 
 const state = loadState();
+const frontendBuildVersion = "2026-06-02-1";
 let sessionAuth = loadSessionAuth();
 if (!sessionAuth.token || sessionAuth.userId !== state.currentUserId) state.currentUserId = "";
 let operationType = "in";
