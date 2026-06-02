@@ -734,7 +734,7 @@ function renderOperationStockRows(rows) {
             </div>
           </button>`;
       }).join("")
-    : emptyHtml();
+    : `<div class="empty-state">${escapeHtml(operationEmptyText())}</div>`;
 }
 
 function updateMaterialPicker() {
@@ -802,6 +802,12 @@ function renderSelectedStockInfo() {
   updateOperationHelper();
 }
 
+function operationEmptyText() {
+  const keyword = $("#operationStockSearch")?.value.trim();
+  if (!keyword) return "请先扫码或输入物料编码、批号、库位，查询可操作库存。";
+  return "未找到可操作库存，请确认物料编码、批号或库位是否正确。";
+}
+
 function updateOperationHelper() {
   const guide = $("#operationGuide");
   const qtyHint = $("#qtyHint");
@@ -811,10 +817,10 @@ function updateOperationHelper() {
 
   const labels = { in: "入库", out: "出库", move: "移库" };
   const steps = {
-    in: ["选择物料", "选择库位", "输入数量", "提交"],
-    out: ["选择库存", "输入数量", "提交"],
-    move: ["选择库存", "输入数量", "选择目标库位", "提交"]
-  }[operationType] || ["填写信息", "提交"];
+    in: ["选择物料", "选择库位", "输入数量", "确认提交"],
+    out: ["选择库存明细", "输入数量", "确认提交"],
+    move: ["选择库存明细", "输入数量", "选择目标库位", "确认提交"]
+  }[operationType] || ["填写信息", "确认提交"];
 
   const inputSku = normalize($("#skuInput").value);
   const batch = normalize($("#batchInput").value);
@@ -834,7 +840,7 @@ function updateOperationHelper() {
     delete qtyInput.dataset.maxQty;
     qtyInput.placeholder = "如 1000 或 1000.123456";
     ready = !!findMaterial($("#skuInput").value) && !!findLocation(location) && !!batch && qty !== null && qty > 0;
-    nextText = ready ? "可以提交入库。" : "按顺序选择物料、库位，再输入本次数量。";
+    nextText = ready ? "可先确认，再提交入库。" : "请先选择物料、库位，再输入数量。";
   } else {
     if (selectedRow) activeStep = 1;
     if (qty !== null && qty > 0 && selectedRow && qty <= Number(selectedRow.qty || 0)) activeStep = 2;
@@ -843,18 +849,18 @@ function updateOperationHelper() {
       qtyInput.dataset.maxQty = selectedRow.qty;
       qtyInput.placeholder = `最多 ${selectedRow.qty}`;
       if (selectedRow.location !== location) {
-        nextText = `已选中 ${selectedRow.location} 的库存明细，当前库位框里显示的是 ${location || "空"}，请以选中明细为准或重新选择。`;
+        nextText = `已选中 ${selectedRow.location} 的库存明细，请继续输入数量。`;
       } else if (qty !== null && qty > Number(selectedRow.qty || 0)) {
         nextText = "数量超过现有库存，请改小。";
       } else if (operationType === "move" && targetLocation && targetLocation === location) {
         nextText = "目标库位不能和原库位相同。";
       } else {
-        nextText = `现有库存 ${selectedRow.qty}，请输入本次数量。`;
+        nextText = `现有库存 ${selectedRow.qty}，请继续输入数量。`;
       }
     } else {
       delete qtyInput.dataset.maxQty;
       qtyInput.placeholder = "先选择库存明细";
-      nextText = operationType === "move" ? "先选择要移库的库存。" : "先选择要出库的库存。";
+      nextText = operationType === "move" ? "请先选择要移库的库存明细。" : "请先选择要出库的库存明细。";
     }
     ready = !!selectedRow && qty !== null && qty > 0 && qty <= Number(selectedRow.qty || 0);
     if (operationType === "move") {
@@ -1026,6 +1032,12 @@ function updateCountPreview() {
   renderSelectedCountInfo();
 }
 
+function countEmptyText() {
+  const keyword = $("#countStockSearch")?.value.trim();
+  if (!keyword) return "请先扫码或输入物料编码、批号、库位，查询盘点库存。";
+  return "未找到可盘点库存，请确认物料编码、批号或库位是否正确。";
+}
+
 function scheduleCountStockLoad() {
   clearTimeout(countStockTimer);
   countStockTimer = setTimeout(loadCountStockRows, 180);
@@ -1084,7 +1096,7 @@ function renderCountStockList(rows = []) {
           </div>
         </button>`;
       }).join("")
-    : emptyHtml();
+    : `<div class="empty-state">${escapeHtml(countEmptyText())}</div>`;
 }
 
 function selectCountStock(event) {
@@ -1532,7 +1544,7 @@ function renderStockRows(rows) {
           </tbody>
         </table>
       </div>`
-    : emptyHtml();
+    : `<div class="empty-state">当前没有库存数据。你可以先从库存页搜索物料、批号或库位。</div>`;
 }
 
 function renderStockPager() {
