@@ -1168,7 +1168,7 @@ function renderPermissions() {
   $(".tabbar").classList.toggle("hidden", !loggedIn);
   $("#passwordWarning")?.classList.toggle("hidden", !passwordWarning);
   $$(".view").forEach((item) => item.classList.toggle("hidden", !loggedIn));
-  $("#accountBadge").textContent = loggedIn ? `${currentUser().id} / ${roleLabel(currentUser().role)}` : "未登录";
+  $("#accountBadge").textContent = loggedIn ? `${currentUser().id} / ${roleLabel(currentUser().role)}` : "\u672a\u767b\u5f55";
   if (!loggedIn) return;
   $$(".admin-only, .admin-view").forEach((item) => item.classList.toggle("hidden", !admin));
   $$(".keeper-only").forEach((item) => item.classList.toggle("hidden", !keeper));
@@ -1178,6 +1178,16 @@ function renderPermissions() {
     $("#operationTypeInput").value = "in";
   }
   const activeView = $(".view.active");
+  if (!activeView || activeView.classList.contains("hidden") || !canOpenView(activeView.id)) {
+    activateView("operate");
+  }
+}
+
+function renderUserSelect() {
+  // Login uses typed account/password. This render hook is kept for the wider render flow.
+}
+  // Login uses typed account/password. This render hook is kept for the wider render flow.
+}
   if (!activeView || activeView.classList.contains("hidden") || !canOpenView(activeView.id)) {
     activateView("operate");
   }
@@ -2340,23 +2350,13 @@ async function addUser(event) {
   }
   if (id.toLowerCase() === "admin" && password && sessionAuth.userId?.toLowerCase() === "admin") {
     sessionAuth = { ...sessionAuth, mustChangePassword: false };
-    sessionStorage.setItem(authKey, JSON.stringify(sessionAuth));
-  }
-  event.target.reset();
-  render();
-}
-
-function login() {
-  loginAsync();
-}
-
 async function loginAsync() {
   const userId = $("#loginUserInput").value.trim();
   const password = $("#loginPasswordInput").value;
   const button = $("#loginButton");
   if (button.dataset.busy === "1") return;
-  setButtonBusy(button, true, "登录中");
-  showToast("正在登录");
+  setButtonBusy(button, true, "\u6b63\u5728\u767b\u5f55");
+  showToast("\u6b63\u5728\u767b\u5f55");
   try {
     const response = await fetch("/api/login", {
       method: "POST",
@@ -2364,7 +2364,7 @@ async function loginAsync() {
       body: JSON.stringify({ userId, password })
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "账号或密码错误");
+    if (!response.ok) throw new Error(data.error || "\u8d26\u53f7\u6216\u5bc6\u7801\u9519\u8bef");
     Object.assign(state, migrateState({ ...defaultState(), ...(data.state || {}) }));
     state.currentUserId = data.user.id;
     saveSessionAuth(data.user.id, data.token, data.expiresAt, data.mustChangePassword);
@@ -2376,11 +2376,21 @@ async function loginAsync() {
     $("#accountBadge").textContent = `${data.user.id} / ${roleLabel(data.user.role)}`;
     renderPermissions();
     render();
-    showToast(`登录成功，当前用户：${data.user.id}`);
+    showToast(`\u767b\u5f55\u6210\u529f\uff0c\u5f53\u524d\u7528\u6237\uff1a${data.user.id}`);
     if (data.mustChangePassword) {
       activateView("users");
-      showToast("管理员仍在使用默认密码，请先修改密码");
+      showToast("\u7ba1\u7406\u5458\u4ecd\u5728\u4f7f\u7528\u9ed8\u8ba4\u5bc6\u7801\uff0c\u8bf7\u5148\u4fee\u6539\u5bc6\u7801");
     }
+  } catch (error) {
+    showToast(error?.message || "\u767b\u5f55\u5931\u8d25\uff0c\u8bf7\u91cd\u8bd5");
+  } finally {
+    setButtonBusy(button, false);
+  }
+}
+
+function logout() {
+
+function logout() {
   } catch (error) {
     showToast(error?.message || "登录失败，请重试");
   } finally {
