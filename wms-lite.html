@@ -52,7 +52,7 @@
         管理员仍在使用默认密码，请到“账号权限”修改后再正式使用。
       </section>
 
-      <nav class="tabbar" aria-label="主导航">
+      <nav class="tabbar hidden" aria-label="主导航">
         <button class="tab active" data-view="operate" type="button">作业</button>
         <button class="tab keeper-only" data-view="count" type="button">盘点</button>
         <button class="tab" data-view="stock" type="button">库存</button>
@@ -63,7 +63,7 @@
         <button class="tab admin-only" data-view="audit" type="button">修改记录</button>
       </nav>
 
-      <section class="view active" id="operate">
+      <section class="view active hidden" id="operate">
         <section class="panel action-panel">
           <form id="operationForm" class="form-grid">
             <label class="wide">
@@ -145,7 +145,7 @@
         </section>
       </section>
 
-      <section class="view" id="count">
+      <section class="view hidden" id="count">
         <section class="panel action-panel">
           <form id="countForm" class="form-grid">
             <div class="count-stock-list wide">
@@ -216,7 +216,7 @@
         </section>
       </section>
 
-      <section class="view" id="stock">
+      <section class="view hidden" id="stock">
         <section class="panel">
           <div class="toolbar stock-toolbar">
             <input id="stockSearch" type="search" placeholder="搜索库位、物料编码、名称、批号、状态" />
@@ -227,7 +227,7 @@
         </section>
       </section>
 
-      <section class="view admin-view" id="import">
+      <section class="view admin-view hidden" id="import">
         <section class="panel">
           <div class="panel-title">
             <h2>期初库存导入</h2>
@@ -249,7 +249,7 @@
         </section>
       </section>
 
-      <section class="view admin-view" id="master">
+      <section class="view admin-view hidden" id="master">
         <section class="split-grid">
           <div class="panel">
             <div class="panel-title">
@@ -299,7 +299,7 @@
         </section>
       </section>
 
-      <section class="view admin-view" id="users">
+      <section class="view admin-view hidden" id="users">
         <section class="panel">
           <div class="panel-title">
             <h2>账号与权限</h2>
@@ -320,7 +320,7 @@
         </section>
       </section>
 
-      <section class="view admin-view" id="logs">
+      <section class="view admin-view hidden" id="logs">
         <section class="panel">
           <div class="panel-title">
             <h2>出入库流水账</h2>
@@ -334,7 +334,7 @@
         </section>
       </section>
 
-      <section class="view admin-view" id="audit">
+      <section class="view admin-view hidden" id="audit">
         <section class="panel">
           <div class="panel-title">
             <h2>主数据修改记录</h2>
