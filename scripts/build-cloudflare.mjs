@@ -9,7 +9,6 @@ const files = [
   ["app.js", "app.js"],
   ["styles.css", "styles.css"],
   ["manifest.webmanifest", "manifest.webmanifest"],
-  ["_routes.json", "_routes.json"],
   ["sw.js", "sw.js"],
   ["assets/icon-192.png", "assets/icon-192.png"],
   ["assets/icon-512.png", "assets/icon-512.png"]
