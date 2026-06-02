@@ -6,7 +6,7 @@ const materialCache = new Map();
 const locationCache = new Map();
 
 const state = loadState();
-const frontendBuildVersion = "debug-login-f82ce52";
+const frontendBuildVersion = "debug-bind-20260603";
 let sessionAuth = loadSessionAuth();
 if (!sessionAuth.token || sessionAuth.userId !== state.currentUserId) state.currentUserId = "";
 let operationType = "in";
@@ -42,6 +42,32 @@ window.__loginJustCompleted = false;
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => bindLoginButton());
+} else {
+  bindLoginButton();
+}
+
+function bindLoginButton() {
+  const loginButton = document.getElementById("loginButton");
+  if (!loginButton) {
+    debugLogin("login button not found");
+    return;
+  }
+  debugLogin("login button found");
+  if (loginButton.dataset.bound === "1") {
+    debugLogin("login button already bound");
+    return;
+  }
+  loginButton.dataset.bound = "1";
+  loginButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    debugLogin("login button clicked");
+    login();
+  });
+  debugLogin("login button bind success");
+}
 
 function defaultState() {
   return {
@@ -2498,7 +2524,7 @@ $("#operationTypeInput").addEventListener("change", (event) => {
   updateOperationStockList();
 });
 
-$("#loginButton").addEventListener("click", login);
+bindLoginButton();
 $("#resetAdminButton").addEventListener("click", ensureAdminAccount);
 $("#logoutButton").addEventListener("click", logout);
 $("#skuInput").addEventListener("input", () => {
