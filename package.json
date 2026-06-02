@@ -1,0 +1,18 @@
+{
+  "name": "wms-lite",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-netlify.mjs",
+    "build:cloudflare": "node scripts/build-cloudflare.mjs",
+    "build:all": "node scripts/build-netlify.mjs && node scripts/build-cloudflare.mjs",
+    "start": "node backend/server.js"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^10.7.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

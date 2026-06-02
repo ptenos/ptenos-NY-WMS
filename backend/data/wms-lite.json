@@ -1,0 +1,2488 @@
+{
+  "materials": [
+    {
+      "sku": "400104080016",
+      "name": "MOSSERU 3per Tranexamic Acid Bright Booster Serum 2nd Generation 30ml"
+    },
+    {
+      "sku": "4001140053",
+      "name": "N-EASE Cooling Care Gel 30gr"
+    },
+    {
+      "sku": "4001140052",
+      "name": "N-EASE RelaxTouch Gel 30gr"
+    },
+    {
+      "sku": "400203110098",
+      "name": "GS 亮面气垫"
+    },
+    {
+      "sku": "400201010062",
+      "name": "The Originote Hyaluberry Lip Protect Serum SPF 50 PA+++ TO 防晒唇釉"
+    },
+    {
+      "sku": "400201050844",
+      "name": "RAECCA Glow Up Tint Energic"
+    },
+    {
+      "sku": "4001130046",
+      "name": "NPURE Licorice Bright and Glow Face Essence Sheet Mask (NA NBI) V2"
+    },
+    {
+      "sku": "400104080013",
+      "name": "The Originote Gluta Bright B3 Serum"
+    },
+    {
+      "sku": "400201050843",
+      "name": "RAECCA Glow Up Tint Active"
+    },
+    {
+      "sku": "400201050842",
+      "name": "RAECCA Glow Up Tint Joyful"
+    },
+    {
+      "sku": "400201050847",
+      "name": "RAECCA Glow Up Tint Brave"
+    },
+    {
+      "sku": "4001060013",
+      "name": "The Originote Ceramella Sunscreen"
+    },
+    {
+      "sku": "400201060393",
+      "name": "DEAR ME BEAUTY Airy Lip Matte Dear Marsha"
+    },
+    {
+      "sku": "400201060389",
+      "name": "DEAR ME BEAUTY Airy Lip Matte Dear Elsya"
+    },
+    {
+      "sku": "400201050845",
+      "name": "RAECCA Glow Up Tint Incredible"
+    },
+    {
+      "sku": "4001250004",
+      "name": "GRACE AND GLOW Bright & Smooth Deodorant Serum"
+    },
+    {
+      "sku": "400201020138",
+      "name": "Glowsophy Color Crush Juicy Tinted Lip Balm Strawberry Juice"
+    },
+    {
+      "sku": "400201060433",
+      "name": "Raecca Power Frosted Velvet Matte - 01. Kind Power"
+    },
+    {
+      "sku": "400104050002",
+      "name": "TO B5 祛痘精华"
+    },
+    {
+      "sku": "400201060436",
+      "name": "Raecca Power Frosted Velvet Matte - 04. Smart Power"
+    },
+    {
+      "sku": "400102010038",
+      "name": "THE ORIGINOTE Low pH Cicamide Facial Cleanser"
+    },
+    {
+      "sku": "400201060434",
+      "name": "Raecca Power Frosted Velvet Matte - 02. Honest Power"
+    },
+    {
+      "sku": "400103040013",
+      "name": "Milk Recipe Brightening Body Toner"
+    },
+    {
+      "sku": "400201060391",
+      "name": "DEAR ME BEAUTY Airy Lip Matte Dear Felice"
+    },
+    {
+      "sku": "400104110003",
+      "name": "Grace and Glow Silky & Protect Care Hair Mist"
+    },
+    {
+      "sku": "400201060392",
+      "name": "DEAR ME BEAUTY Airy Lip Matte Daisy"
+    },
+    {
+      "sku": "400201060348",
+      "name": "GLOWSOPHY Watermelon Daily Lip SPF 50 PA++++ Clear"
+    },
+    {
+      "sku": "4001250006",
+      "name": "ProtecTEA+ AI Smart Odor Control Antiperspirant Deodorant"
+    },
+    {
+      "sku": "4001190015",
+      "name": "THE ORIGINOTE Brightening Moisturizer"
+    },
+    {
+      "sku": "400101020021",
+      "name": "NPURE Power Gentle & Hydrate Micellar Water 300ml 保湿卸妆水300ml"
+    },
+    {
+      "sku": "4001140049",
+      "name": "Milk Recipe Bright & Smooth Axillary Cream"
+    },
+    {
+      "sku": "400101020035",
+      "name": "NPURE Acne Power Clear Micellar Water 50 ML - V2"
+    },
+    {
+      "sku": "400201050869",
+      "name": "RAECCA Glow Up Tint Dynamic"
+    },
+    {
+      "sku": "400201050841",
+      "name": "RAECCA Glow Up Tint Strong"
+    },
+    {
+      "sku": "400201020141",
+      "name": "Glowsophy Color Crush Juicy Tinted Lip Balm Fig Juice"
+    },
+    {
+      "sku": "400201020139",
+      "name": "Glowsophy Color Crush Juicy Tinted Lip Balm Cherry Juice"
+    },
+    {
+      "sku": "400201050870",
+      "name": "RAECCA Glow Up Tint Gorgeous"
+    },
+    {
+      "sku": "400201050871",
+      "name": "RAECCA Glow Up Tint Confident"
+    },
+    {
+      "sku": "400101020001",
+      "name": "Sea Makeup卸妆水"
+    },
+    {
+      "sku": "400101020029",
+      "name": "Sea Makeup Lock It Matte Acne Setting Spray"
+    },
+    {
+      "sku": "4001190027",
+      "name": "SHOWTY Cloud Screen Moisturizer"
+    },
+    {
+      "sku": "400101020018",
+      "name": "NPURE Acne Power Clear Micellar Water 300ML  NP卸妆水300ml"
+    },
+    {
+      "sku": "400201060345",
+      "name": "SEA MAKE UP On & On Lip Mousse Sabrina"
+    },
+    {
+      "sku": "400201060349",
+      "name": "GLOWSOPHY Watermelon Daily Lip SPF 50 PA++++ Pink Pout"
+    },
+    {
+      "sku": "400105020045",
+      "name": "Glowsophy Mulberry Ceramide Barrier Moisturizer 100ML"
+    },
+    {
+      "sku": "400201020140",
+      "name": "Glowsophy Color Crush Juicy Tinted Lip Balm Raspberry Juice"
+    },
+    {
+      "sku": "400101020027",
+      "name": "NPURE Acne Power Clear Micellar Water 300ML NP卸妆水(ALFAMART) 300ml"
+    },
+    {
+      "sku": "4001200031",
+      "name": "Milk Recipe Gentle Feminine Wash"
+    },
+    {
+      "sku": "400203010099",
+      "name": "ARTISANPRO CASHMERE SUPREME Ultra Cover Liquid Foundation W20 - Nude 10ml"
+    },
+    {
+      "sku": "4001200029",
+      "name": "Grace and Glow Brightening Solution Body Wash Refill Pouch 380 mL 美白沐浴露"
+    },
+    {
+      "sku": "400203110104",
+      "name": "Glowsophy Cover Fit Serum Cushion - Maple"
+    },
+    {
+      "sku": "400203010072",
+      "name": "MERCREDI LUMISILK Flawless Luminous Skin Tint W20 - SAND 30ML"
+    },
+    {
+      "sku": "4001230008",
+      "name": "The Originote Low pH Cicamide Facial Cleanser 70ml"
+    },
+    {
+      "sku": "400201060372",
+      "name": "SOMETHINC Forever Stay LightComfort Lip Matte 01 Nude"
+    },
+    {
+      "sku": "400101020026",
+      "name": "NPURE Oil-Infused Micellar Water 50 ML"
+    },
+    {
+      "sku": "400203010094",
+      "name": "ARTISANPRO CASHMERE SUPREME Ultra Cover Liquid Foundation O15 - Shell 10ml"
+    },
+    {
+      "sku": "4001130044",
+      "name": "NPURE Marigold Anti-Aging Youth Defense Face Essence Sheet Mask"
+    },
+    {
+      "sku": "400203010038",
+      "name": "SEA MAKE UP Soft Focus Skin Perfector Tint Granita"
+    },
+    {
+      "sku": "400104110001",
+      "name": "Lab on Hair Hair Ampoule"
+    },
+    {
+      "sku": "400203140023",
+      "name": "ROSE ALL DAY COSMETICS The Powerpuff Girls x Rose all day Eyeshadow The Communicator - REWORK"
+    },
+    {
+      "sku": "400105020044",
+      "name": "Glowsophy Mulberry Ceramide Barrier Moisturizer 30ml"
+    },
+    {
+      "sku": "4001110056",
+      "name": "N-EASE Relax Touch Gel"
+    },
+    {
+      "sku": "400201060344",
+      "name": "SEA MAKE UP On & On Lip Mousse Delilah"
+    },
+    {
+      "sku": "400201060346",
+      "name": "SEA MAKE UP On & On Lip Mousse Marea"
+    },
+    {
+      "sku": "4001230006",
+      "name": "SELFMOLOGY Oil Control Cleanser"
+    },
+    {
+      "sku": "4001200033",
+      "name": "MOSSERU TRANEXAMIC ACID BRIGHT SHOWER GEL 1000ml"
+    },
+    {
+      "sku": "400201070374",
+      "name": "SOMETHINC Checkmatte Transferproof Lipstick - 04 Grandmaster"
+    },
+    {
+      "sku": "400104050020",
+      "name": "NPURE Cica Acne Spot 20gr"
+    },
+    {
+      "sku": "4001110064",
+      "name": "SEMUA CARE Massage Gel Base"
+    },
+    {
+      "sku": "400105020050",
+      "name": "AL AMIN  Calm Glow Moisturizer 50ml"
+    },
+    {
+      "sku": "4001140036",
+      "name": "GRACE AND GLOW Brightening Sun Body Serum"
+    },
+    {
+      "sku": "400201070165",
+      "name": "RAECCA The Bloom Perfect Matte Lipstick- 05. Orchid"
+    },
+    {
+      "sku": "400201040128",
+      "name": "RAECCA OVER THE GLAZE - LIP VINYL 06 OVER DRAMA 3ml"
+    },
+    {
+      "sku": "400104110002",
+      "name": "Grace and Glow Peony Blush Heat Care Hair Mist"
+    },
+    {
+      "sku": "4001240002",
+      "name": "Grace and Glow Daisy Hair Mist 100ML (Rework)"
+    },
+    {
+      "sku": "4001200035",
+      "name": "MOSSERU TRANEXAMIC ACID BRIGHT SHOWER GEL 500ml"
+    },
+    {
+      "sku": "400201060429",
+      "name": "FEYRELY Ultimatte Lip Cream - 11 Choco Gravel"
+    },
+    {
+      "sku": "400201040127",
+      "name": "RAECCA OVER THE GLAZE - LIP VINYL 05 OVER REACT 3ml"
+    },
+    {
+      "sku": "400201060454",
+      "name": "Rose All Day Cosmetics - Slip Velvet Lip Ink Flex"
+    },
+    {
+      "sku": "400201060448",
+      "name": "Rose All Day Cosmetics - Slip Velvet Lip Ink Enigma"
+    },
+    {
+      "sku": "400201060441",
+      "name": "Rose All Day Cosmetics - Slip Velvet Lip Ink Potrait"
+    },
+    {
+      "sku": "4001110054",
+      "name": "HAIRMONY Scalp Treatment Hair Tonic Serum"
+    },
+    {
+      "sku": "400201060444",
+      "name": "Rose All Day Cosmetics - Slip Velvet Lip Ink Zen"
+    },
+    {
+      "sku": "4001200032",
+      "name": "MOSSERU PROPOLIS SALICYLIC ACID SHOWER GEL 1000ml"
+    },
+    {
+      "sku": "400105020048",
+      "name": "GROGLO Artemisia Hydro Burst Rescue Moisturizer"
+    },
+    {
+      "sku": "400201060390",
+      "name": "DEAR ME BEAUTY Airy Lip Matte Dear Tasya"
+    },
+    {
+      "sku": "4001200034",
+      "name": "MOSSERU PROPOLIS SALICYLIC ACID SHOWER GEL 500ml"
+    },
+    {
+      "sku": "400201070166",
+      "name": "RAECCA The Bloom Perfect Matte Lipstick- 06. Dahlia"
+    },
+    {
+      "sku": "4001200026",
+      "name": "Grace and Glow English Pear and Freesia Anti Acne Solution Body Wash GNG英国梨沐浴露"
+    },
+    {
+      "sku": "400101020023",
+      "name": "NPURE Power Gentle & Hydrate Micellar Water 50 ML"
+    },
+    {
+      "sku": "400201060379",
+      "name": "SOMETHINC Forever Stay LightComfort Lip Matte 08 Chai"
+    },
+    {
+      "sku": "4001140056",
+      "name": "JEUNE FEN Black Opium Collagen Body Lotion"
+    },
+    {
+      "sku": "400201040093",
+      "name": "NAMA Dewly Plump Lip Gloss 02 Mocha Melt"
+    },
+    {
+      "sku": "400201060382",
+      "name": "SOMETHINC Forever Stay LightComfort Lip Matte 11 GGWP"
+    },
+    {
+      "sku": "400201060375",
+      "name": "SOMETHINC Forever Stay LightComfort Lip Matte 04 Dolce"
+    },
+    {
+      "sku": "400103040004",
+      "name": "The Originote Hyalucera Moisturizer"
+    },
+    {
+      "sku": "400203010090",
+      "name": "ARTISANPRO CASHMERE SUPREME Ultra Cover Liquid Foundation O20 - Ecru 10ml"
+    },
+    {
+      "sku": "400201060373",
+      "name": "SOMETHINC Forever Stay LightComfort Lip Matte 02 Cozy"
+    },
+    {
+      "sku": "400201070449",
+      "name": "SOMETHINC Checkmatte Transferproof Lipstick - 06 Mage"
+    },
+    {
+      "sku": "400203070231",
+      "name": "PIXY CHEEKY FIT SERUM BLUSH 02 Mauve Tiara"
+    },
+    {
+      "sku": "400201060383",
+      "name": "SOMETHINC Forever Stay LightComfort Lip Matte 12 Xoxo"
+    },
+    {
+      "sku": "400201060377",
+      "name": "SOMETHINC Forever Stay LightComfort Lip Matte 06 Baby"
+    },
+    {
+      "sku": "4001110057",
+      "name": "N-EASE Cooling Care Gel"
+    },
+    {
+      "sku": "400201051305",
+      "name": "LUXCRIME Ultra Light Lip Stain Glasstonberry"
+    },
+    {
+      "sku": "400201070702",
+      "name": "ONLYOU All-Day Wear Powdery Matte Lipstick P04 Blossom"
+    },
+    {
+      "sku": "400201040115",
+      "name": "MOTHER OF PEARL G.W.S (Gleaming, Wonderful, Shiny) Plump Gloss - 03 Berryphoria"
+    },
+    {
+      "sku": "400101020019",
+      "name": "NPURE Acne Power Clear Micellar Water 100ML"
+    },
+    {
+      "sku": "400201050503",
+      "name": "DEAR ME BEAUTY Hydraglow Lip Stain Dear Ayu"
+    },
+    {
+      "sku": "400101020033",
+      "name": "NPURE Power Gentle & Hydrate Micellar Water 100ml V2 (BOTTLE w/ HALAL)"
+    },
+    {
+      "sku": "4001230005",
+      "name": "DermDiamond Beauty White Truffle Facial Wash 70ml"
+    },
+    {
+      "sku": "400101020025",
+      "name": "NPURE Oil-Infused Micellar Water 300 ML"
+    },
+    {
+      "sku": "400201050819",
+      "name": "MOTHER OF PEARL AM To PM Colorfast Hypertint Golden Hour"
+    }
+  ],
+  "locations": [
+    {
+      "code": "A-1-1-1",
+      "status": "占用"
+    }
+  ],
+  "stock": [
+    {
+      "id": "28b24ea3-5116-49e0-9aff-81b06b33713d",
+      "sku": "400104080016",
+      "batch": "B05001",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 35513,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "88b18732-3b43-4488-8cb4-7e36fb59ba78",
+      "sku": "4001140053",
+      "batch": "B03071",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 35280,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "d5fce75e-52ca-4a2a-aaa6-3ea03835605c",
+      "sku": "4001140053",
+      "batch": "B03069",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 34758,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "8b63bc33-ad2a-4494-b393-fc14528707a8",
+      "sku": "4001140052",
+      "batch": "B03072",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 33676,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "2a3f5361-1aac-4fea-9327-18b1ed59c4ba",
+      "sku": "4001140052",
+      "batch": "B03117",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 33600,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "e7807408-f65c-4dbb-b87b-6b11b3196a4f",
+      "sku": "4001140052",
+      "batch": "B03109",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 33444,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "7cad1271-fd1b-4d23-882f-a6e5f4428689",
+      "sku": "4001140052",
+      "batch": "B03070",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 33332,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "e444f909-f4be-4554-8709-59b91ce6a961",
+      "sku": "4001140052",
+      "batch": "B03095",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 29324,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "57ff4131-2820-466a-91a8-ae008aa44224",
+      "sku": "400203110098",
+      "batch": "B04087",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 28372,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "7c0b68c8-f9f7-4736-9e1b-b8aac367fd88",
+      "sku": "400201010062",
+      "batch": "B05086",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 26880,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "89c75ee9-f60a-490e-8a2c-445199c93f24",
+      "sku": "400201050844",
+      "batch": "B03174",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 26481,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "b7f5ca8c-53cb-4cfc-a38d-70bd9c13fe7b",
+      "sku": "400201010062",
+      "batch": "B05087",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 26304,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "7c4ebbdf-1fc1-4b92-b3ef-190d321b474e",
+      "sku": "4001130046",
+      "batch": "SBE027H",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 38056,
+      "version": 3,
+      "updatedAt": "2026-05-29T02:35:51.875Z"
+    },
+    {
+      "id": "8538bbb7-1a1c-49c3-bdbe-42d7127cc7b2",
+      "sku": "400201010062",
+      "batch": "B05085",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 23880,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "e2af8390-2dba-44e2-aef1-5b283c763fb1",
+      "sku": "400104080013",
+      "batch": "BBB1606.3",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 23040,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "0358e9ef-7332-44b0-8922-643410eb3136",
+      "sku": "400201050843",
+      "batch": "B04127",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 52876,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "86f49be6-e873-49e1-9f4e-0e0c22636f1b",
+      "sku": "400201050842",
+      "batch": "B04206",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 24981,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "7a72a94f-a746-4269-9f40-a2877618137c",
+      "sku": "400201050847",
+      "batch": "B04113",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 38296,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "f1b87c3c-369e-4fe8-a291-0f26be26c4d2",
+      "sku": "4001060013",
+      "batch": "BDE2038",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 19052,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "68ed083c-e2b6-49f6-80bb-5364ac464c8d",
+      "sku": "400201010062",
+      "batch": "B05032",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 18985,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "1f4ab196-53b1-4971-874a-474c1ea07062",
+      "sku": "400201060393",
+      "batch": "B01017",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 18616,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "e75ab8c6-92ec-4c1a-82d0-dd9914b4081e",
+      "sku": "400201060389",
+      "batch": "B01015",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 17464,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "0ea60f93-d5ab-48ce-a4ed-a58eca114458",
+      "sku": "400201050845",
+      "batch": "B05007",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 16558,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "dec1b1fa-83ba-4d02-a45a-9a6cea3fa4df",
+      "sku": "4001250004",
+      "batch": "B01107",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 16480,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "e2bb742b-a1eb-499d-a52d-b1aca41ea190",
+      "sku": "400203110098",
+      "batch": "B04088",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 18213,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "52f6fd5a-4fe1-492d-9e83-d8c8367d55e1",
+      "sku": "400201020138",
+      "batch": "B05084",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 15009,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "3d49bada-126a-4b7f-9253-ecadaacd999d",
+      "sku": "400201050845",
+      "batch": "B04145",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 24992,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "b6989247-1169-4b16-9bb0-1c9a35107846",
+      "sku": "400201060433",
+      "batch": "B03145",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 14490,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "0ac98b63-c76d-45b5-a679-c4d924900d1c",
+      "sku": "400104050002",
+      "batch": "BCJ2302",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 14288,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "6620c4bf-4d5a-4208-ae1b-ade69e513c0d",
+      "sku": "400201060436",
+      "batch": "B03139",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 13995,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "41d2cbbc-23da-4bce-b83a-e4fd1bdac797",
+      "sku": "400102010038",
+      "batch": "SBE117B",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 13661,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "9c01fc7d-7c6e-4853-83e4-5588230cc661",
+      "sku": "400201060434",
+      "batch": "B03140",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 13349,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "6cdddf17-156c-47ed-8fad-320e4ba00910",
+      "sku": "400103040013",
+      "batch": "B03136",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 13257,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "bbb543c3-61d9-439f-a949-ebbe6a3a71fc",
+      "sku": "400201010062",
+      "batch": "B05043.",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 12905,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "9f72aa3c-0e46-4d34-bb33-4f5afe4c032f",
+      "sku": "400201010062",
+      "batch": "B05043",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 12809,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "5cd7f8d9-e73c-447f-8786-48b3bd83cdc0",
+      "sku": "4001250004",
+      "batch": "B03132",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 12765,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "79895037-53f8-4d5b-88aa-1612fc479364",
+      "sku": "400201050842",
+      "batch": "B04112",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 22285,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "759df7ce-eac9-4fb1-9d72-791662d7a9be",
+      "sku": "400201060391",
+      "batch": "B01018",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 12280,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "d000b98c-0f7e-4a1e-95fa-b7971f259b76",
+      "sku": "400104110003",
+      "batch": "B05010",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 11791,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "5736a9c2-2458-485c-bec7-6dd0ccfae6c1",
+      "sku": "400201060392",
+      "batch": "B01013",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 11760,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "a06d9a05-ba0f-4e4f-ae14-9b93451a4777",
+      "sku": "4001140052",
+      "batch": "B03217",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 11715,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "88118384-fb39-49df-b83e-eb7aa7a5f95e",
+      "sku": "400201060348",
+      "batch": "B01029",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 11712,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "3a27994d-81f8-46cf-9ebd-d1be2a05fb01",
+      "sku": "4001250006",
+      "batch": "B04208",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 11142,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "3f7131eb-2c4b-42dd-8115-aab3f285226b",
+      "sku": "400201050844",
+      "batch": "B03174.",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 10690,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "ec446642-2a31-4c0e-9e44-8bcd3a7c187f",
+      "sku": "4001190015",
+      "batch": "SBE050G",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 11592,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "6a0d28f7-66c9-4087-9c59-8f6d636c4e8b",
+      "sku": "400101020021",
+      "batch": "SBE059C",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 10248,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "1c5df1e2-b45e-4a82-b8d4-86cdcd639014",
+      "sku": "4001140049",
+      "batch": "B03037",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 14716,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "b9ab04d4-b95d-425e-99d7-85d1c6f922c9",
+      "sku": "400101020035",
+      "batch": "SBE005E",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 10128,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "fceaec2d-f6ca-43dd-9966-c23aba12ba4c",
+      "sku": "400201050869",
+      "batch": "B03148",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 18314,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "03948f9c-2c1c-45e8-8a16-5640500c37ba",
+      "sku": "400201050841",
+      "batch": "B04096",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 15027,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "1771464e-d579-4a27-bea1-b953d042a3cd",
+      "sku": "400201020141",
+      "batch": "MBE040C",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 10008,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "52a52120-f87c-4680-92f7-36476055a4d9",
+      "sku": "400201020139",
+      "batch": "MBE041C",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 10008,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "03f88ea1-6862-4725-b53e-8cd2a79d03d5",
+      "sku": "400101020035",
+      "batch": "SBE005D",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 10008,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "33900490-dbfb-46b9-8d9f-77bbdcfa3c63",
+      "sku": "400201050870",
+      "batch": "B04083",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 20006,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "ab7a1d5d-eee2-421e-820b-ed6843d7cf5e",
+      "sku": "400201060436",
+      "batch": "B05021",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 10002,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "487bbb6f-c807-49e0-900e-11618b656cb0",
+      "sku": "400201050871",
+      "batch": "B04183",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 19839,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "1127ac93-2760-42f2-a3ec-e85ff47e7137",
+      "sku": "400101020001",
+      "batch": "BDD1436",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 9984,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "5e53cdcf-59e9-494a-a2e6-8f0cb6b45835",
+      "sku": "400101020001",
+      "batch": "BDD2135",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 9974,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "6e8cdd49-c6dc-46db-ae6c-c481e29d5ae5",
+      "sku": "400101020029",
+      "batch": "SBE020F",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 9960,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "a9a8eac9-6f1c-4f77-bd3a-fa31d6d7a2bd",
+      "sku": "4001190027",
+      "batch": "BCK1902",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 9786,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "cae19dce-dee0-4bc6-a6ef-fde39a0cc297",
+      "sku": "400101020018",
+      "batch": "SBE061E",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 9668,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "8cb3311f-640d-4666-b6f8-d91daf3436c9",
+      "sku": "400201060345",
+      "batch": "A10014",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 9469,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "65f8d7a2-61c1-4411-ad26-6c0cef7bb20e",
+      "sku": "400201050847",
+      "batch": "B04086",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 11998,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "bf5768ee-3705-4e8e-972d-320db397b283",
+      "sku": "4001250006",
+      "batch": "B04047",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 9328,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.666Z"
+    },
+    {
+      "id": "c5d8b845-a69d-4d63-b40c-25f3ff14d6a1",
+      "sku": "400201060349",
+      "batch": "B02120",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 15131,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "39f55e41-37d8-4616-a07b-88a3fc9d5eb4",
+      "sku": "400201010062",
+      "batch": "B05023.",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 9000,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "3de4e584-a2ea-4bb6-be7b-5cb3bf01b264",
+      "sku": "400105020045",
+      "batch": "B04203",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 8964,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "9ebc3546-3415-41ef-9094-d9830d5f26e7",
+      "sku": "400103040013",
+      "batch": "B04002",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 8880,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "94887401-ae02-4ab6-bc05-fbbe5b0d0800",
+      "sku": "400201050869",
+      "batch": "B04171",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 8034,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "6c239f71-d26d-407d-8ac0-fa265717a7f7",
+      "sku": "400201020140",
+      "batch": "MBE033C",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 8016,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "6a409601-7ca4-4749-9118-d203a982a354",
+      "sku": "400101020018",
+      "batch": "SBE137E",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 9198,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "be0c9b6d-acd9-4412-80b1-5c5f65b3799a",
+      "sku": "400201050843",
+      "batch": "B03105",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 10629,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "c166f7ba-06da-4298-8864-ddbba0527634",
+      "sku": "400101020035",
+      "batch": "B04072",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 7248,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "7f8cb8fd-589c-415c-a416-109d1ac9c52e",
+      "sku": "400101020027",
+      "batch": "SBE061E",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 7070,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "a8c94116-0b94-4d33-b77e-0053931529ab",
+      "sku": "400201010062",
+      "batch": "B05032.",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 6912,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "1bd4454e-1d8b-4425-939d-b2996a558cdd",
+      "sku": "400201010062",
+      "batch": "B05023",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 6720,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "fd227774-0a74-4639-8424-fa510dc97aa5",
+      "sku": "4001200031",
+      "batch": "SBE037K",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 6720,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "ceec3dec-8325-4fb4-b951-03460f8ab222",
+      "sku": "4001190015",
+      "batch": "SBE050D",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 10284,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "9868e86f-22ef-4cdf-8d52-1f879d58c4eb",
+      "sku": "400203010099",
+      "batch": "B03159",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 6659,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "19381097-1234-4c3d-8560-df7e4b1304c4",
+      "sku": "4001200029",
+      "batch": "SBE035G",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 6604,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "b93f3e37-eb26-4bd3-b998-14c201696916",
+      "sku": "400203110104",
+      "batch": "B05008",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 6336,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "1a174680-259e-4fe1-9512-a1e9617f0cba",
+      "sku": "400203010072",
+      "batch": "B01111",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 6214,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "598b267e-7ef2-4621-8218-76bb2b504fcc",
+      "sku": "4001230008",
+      "batch": "B04143",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 5913,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "7ce7df9b-9d0c-4299-8eda-7abd313a80ec",
+      "sku": "400201060372",
+      "batch": "BDD0935",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 11300,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "712c5a97-0e18-4152-b284-911550a781f1",
+      "sku": "400103040013",
+      "batch": "B03038",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 6162,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "c6149e56-8c22-446f-854a-f34657d051d5",
+      "sku": "400101020026",
+      "batch": "B05075.",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 5616,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "23bcd2e8-6fe9-4d8c-9e7a-381156ef5c2f",
+      "sku": "4001230008",
+      "batch": "B04059",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 5494,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "4b2bac32-b60e-41d5-8a87-33b7f4fec91d",
+      "sku": "400203010094",
+      "batch": "B03047",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 5452,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "fd99fe96-c124-48bd-9788-5694edec9a4a",
+      "sku": "4001130044",
+      "batch": "B05077",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 5376,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "1f9c8114-a851-493c-ac53-95559f45a3ff",
+      "sku": "400203010038",
+      "batch": "MBE002C",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 5040,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "ea25a993-a1d2-4e38-a1c2-8551cf2dcfc1",
+      "sku": "400104110001",
+      "batch": "SBE116G",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 4992,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "8a18f917-d720-4357-a437-23080bc06378",
+      "sku": "400203140023",
+      "batch": "DCI0901",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 4981,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "38fb2b18-c736-4c80-85ff-ef09bcbe61c5",
+      "sku": "400105020044",
+      "batch": "A12088",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 4896,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "9090ca3f-05f4-4a4f-9556-9d429d7136b3",
+      "sku": "4001110056",
+      "batch": "B03095",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 4799,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "5e5acc1e-4a16-4f3c-b5f0-920bce28665d",
+      "sku": "400201060344",
+      "batch": "A10013",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 4617,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "7b2643e6-3523-4577-8aa4-29e99c0a0e9d",
+      "sku": "4001130046",
+      "batch": "SBE026H",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 7680,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "b27d0a4d-d3cd-4099-b5aa-23ea01e0032e",
+      "sku": "400201060346",
+      "batch": "A11007",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 4602,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "2aca30d9-4258-449f-b7e9-04483510f226",
+      "sku": "4001130044",
+      "batch": "B05047",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 83,
+      "version": 3,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "45f2bbea-9a34-4f4b-a681-56ca7ba2d1ce",
+      "sku": "400105020045",
+      "batch": "SBE132B",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 4327,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "0c891a9e-dc06-4046-9528-b360e8c71aa9",
+      "sku": "4001230006",
+      "batch": "B02065",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 4165,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "01152378-5872-46b1-8a51-6626795f02c4",
+      "sku": "400101020021",
+      "batch": "SBE059E",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 4102,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "eecfe2f7-ee9d-4e8f-bb05-a5a77665e32e",
+      "sku": "4001200033",
+      "batch": "SBE190D",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 4062,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "feefdcdc-f693-4da4-a990-b4978709a244",
+      "sku": "400201070374",
+      "batch": "B04063",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 4032,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "47cc3898-be4d-485d-ab92-9eb4136787ee",
+      "sku": "400104050020",
+      "batch": "SBE010E",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 4026,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "65988ce4-6780-4997-90e1-daca6c84e0e7",
+      "sku": "400101020026",
+      "batch": "B05075",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 5044,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "16ec3634-57fd-4fb7-9091-d95b777ec24e",
+      "sku": "400105020045",
+      "batch": "SBE132H",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 3900,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "25ed6227-d108-409e-ab44-a4054bb542a3",
+      "sku": "4001110064",
+      "batch": "SBE047J",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 3874,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "2a71f9dd-32a6-4802-86fd-12386fadf835",
+      "sku": "400105020050",
+      "batch": "SBE123G",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 3850,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "0a4a4351-b7e4-4ac4-b2eb-f0006e6270b3",
+      "sku": "4001140036",
+      "batch": "B03134",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 3711,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "79f7d2b3-8528-4ce4-bc15-a1eda2be665b",
+      "sku": "400105020050",
+      "batch": "SBE018G",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 3609,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "8e75a4e2-5461-4ac5-b348-11c7df3c8110",
+      "sku": "4001190015",
+      "batch": "SBE050E",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 3600,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "fd4ad1c4-1ef4-4d4c-a130-2b6b16f01caa",
+      "sku": "4001140052",
+      "batch": "B02173",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 3536,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "58334155-d2e8-4b52-a24b-cfe0e6a4c20b",
+      "sku": "400201070165",
+      "batch": "B03161",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 3488,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "c8597989-d711-494c-b67e-ae794746aaf8",
+      "sku": "400201040128",
+      "batch": "MBE113F",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 3402,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "c87ae18f-452f-42cb-af9d-295412168ff3",
+      "sku": "400104110002",
+      "batch": "B04105",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 3304,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "b246cda8-f744-4ac9-921d-3b40a3fbae6a",
+      "sku": "400103040013",
+      "batch": "B03126",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 3259,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "b2c97275-9b22-45f5-b336-23f3c3dfcfab",
+      "sku": "4001240002",
+      "batch": "B01024",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 3214,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "c3eadcb6-9bb4-4a1d-a110-98ad839305d2",
+      "sku": "400101020018",
+      "batch": "SBE140E",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 3168,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "2a91ec16-f00d-4cb6-a1f4-ace790090d39",
+      "sku": "4001200035",
+      "batch": "SBE188D",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 3164,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "ccff9531-a9b5-47a6-8148-314f750ef485",
+      "sku": "400104110001",
+      "batch": "SBE070F",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 3072,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "7b1ac79f-035d-4f3f-88b8-1699e6e068ac",
+      "sku": "400201060429",
+      "batch": "B05004",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 3040,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "4bc13149-568c-43a7-adf2-fca3ec7fcbb1",
+      "sku": "400201040127",
+      "batch": "MBE112F",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 3024,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "adf282b3-9dab-4db4-8d3b-407029b08ed4",
+      "sku": "4001250006",
+      "batch": "B04154",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 2980,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "dd7c073d-b3f7-4647-83ae-cd9d065e574b",
+      "sku": "400103040013",
+      "batch": "B03136.",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 2976,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "468c4d26-5745-4aed-a948-89f1b34ea648",
+      "sku": "400201060454",
+      "batch": "B03042",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 2949,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "e44b3852-0979-4552-86f6-19e404916e53",
+      "sku": "400201060448",
+      "batch": "B03041",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 2943,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "218fd51d-3abf-43b1-a61d-d643d30c96c6",
+      "sku": "400201060441",
+      "batch": "B03003",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 2930,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "3f28f336-1a05-47dc-86bd-6766a4bfd1d2",
+      "sku": "4001110054",
+      "batch": "B01114",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 2886,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "a62ff08e-e4df-48f5-8f50-dab2db6d8996",
+      "sku": "400101020018",
+      "batch": "SBE136E",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 2766,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "ae45200d-549e-47ef-ac66-43213f5da916",
+      "sku": "400201060444",
+      "batch": "B03004",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 2674,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "808e3ccc-509d-4ea7-9d01-e5d9341a9c8f",
+      "sku": "4001200032",
+      "batch": "SBE139C",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 2624,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "cf9f90f1-47d7-4d15-b31a-5778e94e9dda",
+      "sku": "400201050843",
+      "batch": "B01077",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 2397,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "491ce1f6-8d0b-473d-ba7e-0ad5d9aa1681",
+      "sku": "400101020027",
+      "batch": "B04072",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 2392,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "88ddd08a-d738-4af1-a6ce-bab5283af0a3",
+      "sku": "400105020050",
+      "batch": "SBE114G",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 2182,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "035b91fa-64d9-4e26-a810-912a2e8aa75c",
+      "sku": "400104110001",
+      "batch": "SBE116D",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 2174,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "bd7c17a7-e56b-4184-aecd-e876a5bfd971",
+      "sku": "400105020048",
+      "batch": "SBE212J",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 2156,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "c52e92aa-9170-4228-9e8b-e9e5070e69cb",
+      "sku": "400201060390",
+      "batch": "B01014",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 2008,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "313ea28d-5e77-4cac-9ba8-7e58870905a5",
+      "sku": "400201050842",
+      "batch": "B02080",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 1953,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "09c5547d-350f-4771-812c-71c026c17460",
+      "sku": "400201050843",
+      "batch": "B02023",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 1781,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "a7ab00cf-9401-45ae-aa35-a72f503db3cf",
+      "sku": "400101020018",
+      "batch": "BCG1128S",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 1693,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "bdcec870-9cb9-499a-bfee-beeaa9e2984a",
+      "sku": "4001200034",
+      "batch": "SBE186C",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 1608,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "dbf69b0d-ef8b-4958-b398-17509a8bafb9",
+      "sku": "400201050843",
+      "batch": "B02093",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 1519,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "4f7893cf-51d1-4a2f-bd7f-e582a22ed947",
+      "sku": "4001250004",
+      "batch": "B02007",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 1392,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "29812d79-c3a0-4b4f-a1ea-796ed1343070",
+      "sku": "400201070166",
+      "batch": "B03149",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 1316,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "92f9cdec-a9a3-4bba-bf37-f19c50c76785",
+      "sku": "4001200033",
+      "batch": "SBE188D",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 1254,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "a3ff30be-ce7c-4dc7-a445-4488b8f14f57",
+      "sku": "4001200034",
+      "batch": "SBE187C",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 1242,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "a76fc385-faa4-4e21-b59f-778ac4091126",
+      "sku": "4001200026",
+      "batch": "SBE055C",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 1181,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "08ec3772-4d52-45dc-a7fa-d8c706a1a9f5",
+      "sku": "400201060392",
+      "batch": "B01013.",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 1152,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "0a7ed274-f89c-4f04-8999-e81688ec07c7",
+      "sku": "4001110056",
+      "batch": "B02153",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 974,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "03476bf2-df89-4707-9f84-ceaa29d7b625",
+      "sku": "400201060349",
+      "batch": "A12093",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 972,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "e44b1bb8-7210-49d8-8364-f631b1da0f45",
+      "sku": "4001200026",
+      "batch": "SBE013C",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 960,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "5be28dd9-fe34-4464-8697-131d04b2fb7e",
+      "sku": "400101020023",
+      "batch": "SBE059F",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 960,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "8ca5c82a-9445-43b2-a4ac-7a725ba27205",
+      "sku": "4001200029",
+      "batch": "A11045",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 912,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "9f4bd970-d667-452a-afbb-f975c38a31dc",
+      "sku": "400201050871",
+      "batch": "B03057",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 862,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "a6658c2c-fdd4-4bab-8f6c-6954d959c720",
+      "sku": "400201060379",
+      "batch": "BCL3036R",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 849,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "3268c7a6-763d-4d58-8316-fe596522f969",
+      "sku": "4001140056",
+      "batch": "B03192",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 821,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "463b6cbe-50b9-4420-8c96-6e83e37516fa",
+      "sku": "400201040093",
+      "batch": "B02151",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 816,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "0337f037-f2d4-4dea-9a3c-f5abd9b2e5b5",
+      "sku": "400201060382",
+      "batch": "BDA0336R",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 721,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "f454d77c-70ae-46de-9f90-f31b25824e81",
+      "sku": "400201050843",
+      "batch": "B04149",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 702,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "00e6bec2-504c-4f66-9096-cc8d35ed029c",
+      "sku": "400201060375",
+      "batch": "BCL2839R",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 667,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "4cf8021a-34ed-43e7-8f25-82d093c11a39",
+      "sku": "400103040004",
+      "batch": "B02169",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 648,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "8685a169-3a70-4e48-882a-66b4e784e5b4",
+      "sku": "400101020027",
+      "batch": "SBE136E",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 624,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "9ce63519-1ec9-4289-8a91-71df241f97bf",
+      "sku": "4001200032",
+      "batch": "SBE192C",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 600,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "86659045-1fba-4300-a8d3-9bda711a07a7",
+      "sku": "400203010090",
+      "batch": "B03147",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 594,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "bd98aec0-1d01-4984-ac1d-65130abb6538",
+      "sku": "400201060372",
+      "batch": "BDA0535R",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 572,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "2e1683c5-0ab2-49cf-835e-367af96b6a46",
+      "sku": "400201060373",
+      "batch": "BCL2838R",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 535,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "78c596f8-f76a-4304-b6c4-19eb87b96814",
+      "sku": "400101020021",
+      "batch": "SBE053E",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 480,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "32d294a8-05a3-403b-ab2f-840eb3ec30bf",
+      "sku": "400201070449",
+      "batch": "BDB2036",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 475,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "f3c08329-d029-4ec3-9d4e-2954664bd7c7",
+      "sku": "400203070231",
+      "batch": "B02066",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 453,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "6e702861-5d7a-49a8-b7e2-6a700e738501",
+      "sku": "400201060383",
+      "batch": "BDA0335R",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 417,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "99e726d2-6290-43e9-bfb0-8df207bad25f",
+      "sku": "400201060377",
+      "batch": "BDA0235R",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 417,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "90b39da5-7167-400e-a831-59fdb48370b6",
+      "sku": "400104110001",
+      "batch": "B01044",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 411,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "b22236bf-8edf-4171-abcb-19c5b070e16a",
+      "sku": "400201050844",
+      "batch": "B03059",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 403,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "c0a20d0a-d820-4e12-b6f5-1a94769f108e",
+      "sku": "4001110057",
+      "batch": "B03069",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 396,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "593adc2e-a30a-4ae1-9e77-e6912d6b1191",
+      "sku": "400201051305",
+      "batch": "B03056",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 345,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "486133d7-7428-4830-bbe5-03cc885fad25",
+      "sku": "400201060436",
+      "batch": "B02134",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 288,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "542751ce-27e2-48bc-8762-2044d95b10f9",
+      "sku": "400201070702",
+      "batch": "BDD1435",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 277,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "aeb6e832-773f-4bed-b130-d6da28baf3df",
+      "sku": "400102010038",
+      "batch": "B05002",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 264,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "700431f0-4244-4718-a1bc-c4b446dc6b18",
+      "sku": "400102010038",
+      "batch": "B04177",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 239,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "63caf80b-a6f4-4a75-b879-0ed20bdf0536",
+      "sku": "4001110057",
+      "batch": "B04055",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 214,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "c2c8efe7-a951-456f-a73e-fca3b6d0ebbd",
+      "sku": "400201040115",
+      "batch": "B03227",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 144,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "a85a293c-6465-4c8b-924f-bd87147a1cc9",
+      "sku": "400101020019",
+      "batch": "B04076",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 144,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "893ccb22-14a8-4205-b5eb-6c58224c5ae1",
+      "sku": "4001060013",
+      "batch": "B01072.",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 140,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "47eeb0b0-4a1c-459e-9692-006b4a5ac49b",
+      "sku": "400201060377",
+      "batch": "BDD2235",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 128,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "3ec935fb-23cf-466b-864f-741778a05e27",
+      "sku": "400201050503",
+      "batch": "BDC0835",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 120,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "a43b4b01-5b7e-4455-9f8e-833c051f260d",
+      "sku": "400101020033",
+      "batch": "SBE059J",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 96,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "e1d5ad0e-7760-495c-8cad-fe370120be3e",
+      "sku": "4001110057",
+      "batch": "B03071",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 77,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "919eef57-cabe-43d2-80f2-dd41f2336878",
+      "sku": "4001230005",
+      "batch": "B04031",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 74,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "33816b40-7ce4-402d-87e7-b4055112e1be",
+      "sku": "400101020025",
+      "batch": "B05075",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 59,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "ca5cb46e-c344-46ba-8f7b-1ed4e75e7ddb",
+      "sku": "400201050819",
+      "batch": "B04191",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 45,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "59fe6bf1-dc35-40b8-afff-6acb3a2df629",
+      "sku": "4001230006",
+      "batch": "B02055",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 45,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "bc244301-eafb-4d0e-a16d-dac68df3a94b",
+      "sku": "400101020035",
+      "batch": "B04076",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 7,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "a3f127b7-7475-4254-b4ab-c6f561a566d0",
+      "sku": "400101020025",
+      "batch": "B05078.",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 4,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    },
+    {
+      "id": "5ad078c9-27f5-42e2-9fc4-46aad9402be7",
+      "sku": "400201070702",
+      "batch": "BCL0236",
+      "location": "A-1-1-1",
+      "status": "可用",
+      "qty": 3,
+      "version": 2,
+      "updatedAt": "2026-05-29T02:34:47.667Z"
+    }
+  ],
+  "logs": [
+    {
+      "id": "d1ca99af-58b8-41e5-9ee6-8f3a212453b6",
+      "time": "2026-05-29 09:35",
+      "operatorId": "admin",
+      "operatorName": "管理员",
+      "operator": "admin 管理员",
+      "type": "adjust",
+      "sku": "4001130046",
+      "batch": "SBE027H",
+      "qty": 38056,
+      "beforeQty": 38056,
+      "location": "A-1-1-1",
+      "targetLocation": "",
+      "status": "可用",
+      "note": "",
+      "gps": null
+    },
+    {
+      "id": "7432996e-d347-4b5e-bff6-42aee57f09f3",
+      "time": "2026-05-29T02:31:11.085Z",
+      "operator": "admin 管理员",
+      "type": "out",
+      "sku": "4001130044",
+      "batch": "B05047",
+      "qty": 4500,
+      "location": "成品仓FINISHED WH",
+      "targetLocation": "",
+      "status": "可用",
+      "note": "",
+      "gps": null
+    },
+    {
+      "id": "d9fca471-dcd2-401d-b658-3e5ff9aafd24",
+      "type": "initial",
+      "operator": "system",
+      "sku": "IMPORT",
+      "batch": "",
+      "qty": 194,
+      "beforeQty": null,
+      "location": "",
+      "targetLocation": "",
+      "status": "",
+      "note": "导入期初库存 194 条，来源 现存量查询.xlsx；原始有效行 221，拒绝 1937，总数量 1611596",
+      "time": "2026-05-28 22:25:22"
+    }
+  ],
+  "users": [
+    {
+      "id": "admin",
+      "name": "管理员",
+      "role": "admin",
+      "password": "admin123"
+    },
+    {
+      "id": "WH-001",
+      "name": "仓库员工",
+      "role": "employee",
+      "password": "123456"
+    },
+    {
+      "id": "WH-MGR",
+      "name": "仓管",
+      "role": "keeper",
+      "password": "123456"
+    }
+  ],
+  "currentUserId": "",
+  "auditLogs": [
+    {
+      "id": "d314e962-04a4-411e-a0ed-83703164bff5",
+      "time": "2026-05-29 11:47",
+      "operatorId": "admin",
+      "operatorName": "管理员",
+      "action": "修改物料",
+      "entity": "物料主数据",
+      "key": "400104080016",
+      "before": {
+        "sku": "400104080016",
+        "name": "MOSSERU 3per Tranexamic Acid Bright Booster Serum 2nd Generation 30ml"
+      },
+      "after": {
+        "sku": "400104080016",
+        "name": "MOSSERU 3per Tranexamic Acid Bright Booster Serum 2nd Generation 30ml"
+      },
+      "note": ""
+    }
+  ]
+}

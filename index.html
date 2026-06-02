@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>仓库AI秘书系统</title>
+    <link rel="stylesheet" href="./ai-secretary.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">AI</div>
+          <div>
+            <h1>仓库AI秘书</h1>
+            <p>消息收集 · 自动归类 · 日报提醒</p>
+          </div>
+        </div>
+
+        <nav class="nav-list" aria-label="主导航">
+          <button class="nav-item active" data-view="dashboard">总览</button>
+          <button class="nav-item" data-view="intake">消息入口</button>
+          <button class="nav-item" data-view="analysis">归类分析</button>
+          <button class="nav-item" data-view="tasks">任务提醒</button>
+          <button class="nav-item" data-view="daily">今日日报</button>
+        </nav>
+
+        <section class="status-panel">
+          <h2>当前方案</h2>
+          <div class="status-row"><span>收集方式</span><strong>表单半自动</strong></div>
+          <div class="status-row"><span>支持来源</span><strong>3 个</strong></div>
+          <div class="status-row"><span>日报建议</span><strong>18:00</strong></div>
+        </section>
+      </aside>
+
+      <section class="main-panel">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Warehouse AI Secretary</p>
+            <h2 id="viewTitle">总览</h2>
+          </div>
+          <div class="top-actions">
+            <a class="secondary-link" href="https://nayue.feishu.cn/share/base/form/shrcnxiWMjJDzIaYHKFzc0qmGOd" target="_blank" rel="noreferrer">打开飞书提交表单</a>
+            <button class="secondary-button" id="loadSamples">载入示例</button>
+            <button class="primary-button" id="analyzeAll">重新分析</button>
+          </div>
+        </header>
+
+        <section class="view active" id="dashboard">
+          <div class="metrics-grid">
+            <article class="metric urgent"><span>紧急提醒</span><strong id="urgentCount">0</strong></article>
+            <article class="metric warning"><span>仓库异常</span><strong id="warehouseCount">0</strong></article>
+            <article class="metric blue"><span>待跟进任务</span><strong id="taskCount">0</strong></article>
+            <article class="metric green"><span>今日消息</span><strong id="messageCount">0</strong></article>
+          </div>
+
+          <div class="content-grid">
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>优先提醒</h3>
+                <span>系统自动挑出要马上看的消息</span>
+              </div>
+              <div class="alert-list" id="alertList"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>风险关键词</h3>
+                <span>中文 / 英文 / 印尼语</span>
+              </div>
+              <div class="keyword-cloud" id="keywordCloud"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="intake">
+          <section class="panel wide">
+            <div class="panel-heading">
+              <h3>手机提交入口</h3>
+              <span>先用这个把 WhatsApp / 微信 / 飞书消息收进表格</span>
+            </div>
+            <div class="form-link-box">
+              <p>飞书表单链接已经开启。手机打开后，只填三项：Message_ID、Source_Platform、Raw_Text。</p>
+              <a class="primary-link" href="https://nayue.feishu.cn/share/base/form/shrcnxiWMjJDzIaYHKFzc0qmGOd" target="_blank" rel="noreferrer">打开仓库AI消息提交表单</a>
+            </div>
+          </section>
+
+          <section class="input-panel">
+            <label for="messageInput">本地快速分析</label>
+            <textarea id="messageInput" placeholder="也可以直接在这里粘贴消息，例如：Forklift rusak, unloading container NR016 tertunda"></textarea>
+            <div class="input-actions">
+              <select id="sourceSelect" aria-label="选择消息来源">
+                <option>WhatsApp</option>
+                <option>WeChat</option>
+                <option>Feishu</option>
+              </select>
+              <select id="groupSelect" aria-label="选择群组">
+                <option>仓库管理群</option>
+                <option>PMC群</option>
+                <option>出货群</option>
+                <option>QC群</option>
+              </select>
+              <button class="primary-button" id="addMessage">加入分析</button>
+            </div>
+          </section>
+        </section>
+
+        <section class="view" id="analysis">
+          <section class="panel wide">
+            <div class="panel-heading">
+              <h3>归类分析结果</h3>
+              <span>分类、摘要、翻译、建议动作</span>
+            </div>
+            <div class="message-list" id="messageList"></div>
+          </section>
+        </section>
+
+        <section class="view" id="tasks">
+          <section class="panel wide">
+            <div class="panel-heading">
+              <h3>自动任务提醒</h3>
+              <span>从重要消息里提取负责人、动作、截止时间</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>完成</th><th>优先级</th><th>负责人</th><th>任务</th><th>截止</th><th>来源</th></tr>
+                </thead>
+                <tbody id="taskTable"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section class="view" id="daily">
+          <section class="panel wide">
+            <div class="panel-heading">
+              <h3>今日仓库日报</h3>
+              <span>可复制到飞书、WhatsApp 或邮件</span>
+            </div>
+            <pre class="daily-report" id="dailyReport"></pre>
+            <button class="secondary-button" id="copyDaily">复制日报</button>
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <script src="./ai-secretary.js"></script>
+  </body>
+</html>

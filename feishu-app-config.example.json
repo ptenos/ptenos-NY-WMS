@@ -1,0 +1,14 @@
+{
+  "app_name": "仓库AI秘书",
+  "tenant": "NAYUE Global",
+  "app_id": "cli_aa9d17ad867a1cb0",
+  "app_secret": "请在飞书后台复制后填入n8n，不要公开分享",
+  "n8n_test_webhook_url": "https://ys9203.app.n8n.cloud/webhook-test/warehouse-feishu",
+  "n8n_production_webhook_url": "https://ys9203.app.n8n.cloud/webhook/warehouse-feishu",
+  "enabled_capabilities": ["机器人"],
+  "enabled_permissions": ["im:message.group_msg"],
+  "feishu_event": "im.message.receive_v1",
+  "release_version": "1.0.0",
+  "release_status": "已发布 / 已启用",
+  "status": "飞书应用已创建并发布；机器人能力、群消息权限、事件回调、接收消息事件均已配置；n8n Webhook 已发布且 challenge 返回测试通过；下一步是把机器人加入测试群并补 OpenAI 分析节点"
+}

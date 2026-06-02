@@ -1,0 +1,115 @@
+{
+  "name": "Warehouse AI Secretary - WhatsApp Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "warehouse-whatsapp",
+        "httpMethod": "POST",
+        "responseMode": "lastNode"
+      },
+      "name": "WhatsApp Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 260]
+    },
+    {
+      "parameters": {
+        "path": "warehouse-feishu",
+        "httpMethod": "POST",
+        "responseMode": "lastNode"
+      },
+      "name": "Feishu Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 80]
+    },
+    {
+      "parameters": {
+        "path": "warehouse-wechat",
+        "httpMethod": "POST",
+        "responseMode": "lastNode"
+      },
+      "name": "WeChat Work Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 440]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "jsonBody": "={\n  \"model\": \"gpt-4.1-mini\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"你是仓库AI秘书。分析WhatsApp消息，判断是否重要，识别缺料、WO异常、来料延迟、客户催货、库存差异、QC HOLD、叉车故障、BPOM、容器到货、加班、紧急放货。只返回JSON。\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"群组：{{$json.group}}\\n发送人：{{$json.sender}}\\n消息：{{$json.message}}\"\n    }\n  ],\n  \"response_format\": { \"type\": \"json_object\" }\n}"
+      },
+      "name": "OpenAI Analyze",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [560, 260]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{JSON.parse($json.choices[0].message.content).important}}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "Important?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [820, 260]
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "=【仓库AI秘书】\\n分类：{{JSON.parse($json.choices[0].message.content).category}}\\n优先级：{{JSON.parse($json.choices[0].message.content).priority}}\\n摘要：{{JSON.parse($json.choices[0].message.content).summary_zh}}\\n建议：{{JSON.parse($json.choices[0].message.content).suggested_action}}"
+      },
+      "name": "Telegram Notify",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1100, 160]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v20.0/YOUR_PHONE_NUMBER_ID/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"YOUR_MANAGER_PHONE_WITH_COUNTRY_CODE\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"【仓库AI秘书】\\n分类：\" + JSON.parse($json.choices[0].message.content).category + \"\\n优先级：\" + JSON.parse($json.choices[0].message.content).priority + \"\\n摘要：\" + JSON.parse($json.choices[0].message.content).summary_zh + \"\\n建议：\" + JSON.parse($json.choices[0].message.content).suggested_action\n  }\n}"
+      },
+      "name": "WhatsApp Notify",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1100, 330]
+    }
+  ],
+  "connections": {
+    "WhatsApp Webhook": {
+      "main": [[{ "node": "OpenAI Analyze", "type": "main", "index": 0 }]]
+    },
+    "Feishu Webhook": {
+      "main": [[{ "node": "OpenAI Analyze", "type": "main", "index": 0 }]]
+    },
+    "WeChat Work Webhook": {
+      "main": [[{ "node": "OpenAI Analyze", "type": "main", "index": 0 }]]
+    },
+    "OpenAI Analyze": {
+      "main": [[{ "node": "Important?", "type": "main", "index": 0 }]]
+    },
+    "Important?": {
+      "main": [
+        [
+          { "node": "Telegram Notify", "type": "main", "index": 0 },
+          { "node": "WhatsApp Notify", "type": "main", "index": 0 }
+        ],
+        []
+      ]
+    }
+  }
+}
