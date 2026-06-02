@@ -6,7 +6,7 @@ const materialCache = new Map();
 const locationCache = new Map();
 
 const state = loadState();
-const frontendBuildVersion = "2026-06-02-1";
+const frontendBuildVersion = "debug-login-f82ce52";
 let sessionAuth = loadSessionAuth();
 if (!sessionAuth.token || sessionAuth.userId !== state.currentUserId) state.currentUserId = "";
 let operationType = "in";
@@ -38,6 +38,7 @@ let materialOptionTimer = null;
 let locationOptionTimer = null;
 let selectedOperationStock = null;
 let selectedCountStock = null;
+window.__loginJustCompleted = false;
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -172,6 +173,12 @@ function saveState(sync = true) {
   setSyncStatus(syncStatusText());
 }
 
+function debugLogin(message) {
+  console.log(`[WMS Login] ${message}`);
+  const target = $("#buildMarker");
+  if (target) target.textContent = `BUILD: ${frontendBuildVersion} | ${message}`;
+}
+
 async function initApiSync() {
   try {
     const healthResponse = await fetch("/api/health", { headers: { Accept: "application/json" } });
@@ -183,9 +190,16 @@ async function initApiSync() {
     try {
       const response = await fetch("/api/state?lite=1", { headers: { Accept: "application/json" } });
       if (response.ok) {
-        const currentUserId = sessionAuth.token && sessionAuth.userId === state.currentUserId ? state.currentUserId : "";
+        const preservedUserId = state.currentUserId;
+        const preservedAuth = { ...sessionAuth };
         Object.assign(state, migrateState({ ...defaultState(), ...(await response.json()) }));
-        state.currentUserId = currentUserId;
+        if (preservedUserId) {
+          state.currentUserId = preservedUserId;
+        } else if (preservedAuth.token && preservedAuth.userId) {
+          state.currentUserId = preservedAuth.userId;
+        } else {
+          state.currentUserId = "";
+        }
         localStorage.setItem(storeKey, JSON.stringify(state));
       }
     } catch {
@@ -2336,6 +2350,7 @@ async function addUser(event) {
 }
 
 function login() {
+  debugLogin("login clicked");
   loginAsync();
 }
 
@@ -2346,27 +2361,34 @@ async function loginAsync() {
   if (button.dataset.busy === "1") return;
   setButtonBusy(button, true, "登录中");
   try {
+    debugLogin("sending /api/login");
     const response = await fetch("/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json", "X-WMS-Lite-Lite": "1" },
       body: JSON.stringify({ userId, password })
     });
     const data = await response.json();
+    debugLogin(`/api/login status ${response.status}`);
     if (!response.ok) throw new Error(data.error || "账号或密码错误");
+    debugLogin(`/api/login response user ${data.user?.id || ""}`);
     Object.assign(state, migrateState({ ...defaultState(), ...(data.state || {}) }));
     state.currentUserId = data.user.id;
+    window.__loginJustCompleted = true;
     saveSessionAuth(data.user.id, data.token, data.expiresAt, data.mustChangePassword);
     apiAvailable = true;
     apiSyncAttempted = true;
     apiConnectionState = "connected";
     $("#loginPasswordInput").value = "";
     saveState();
+    debugLogin(`currentUserId after login ${state.currentUserId}`);
     render();
+    debugLogin("render called after login");
     if (data.mustChangePassword) {
       activateView("users");
       showToast("管理员仍在使用默认密码，请先修改密码");
     }
   } catch (error) {
+    debugLogin(`login error ${error?.message || "unknown"}`);
     showToast(error.message);
   } finally {
     setButtonBusy(button, false);
