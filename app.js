@@ -1,4 +1,4 @@
-const storeKey = "wms-lite-state-v4";
+﻿const storeKey = "wms-lite-state-v4";
 const authKey = "wms-lite-auth-v2";
 const channel = "BroadcastChannel" in window ? new BroadcastChannel("wms-lite-sync") : null;
 const serverRequired = location.protocol !== "file:";
@@ -50,9 +50,9 @@ function defaultState() {
     logs: [],
     auditLogs: [],
     users: [
-      { id: "admin", name: "绠＄悊鍛?, role: "admin" },
-      { id: "WH-001", name: "浠撳簱鍛樺伐", role: "employee" },
-      { id: "WH-MGR", name: "浠撶", role: "keeper" }
+      { id: "admin", name: "缁狅紕鎮婇崨?, role: "admin" },
+      { id: "WH-001", name: "娴犳挸绨遍崨妯轰紣", role: "employee" },
+      { id: "WH-MGR", name: "娴犳挾顓?, role: "keeper" }
     ],
     currentUserId: ""
   };
@@ -111,22 +111,22 @@ function migrateState(data) {
 
 function ensureAdminAccount() {
   if (serverRequired) {
-    showToast("姝ｅ紡鏈嶅姟涓嶈兘鍦ㄦ墜鏈虹閲嶇疆绠＄悊鍛樺瘑鐮侊紝璇峰湪璐﹀彿鏉冮檺閲屼慨鏀瑰瘑鐮?);
+    showToast("濮濓絽绱￠張宥呭娑撳秷鍏橀崷銊﹀閺堣櫣顏柌宥囩枂缁狅紕鎮婇崨妯虹槕閻緤绱濈拠宄版躬鐠愶箑褰块弶鍐闁插奔鎱ㄩ弨鐟扮槕閻?);
     return;
   }
   let admin = state.users.find((user) => String(user.id).toLowerCase() === "admin");
   if (!admin) {
-    admin = { id: "admin", name: "绠＄悊鍛?, role: "admin" };
+    admin = { id: "admin", name: "缁狅紕鎮婇崨?, role: "admin" };
     state.users.unshift(admin);
   }
   admin.id = "admin";
-  admin.name = admin.name || "绠＄悊鍛?;
+  admin.name = admin.name || "缁狅紕鎮婇崨?;
   admin.role = "admin";
   delete admin.password;
   delete admin.passwordHash;
   saveState();
   render();
-  showToast("绠＄悊鍛樺瘑鐮佸凡閲嶇疆涓?admin123");
+  showToast("缁狅紕鎮婇崨妯虹槕閻礁鍑￠柌宥囩枂娑?admin123");
 }
 
 function currentUser() {
@@ -163,7 +163,7 @@ function canOpenView(viewId) {
 }
 
 function roleLabel(role) {
-  return { employee: "鍛樺伐", keeper: "浠撶", admin: "绠＄悊鍛?, operator: "鍛樺伐" }[role] || role;
+  return { employee: "閸涙ê浼?, keeper: "娴犳挾顓?, admin: "缁狅紕鎮婇崨?, operator: "閸涙ê浼? }[role] || role;
 }
 
 function saveState(sync = true) {
@@ -226,10 +226,10 @@ async function pushRemoteState() {
       body: JSON.stringify(state)
     });
     if (!response.ok) throw new Error("Remote save failed");
-    setSyncStatus("鏈嶅姟鍣ㄥ悓姝?);
+    setSyncStatus("閺堝秴濮熼崳銊ユ倱濮?);
   } catch {
     apiAvailable = false;
-    setSyncStatus("鏈満婕旂ず");
+    setSyncStatus("閺堫剚婧€濠曟梻銇?);
   }
 }
 
@@ -239,15 +239,15 @@ function setSyncStatus(text) {
 }
 
 function syncStatusText() {
-  if (apiConnectionState === "connecting") return "连接中";
-  if (apiConnectionState === "connected") return "服务器已连接";
-  if (apiConnectionState === "failed") return serverRequired ? "服务器连接失败" : "本机演示";
-  return "连接中";
+  if (apiConnectionState === "connecting") return "杩炴帴涓?;
+  if (apiConnectionState === "connected") return "鏈嶅姟鍣ㄥ凡杩炴帴";
+  if (apiConnectionState === "failed") return serverRequired ? "鏈嶅姟鍣ㄨ繛鎺ュけ璐? : "鏈満婕旂ず";
+  return "杩炴帴涓?;
 }
 
-function requireLiveServer(action = "鎿嶄綔") {
+function requireLiveServer(action = "閹垮秳缍?) {
   if (!serverRequired || apiAvailable) return true;
-  showToast(`鏈嶅姟鍣ㄦ湭杩炴帴锛?{action}鏆備笉鑳芥墽琛宍);
+  showToast(`閺堝秴濮熼崳銊︽弓鏉╃偞甯撮敍?{action}閺嗗倷绗夐懗鑺ュ⒔鐞涘畭);
   return false;
 }
 
@@ -312,9 +312,9 @@ function parseSystemQty(value) {
 
 function qtyErrorText(value) {
   const text = String(value ?? "").trim();
-  if (text.includes(",")) return "鏁伴噺涓嶈兘浣跨敤閫楀彿锛岃涓嶈杈撳叆鍗板凹灏忔暟鏍煎紡锛屼緥濡?1.000,5";
-  if (/^\d{1,3}(\.\d{3})+$/.test(text)) return "鏁伴噺涓嶈兘浣跨敤鍗板凹鍗冨垎浣嶆牸寮忥紝渚嬪 1.000";
-  return "鏁伴噺鍙兘杈撳叆鏅€氭暟瀛楋紝鏈€澶?6 浣嶅皬鏁帮紝渚嬪 1000 鎴?1000.123456";
+  if (text.includes(",")) return "閺佷即鍣烘稉宥堝厴娴ｈ法鏁ら柅妤€褰块敍宀冾嚞娑撳秷顩︽潏鎾冲弳閸楁澘鍑圭亸蹇旀殶閺嶇厧绱￠敍灞肩伐婵?1.000,5";
+  if (/^\d{1,3}(\.\d{3})+$/.test(text)) return "閺佷即鍣烘稉宥堝厴娴ｈ法鏁ら崡鏉垮嚬閸楀啫鍨庢担宥嗙壐瀵骏绱濇笟瀣洤 1.000";
+  return "閺佷即鍣洪崣顏囧厴鏉堟挸鍙嗛弲顕€鈧碍鏆熺€涙绱濋張鈧径?6 娴ｅ秴鐨弫甯礉娓氬顩?1000 閹?1000.123456";
 }
 
 function roundQty(value) {
@@ -387,7 +387,7 @@ function touchStock(row) {
 
 async function postOperation(payload) {
   if (!apiAvailable) {
-    if (serverRequired) throw new Error("鏈嶅姟鍣ㄦ湭杩炴帴锛岃鎭㈠缃戠粶鍚庨噸璇?);
+    if (serverRequired) throw new Error("閺堝秴濮熼崳銊︽弓鏉╃偞甯撮敍宀冾嚞閹垹顦茬純鎴犵捕閸氬酣鍣哥拠?);
     return null;
   }
   const auth = currentAuthPayload();
@@ -397,7 +397,7 @@ async function postOperation(payload) {
     body: JSON.stringify({ ...payload, operatorId: auth.operatorId })
   });
   const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "账号或密码错误");
+    if (!response.ok) throw new Error(data.error || "璐﹀彿鎴栧瘑鐮侀敊璇?);
   const currentUserId = state.currentUserId;
   Object.assign(state, migrateState({ ...defaultState(), ...data }));
   state.currentUserId = currentUserId;
@@ -407,7 +407,7 @@ async function postOperation(payload) {
 
 async function postMasterData(path, payload) {
   if (!apiAvailable) {
-    if (serverRequired) throw new Error("鏈嶅姟鍣ㄦ湭杩炴帴锛岃鎭㈠缃戠粶鍚庨噸璇?);
+    if (serverRequired) throw new Error("閺堝秴濮熼崳銊︽弓鏉╃偞甯撮敍宀冾嚞閹垹顦茬純鎴犵捕閸氬酣鍣哥拠?);
     return null;
   }
   const auth = currentAuthPayload();
@@ -417,7 +417,7 @@ async function postMasterData(path, payload) {
     body: JSON.stringify({ ...payload, operatorId: auth.operatorId })
   });
   const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "账号或密码错误");
+    if (!response.ok) throw new Error(data.error || "璐﹀彿鎴栧瘑鐮侀敊璇?);
   const currentUserId = state.currentUserId;
   if (data.materials || data.locations || data.stock) {
     Object.assign(state, migrateState({ ...defaultState(), ...data }));
@@ -433,7 +433,7 @@ async function postMasterData(path, payload) {
 
 async function postUserData(path, payload) {
   if (!apiAvailable) {
-    if (serverRequired) throw new Error("鏈嶅姟鍣ㄦ湭杩炴帴锛岃鎭㈠缃戠粶鍚庨噸璇?);
+    if (serverRequired) throw new Error("閺堝秴濮熼崳銊︽弓鏉╃偞甯撮敍宀冾嚞閹垹顦茬純鎴犵捕閸氬酣鍣哥拠?);
     return null;
   }
   const auth = currentAuthPayload();
@@ -443,7 +443,7 @@ async function postUserData(path, payload) {
     body: JSON.stringify({ ...payload, operatorId: auth.operatorId })
   });
   const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "账号或密码错误");
+    if (!response.ok) throw new Error(data.error || "璐﹀彿鎴栧瘑鐮侀敊璇?);
   const currentUserId = state.currentUserId;
   Object.assign(state, migrateState({ ...defaultState(), ...data }));
   state.currentUserId = currentUserId;
@@ -464,7 +464,7 @@ async function fetchApiPage(path, params = {}) {
   });
   const response = await fetch(`${url.pathname}${url.search}`, { headers: { Accept: "application/json" } });
   const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "账号或密码错误");
+    if (!response.ok) throw new Error(data.error || "璐﹀彿鎴栧瘑鐮侀敊璇?);
   return data;
 }
 
@@ -474,8 +474,8 @@ function removeZeroStock() {
 
 function refreshLocationUsage() {
   state.locations.forEach((location) => {
-    if (location.status !== "鍐荤粨") {
-      location.status = state.stock.some((item) => item.location === location.code) ? "鍗犵敤" : "绌洪棽";
+    if (location.status !== "閸愯崵绮?) {
+      location.status = state.stock.some((item) => item.location === location.code) ? "閸楃姷鏁? : "缁屾椽妫?;
     }
   });
 }
@@ -486,7 +486,7 @@ function addLog(payload) {
     id: uid(),
     operatorId: user?.id || "",
     operatorName: user?.name || "",
-    operator: user ? `${user.id} ${user.name}` : "鏈€夋嫨",
+    operator: user ? `${user.id} ${user.name}` : "閺堫亪鈧瀚?,
     time: formatMinute(),
     ...payload
   });
@@ -520,19 +520,19 @@ async function submitOperation(event) {
   const status = $("#statusInput").value;
   const note = $("#noteInput").value.trim();
 
-  if (!material) return showToast("鐗╂枡蹇呴』浠庝富鏁版嵁鎼滅储閫夋嫨");
-  if (!findLocation(location)) return showToast("搴撲綅蹇呴』浠庝富鏁版嵁鎼滅储閫夋嫨");
+  if (!material) return showToast("閻椻晜鏋¤箛鍛淬€忔禒搴濆瘜閺佺増宓侀幖婊呭偍闁瀚?);
+  if (!findLocation(location)) return showToast("鎼存挷缍呰箛鍛淬€忔禒搴濆瘜閺佺増宓侀幖婊呭偍闁瀚?);
   if (!batch || qty === null) return showToast(qtyErrorText(rawQty));
-  if (qty <= 0) return showToast(operationType === "in" ? "鍏ュ簱鏁伴噺蹇呴』澶т簬 0" : "鏈鏁伴噺蹇呴』澶т簬 0");
+  if (qty <= 0) return showToast(operationType === "in" ? "閸忋儱绨遍弫浼村櫤韫囧懘銆忔径褌绨?0" : "閺堫剚顐奸弫浼村櫤韫囧懘銆忔径褌绨?0");
   const selectedRow = selectedOperationSourceMatches(sku, batch, status) ? selectedOperationStock : null;
   if (["out", "move"].includes(operationType)) {
-    if (!selectedRow) return showToast("璇峰厛閫夋嫨瑕佹搷浣滅殑搴撳瓨鏄庣粏");
-    if (qty > Number(selectedRow.qty || 0)) return showToast("鏈鏁伴噺涓嶈兘瓒呰繃鐜版湁搴撳瓨");
+    if (!selectedRow) return showToast("鐠囧嘲鍘涢柅澶嬪鐟曚焦鎼锋担婊呮畱鎼存挸鐡ㄩ弰搴ｇ矎");
+    if (qty > Number(selectedRow.qty || 0)) return showToast("閺堫剚顐奸弫浼村櫤娑撳秷鍏樼搾鍛扮箖閻滅増婀佹惔鎾崇摠");
   }
   if (operationType === "move") {
-    if (!targetLocation || !findLocation(targetLocation)) return showToast("璇烽€夋嫨鏈夋晥鐩爣搴撲綅");
-    if (findLocation(targetLocation)?.status === "鍐荤粨") return showToast("鐩爣搴撲綅宸插喕缁?);
-    if (targetLocation === (selectedRow?.location || location)) return showToast("鐩爣搴撲綅涓嶈兘鍜屽師搴撲綅鐩稿悓");
+    if (!targetLocation || !findLocation(targetLocation)) return showToast("鐠囩兘鈧瀚ㄩ張澶嬫櫏閻╊喗鐖ｆ惔鎾茬秴");
+    if (findLocation(targetLocation)?.status === "閸愯崵绮?) return showToast("閻╊喗鐖ｆ惔鎾茬秴瀹告彃鍠曠紒?);
+    if (targetLocation === (selectedRow?.location || location)) return showToast("閻╊喗鐖ｆ惔鎾茬秴娑撳秷鍏橀崪灞藉斧鎼存挷缍呴惄绋挎倱");
   }
 
   setFormSubmitting(event.target, true);
@@ -546,29 +546,29 @@ async function submitOperation(event) {
         selectedOperationVersion = null;
         selectedOperationStock = null;
         render();
-        return showToast("浣滀笟宸叉彁浜?);
+        return showToast("娴ｆ粈绗熷鍙夊絹娴?);
       }
     } catch (error) {
       return showToast(error.message);
     }
 
     if (operationType === "in") {
-      if (qty <= 0) return showToast("鍏ュ簱鏁伴噺蹇呴』澶т簬 0");
+      if (qty <= 0) return showToast("閸忋儱绨遍弫浼村櫤韫囧懘銆忔径褌绨?0");
       upsertStock({ sku, batch, location, status, qty });
     }
 
     if (operationType === "out") {
-      if (qty <= 0) return showToast("鍑哄簱鏁伴噺蹇呴』澶т簬 0");
+      if (qty <= 0) return showToast("閸戝搫绨遍弫浼村櫤韫囧懘銆忔径褌绨?0");
       const row = findStock(sku, batch, selectedRow?.location || location, status);
-      if (!row || row.qty < qty) return showToast("搴撳瓨涓嶈冻鎴栫姸鎬佷笉鍖归厤");
+      if (!row || row.qty < qty) return showToast("鎼存挸鐡ㄦ稉宥堝喕閹存牜濮搁幀浣风瑝閸栧綊鍘?);
       row.qty = roundQty(row.qty - qty);
       touchStock(row);
     }
 
     if (operationType === "move") {
-      if (qty <= 0) return showToast("绉诲簱鏁伴噺蹇呴』澶т簬 0");
+      if (qty <= 0) return showToast("缁夎绨遍弫浼村櫤韫囧懘銆忔径褌绨?0");
       const row = findStock(sku, batch, selectedRow?.location || location, status);
-      if (!row || row.qty < qty) return showToast("鍘熷簱浣嶅簱瀛樹笉瓒?);
+      if (!row || row.qty < qty) return showToast("閸樼喎绨辨担宥呯氨鐎涙ü绗夌搾?);
       row.qty = roundQty(row.qty - qty);
       touchStock(row);
       upsertStock({ sku, batch, location: targetLocation, status, qty });
@@ -582,7 +582,7 @@ async function submitOperation(event) {
     selectedOperationVersion = null;
     selectedOperationStock = null;
     render();
-    showToast("浣滀笟宸叉彁浜?);
+    showToast("娴ｆ粈绗熷鍙夊絹娴?);
   } finally {
     setFormSubmitting(event.target, false);
   }
@@ -613,7 +613,7 @@ function updateOperationStockList() {
   $("#operationStockWrap").classList.toggle("hidden", !useStockPicker);
   $$(".operation-field").forEach((item) => item.classList.toggle("hidden", useStockPicker));
   $("#targetLocationWrap").classList.toggle("hidden", operationType !== "move");
-  $("#operationStockHint").textContent = operationType === "move" ? "鎼滅储骞堕€夋嫨瑕佺Щ搴撶殑搴撳瓨銆? : "鎼滅储骞堕€夋嫨瑕佸嚭搴撶殑搴撳瓨銆?;
+  $("#operationStockHint").textContent = operationType === "move" ? "閹兼粎鍌ㄩ獮鍫曗偓澶嬪鐟曚胶些鎼存挾娈戞惔鎾崇摠閵? : "閹兼粎鍌ㄩ獮鍫曗偓澶嬪鐟曚礁鍤惔鎾舵畱鎼存挸鐡ㄩ妴?;
   updateOperationHelper();
   if (!useStockPicker) return;
   syncOperationSelection();
@@ -634,7 +634,7 @@ function scheduleOperationStockLoad() {
 async function loadOperationStockRows() {
   if (!["out", "move"].includes(operationType)) return;
   const requestId = ++operationStockRequestId;
-  $("#operationStockList").innerHTML = `<div class="empty-state">搴撳瓨鍔犺浇涓?..</div>`;
+  $("#operationStockList").innerHTML = `<div class="empty-state">鎼存挸鐡ㄩ崝鐘烘祰娑?..</div>`;
   try {
     const material = findMaterial($("#skuInput").value);
     const data = await fetchApiPage("/api/stock", {
@@ -718,7 +718,7 @@ function selectOperationStock(event) {
   $("#statusInput").value = card.dataset.status;
   $("#qtyInput").value = "";
   $("#qtyInput").dataset.maxQty = card.dataset.qty;
-  $("#qtyInput").placeholder = `鏈€澶?${card.dataset.qty}`;
+  $("#qtyInput").placeholder = `閺堚偓婢?${card.dataset.qty}`;
   $("#operationStockSearch").value = `${card.dataset.sku} ${card.dataset.batch} ${card.dataset.location}`;
   selectedOperationVersion = Number(card.dataset.version || 1);
   selectedOperationStock = stockFromDataset(card.dataset);
@@ -736,10 +736,10 @@ function renderSelectedStockInfo() {
   const row = selectedOperationMatches(sku, batch, location, status) ? selectedOperationStock : findStock(sku, batch, location, status);
   $("#selectedStockInfo").classList.toggle("hidden", !row);
   $("#selectedStockInfo").innerHTML = row
-    ? `<strong>宸查€夋嫨搴撳瓨鏄庣粏</strong>
-      <span>鐗╂枡锛?{escapeHtml(sku)} / ${escapeHtml(row.name || material?.name || "")}</span>
-      <span>鎵瑰彿锛?{escapeHtml(batch)} / 搴撲綅锛?{escapeHtml(location)} / 鐘舵€侊細${escapeHtml(status)}</span>
-      <span>鐜版湁搴撳瓨锛?{row.qty}锛岃鍦ㄤ笅鏂硅緭鍏ユ湰娆℃暟閲忋€?/span>`
+    ? `<strong>瀹告煡鈧瀚ㄦ惔鎾崇摠閺勫海绮?/strong>
+      <span>閻椻晜鏋￠敍?{escapeHtml(sku)} / ${escapeHtml(row.name || material?.name || "")}</span>
+      <span>閹电懓褰块敍?{escapeHtml(batch)} / 鎼存挷缍呴敍?{escapeHtml(location)} / 閻樿埖鈧緤绱?{escapeHtml(status)}</span>
+      <span>閻滅増婀佹惔鎾崇摠閿?{row.qty}閿涘矁顕崷銊ょ瑓閺傜绶崗銉︽拱濞嗏剝鏆熼柌蹇嬧偓?/span>`
     : "";
   updateOperationHelper();
 }
@@ -751,12 +751,12 @@ function updateOperationHelper() {
   const submitButton = $("#operationSubmitButton");
   if (!guide || !qtyHint || !qtyInput || !submitButton) return;
 
-  const labels = { in: "鍏ュ簱", out: "鍑哄簱", move: "绉诲簱" };
+  const labels = { in: "閸忋儱绨?, out: "閸戝搫绨?, move: "缁夎绨? };
   const steps = {
-    in: ["閫夋嫨鐗╂枡", "閫夋嫨搴撲綅", "杈撳叆鏁伴噺", "鎻愪氦"],
-    out: ["閫夋嫨搴撳瓨", "杈撳叆鏁伴噺", "鎻愪氦"],
-    move: ["閫夋嫨搴撳瓨", "杈撳叆鏁伴噺", "閫夋嫨鐩爣搴撲綅", "鎻愪氦"]
-  }[operationType] || ["濉啓淇℃伅", "鎻愪氦"];
+    in: ["闁瀚ㄩ悧鈺傛灐", "闁瀚ㄦ惔鎾茬秴", "鏉堟挸鍙嗛弫浼村櫤", "閹绘劒姘?],
+    out: ["闁瀚ㄦ惔鎾崇摠", "鏉堟挸鍙嗛弫浼村櫤", "閹绘劒姘?],
+    move: ["闁瀚ㄦ惔鎾崇摠", "鏉堟挸鍙嗛弫浼村櫤", "闁瀚ㄩ惄顔界垼鎼存挷缍?, "閹绘劒姘?]
+  }[operationType] || ["婵夘偄鍟撴穱鈩冧紖", "閹绘劒姘?];
 
   const inputSku = normalize($("#skuInput").value);
   const batch = normalize($("#batchInput").value);
@@ -774,41 +774,41 @@ function updateOperationHelper() {
     if (findLocation(location)) activeStep = 2;
     if (qty !== null && qty > 0) activeStep = 3;
     delete qtyInput.dataset.maxQty;
-    qtyInput.placeholder = "濡?1000 鎴?1000.123456";
+    qtyInput.placeholder = "婵?1000 閹?1000.123456";
     ready = !!findMaterial($("#skuInput").value) && !!findLocation(location) && !!batch && qty !== null && qty > 0;
-    nextText = ready ? "鍙互鎻愪氦鍏ュ簱銆? : "鎸夐『搴忛€夋嫨鐗╂枡銆佸簱浣嶏紝鍐嶈緭鍏ユ湰娆℃暟閲忋€?;
+    nextText = ready ? "閸欘垯浜掗幓鎰唉閸忋儱绨遍妴? : "閹稿銆庢惔蹇涒偓澶嬪閻椻晜鏋￠妴浣哥氨娴ｅ稄绱濋崘宥堢翻閸忋儲婀板▎鈩冩殶闁插繈鈧?;
   } else {
     if (selectedRow) activeStep = 1;
     if (qty !== null && qty > 0 && selectedRow && qty <= Number(selectedRow.qty || 0)) activeStep = 2;
     if (operationType === "move" && findLocation(targetLocation) && targetLocation !== location) activeStep = 3;
     if (selectedRow) {
       qtyInput.dataset.maxQty = selectedRow.qty;
-      qtyInput.placeholder = `鏈€澶?${selectedRow.qty}`;
+      qtyInput.placeholder = `閺堚偓婢?${selectedRow.qty}`;
       if (selectedRow.location !== location) {
-        nextText = `宸查€変腑 ${selectedRow.location} 鐨勫簱瀛樻槑缁嗭紝褰撳墠搴撲綅妗嗛噷鏄剧ず鐨勬槸 ${location || "绌?}锛岃浠ラ€変腑鏄庣粏涓哄噯鎴栭噸鏂伴€夋嫨銆俙;
+        nextText = `瀹告煡鈧鑵?${selectedRow.location} 閻ㄥ嫬绨辩€涙ɑ妲戠紒鍡礉瑜版挸澧犳惔鎾茬秴濡楀棝鍣烽弰鍓с仛閻ㄥ嫭妲?${location || "缁?}閿涘矁顕禒銉┾偓澶夎厬閺勫海绮忔稉鍝勫櫙閹存牠鍣搁弬浼粹偓澶嬪閵嗕繖;
       } else if (qty !== null && qty > Number(selectedRow.qty || 0)) {
-        nextText = "鏁伴噺瓒呰繃鐜版湁搴撳瓨锛岃鏀瑰皬銆?;
+        nextText = "閺佷即鍣虹搾鍛扮箖閻滅増婀佹惔鎾崇摠閿涘矁顕弨鐟扮毈閵?;
       } else if (operationType === "move" && targetLocation && targetLocation === location) {
-        nextText = "鐩爣搴撲綅涓嶈兘鍜屽師搴撲綅鐩稿悓銆?;
+        nextText = "閻╊喗鐖ｆ惔鎾茬秴娑撳秷鍏橀崪灞藉斧鎼存挷缍呴惄绋挎倱閵?;
       } else {
-        nextText = `鐜版湁搴撳瓨 ${selectedRow.qty}锛岃杈撳叆鏈鏁伴噺銆俙;
+        nextText = `閻滅増婀佹惔鎾崇摠 ${selectedRow.qty}閿涘矁顕潏鎾冲弳閺堫剚顐奸弫浼村櫤閵嗕繖;
       }
     } else {
       delete qtyInput.dataset.maxQty;
-      qtyInput.placeholder = "鍏堥€夋嫨搴撳瓨鏄庣粏";
-      nextText = operationType === "move" ? "鍏堥€夋嫨瑕佺Щ搴撶殑搴撳瓨銆? : "鍏堥€夋嫨瑕佸嚭搴撶殑搴撳瓨銆?;
+      qtyInput.placeholder = "閸忓牓鈧瀚ㄦ惔鎾崇摠閺勫海绮?;
+      nextText = operationType === "move" ? "閸忓牓鈧瀚ㄧ憰浣盒╂惔鎾舵畱鎼存挸鐡ㄩ妴? : "閸忓牓鈧瀚ㄧ憰浣稿毉鎼存挾娈戞惔鎾崇摠閵?;
     }
     ready = !!selectedRow && qty !== null && qty > 0 && qty <= Number(selectedRow.qty || 0);
     if (operationType === "move") {
       const target = findLocation(targetLocation);
-      ready = ready && !!target && targetLocation !== location && target.status !== "鍐荤粨";
-      if (target?.status === "鍐荤粨") nextText = "鐩爣搴撲綅宸插喕缁擄紝璇锋崲涓€涓簱浣嶃€?;
+      ready = ready && !!target && targetLocation !== location && target.status !== "閸愯崵绮?;
+      if (target?.status === "閸愯崵绮?) nextText = "閻╊喗鐖ｆ惔鎾茬秴瀹告彃鍠曠紒鎿勭礉鐠囬攱宕叉稉鈧稉顏勭氨娴ｅ秲鈧?;
     }
   }
 
   guide.innerHTML = steps.map((step, index) => `<span class="step-pill ${index <= activeStep ? "active" : ""}">${index + 1}. ${escapeHtml(step)}</span>`).join("");
   qtyHint.textContent = nextText;
-  submitButton.textContent = `${labels[operationType] || "浣滀笟"}鎻愪氦`;
+  submitButton.textContent = `${labels[operationType] || "娴ｆ粈绗?}閹绘劒姘;
   submitButton.dataset.logicDisabled = ready ? "" : "1";
   submitButton.disabled = (serverRequired && !apiAvailable) || !ready || submitButton.dataset.busy === "1";
 }
@@ -869,15 +869,15 @@ async function submitCount(event) {
   const location = normalize($("#countLocationInput").value);
   const note = $("#countNoteInput").value.trim();
 
-  if (!material) return showToast("鐗╂枡蹇呴』浠庝富鏁版嵁鎼滅储閫夋嫨");
+  if (!material) return showToast("閻椻晜鏋¤箛鍛淬€忔禒搴濆瘜閺佺増宓侀幖婊呭偍闁瀚?);
   if (!batch || qty === null) return showToast(qtyErrorText(rawQty));
-  if (!status) return showToast("璇烽€夋嫨鐩樼偣鐘舵€?);
-  if (!findLocation(location)) return showToast("鐩樼偣搴撲綅蹇呴』浠庝富鏁版嵁鎼滅储閫夋嫨");
+  if (!status) return showToast("鐠囩兘鈧瀚ㄩ惄妯煎仯閻樿埖鈧?);
+  if (!findLocation(location)) return showToast("閻╂鍋ｆ惔鎾茬秴韫囧懘銆忔禒搴濆瘜閺佺増宓侀幖婊呭偍闁瀚?);
   if (!selectedCountStock || selectedCountStock.sku !== sku || selectedCountStock.batch !== batch || selectedCountStock.status !== status) {
-    return showToast("璇峰厛閫夋嫨瑕佺洏鐐圭殑搴撳瓨鏄庣粏");
+    return showToast("鐠囧嘲鍘涢柅澶嬪鐟曚胶娲忛悙鍦畱鎼存挸鐡ㄩ弰搴ｇ矎");
   }
   const targetLocation = findLocation(location);
-  if (selectedCountStock.location !== location && targetLocation?.status === "鍐荤粨") return showToast("鐩樼偣搴撲綅宸插喕缁擄紝璇锋崲涓€涓簱浣?);
+  if (selectedCountStock.location !== location && targetLocation?.status === "閸愯崵绮?) return showToast("閻╂鍋ｆ惔鎾茬秴瀹告彃鍠曠紒鎿勭礉鐠囬攱宕叉稉鈧稉顏勭氨娴?);
 
   setFormSubmitting(event.target, true);
   try {
@@ -904,7 +904,7 @@ async function submitCount(event) {
       $("#selectedCountInfo").classList.add("hidden");
       $("#selectedCountInfo").innerHTML = "";
       render();
-      return showToast("鐩樼偣宸茶皟鏁?);
+      return showToast("閻╂鍋ｅ鑼剁殶閺?);
     }
   } catch (error) {
     return showToast(error.message);
@@ -931,7 +931,7 @@ async function submitCount(event) {
   $("#selectedCountInfo").innerHTML = "";
   render();
   updateCountPreview();
-  showToast("鐩樼偣宸茶皟鏁?);
+  showToast("閻╂鍋ｅ鑼剁殶閺?);
   } finally {
     setFormSubmitting(event.target, false);
   }
@@ -976,7 +976,7 @@ function scheduleCountStockLoad() {
 
 async function loadCountStockRows() {
   const requestId = ++countStockRequestId;
-  $("#countStockList").innerHTML = `<div class="empty-state">搴撳瓨鍔犺浇涓?..</div>`;
+  $("#countStockList").innerHTML = `<div class="empty-state">鎼存挸鐡ㄩ崝鐘烘祰娑?..</div>`;
   try {
     const material = findMaterial($("#countSkuInput").value);
     const data = await fetchApiPage("/api/stock", {
@@ -1002,7 +1002,7 @@ async function loadCountStockRows() {
 function formatLocations(locations, total) {
   const text = locations.join(" / ");
   if (!total || total <= locations.length) return text;
-  return `${text} 绛?${total} 涓簱浣峘;
+  return `${text} 缁?${total} 娑擃亜绨辨担宄?
 }
 
 function renderCountStockList(rows = []) {
@@ -1055,10 +1055,10 @@ function renderSelectedCountInfo() {
   const selected = $("#selectedCountInfo");
   selected.classList.toggle("hidden", !row);
   selected.innerHTML = row
-    ? `<strong>宸查€夋嫨鐩樼偣鏄庣粏</strong>
-      <span>鐗╂枡锛?{escapeHtml(sku)} / ${escapeHtml(row.name || material?.name || "")}</span>
-      <span>鎵瑰彿锛?{escapeHtml(batch)} / 鍘熷簱浣嶏細${escapeHtml(row.location)} / 鐘舵€侊細${escapeHtml(status)}</span>
-      <span>璐﹂潰鏁伴噺锛?{row.qty}锛屼笅鏂瑰～鍐欏疄闄呮暟閲忓拰瀹為檯搴撲綅銆?/span>`
+    ? `<strong>瀹告煡鈧瀚ㄩ惄妯煎仯閺勫海绮?/strong>
+      <span>閻椻晜鏋￠敍?{escapeHtml(sku)} / ${escapeHtml(row.name || material?.name || "")}</span>
+      <span>閹电懓褰块敍?{escapeHtml(batch)} / 閸樼喎绨辨担宥忕窗${escapeHtml(row.location)} / 閻樿埖鈧緤绱?{escapeHtml(status)}</span>
+      <span>鐠愶箓娼伴弫浼村櫤閿?{row.qty}閿涘奔绗呴弬鐟帮綖閸愭瑥鐤勯梽鍛殶闁插繐鎷扮€圭偤妾惔鎾茬秴閵?/span>`
     : "";
   updateCountHelper();
 }
@@ -1096,15 +1096,15 @@ function updateCountHelper() {
   const target = findLocation(location);
   let ready = !!selected && qty !== null && !!target;
   let text = "";
-  if (!selected) text = "鍏堥€夋嫨瑕佺洏鐐圭殑搴撳瓨鏄庣粏銆?;
-  else if (qty === null) text = "杈撳叆瀹為檯鏁伴噺锛屽厑璁?0锛屾渶澶?6 浣嶅皬鏁般€?;
-  else if (!target) text = "鐩樼偣搴撲綅蹇呴』浠庝富鏁版嵁閫夋嫨銆?;
-  else if (selected.location !== location && target.status === "鍐荤粨") {
+  if (!selected) text = "閸忓牓鈧瀚ㄧ憰浣烘磸閻愬湱娈戞惔鎾崇摠閺勫海绮忛妴?;
+  else if (qty === null) text = "鏉堟挸鍙嗙€圭偤妾弫浼村櫤閿涘苯鍘戠拋?0閿涘本娓舵径?6 娴ｅ秴鐨弫鑸偓?;
+  else if (!target) text = "閻╂鍋ｆ惔鎾茬秴韫囧懘銆忔禒搴濆瘜閺佺増宓侀柅澶嬪閵?;
+  else if (selected.location !== location && target.status === "閸愯崵绮?) {
     ready = false;
-    text = "鐩樼偣搴撲綅宸插喕缁擄紝璇锋崲涓€涓簱浣嶃€?;
+    text = "閻╂鍋ｆ惔鎾茬秴瀹告彃鍠曠紒鎿勭礉鐠囬攱宕叉稉鈧稉顏勭氨娴ｅ秲鈧?;
   } else {
-    const locationText = selected.location === location ? "搴撲綅涓嶅彉" : `搴撲綅灏嗕粠 ${selected.location} 璋冩暣鍒?${location}`;
-    text = `璐﹂潰 ${selected.qty}锛屽疄闄?${qty}锛?{locationText}銆俙;
+    const locationText = selected.location === location ? "鎼存挷缍呮稉宥呭綁" : `鎼存挷缍呯亸鍡曠矤 ${selected.location} 鐠嬪啯鏆ｉ崚?${location}`;
+    text = `鐠愶箓娼?${selected.qty}閿涘苯鐤勯梽?${qty}閿?{locationText}閵嗕繖;
   }
   hint.textContent = text;
   submitButton.dataset.logicDisabled = ready ? "" : "1";
@@ -1124,7 +1124,7 @@ function syncCountSelection() {
 
 function resetOperationForm(form) {
   form.reset();
-  $("#statusInput").value = "鍙敤";
+  $("#statusInput").value = "閸欘垳鏁?;
   $("#materialNameInput").value = "";
   delete $("#qtyInput").dataset.maxQty;
   updateMaterialPicker();
@@ -1132,30 +1132,30 @@ function resetOperationForm(form) {
 }
 
 function seedDemo() {
-  if (serverRequired) return showToast("姝ｅ紡鏈嶅姟涓嶅厑璁歌浇鍏ユ紨绀烘暟鎹?);
-  if (!isAdmin()) return showToast("鍙湁绠＄悊鍛樺彲浠ヨ浇鍏ユ紨绀?);
+  if (serverRequired) return showToast("濮濓絽绱￠張宥呭娑撳秴鍘戠拋姝屾祰閸忋儲绱ㄧ粈鐑樻殶閹?);
+  if (!isAdmin()) return showToast("閸欘亝婀佺粻锛勬倞閸涙ê褰叉禒銉ㄦ祰閸忋儲绱ㄧ粈?);
   state.materials = [
-    { sku: "RM-1001", name: "鐢樻补" },
-    { sku: "PK-2030", name: "澶栫" },
-    { sku: "FG-8801", name: "闃叉檼闇滄垚鍝? }
+    { sku: "RM-1001", name: "閻㈡ɑ琛? },
+    { sku: "PK-2030", name: "婢舵牜顔? },
+    { sku: "FG-8801", name: "闂冨弶妾奸棁婊勫灇閸? }
   ];
   state.locations = [
-    { code: "A-01-01", status: "鍗犵敤" },
-    { code: "A-01-02", status: "绌洪棽" },
-    { code: "B-02-01", status: "鍗犵敤" },
-    { code: "QC-HOLD", status: "鍐荤粨" }
+    { code: "A-01-01", status: "閸楃姷鏁? },
+    { code: "A-01-02", status: "缁屾椽妫? },
+    { code: "B-02-01", status: "閸楃姷鏁? },
+    { code: "QC-HOLD", status: "閸愯崵绮? }
   ];
   state.stock = [
-    { id: uid(), sku: "RM-1001", batch: "B20260501", location: "A-01-01", status: "鍙敤", qty: 120, version: 1, updatedAt: new Date().toISOString() },
-    { id: uid(), sku: "PK-2030", batch: "P260528", location: "B-02-01", status: "鍙敤", qty: 560, version: 1, updatedAt: new Date().toISOString() },
-    { id: uid(), sku: "FG-8801", batch: "F260527", location: "QC-HOLD", status: "寰呮", qty: 48, version: 1, updatedAt: new Date().toISOString() }
+    { id: uid(), sku: "RM-1001", batch: "B20260501", location: "A-01-01", status: "閸欘垳鏁?, qty: 120, version: 1, updatedAt: new Date().toISOString() },
+    { id: uid(), sku: "PK-2030", batch: "P260528", location: "B-02-01", status: "閸欘垳鏁?, qty: 560, version: 1, updatedAt: new Date().toISOString() },
+    { id: uid(), sku: "FG-8801", batch: "F260527", location: "QC-HOLD", status: "瀵板懏顥?, qty: 48, version: 1, updatedAt: new Date().toISOString() }
   ];
-  addLog({ type: "initial", sku: "IMPORT", batch: "", qty: 3, location: "", targetLocation: "", status: "", note: "婕旂ず鏁版嵁鍒濆鍖? });
-  addAuditLog({ action: "杞藉叆婕旂ず鏁版嵁", entity: "绯荤粺鏁版嵁", key: "DEMO", before: null, after: { materials: state.materials.length, locations: state.locations.length, stock: state.stock.length }, note: "婕旂ず鏁版嵁鍒濆鍖? });
+  addLog({ type: "initial", sku: "IMPORT", batch: "", qty: 3, location: "", targetLocation: "", status: "", note: "濠曟梻銇氶弫鐗堝祦閸掓繂顫愰崠? });
+  addAuditLog({ action: "鏉炶棄鍙嗗鏃傘仛閺佺増宓?, entity: "缁崵绮洪弫鐗堝祦", key: "DEMO", before: null, after: { materials: state.materials.length, locations: state.locations.length, stock: state.stock.length }, note: "濠曟梻銇氶弫鐗堝祦閸掓繂顫愰崠? });
   refreshLocationUsage();
   saveState();
   render();
-  showToast("婕旂ず鏁版嵁宸茶浇鍏?);
+  showToast("濠曟梻銇氶弫鐗堝祦瀹歌尪娴囬崗?);
 }
 
 function renderPermissions() {
@@ -1213,7 +1213,7 @@ function renderLocationOptions(rows) {
     .map((item) => `<option value="${escapeHtml(item.code)}">${escapeHtml(item.status || "")}</option>`)
     .join("");
   $("#targetLocationOptions").innerHTML = rows
-    .filter((item) => item.status !== "鍐荤粨")
+    .filter((item) => item.status !== "閸愯崵绮?)
     .map((item) => `<option value="${escapeHtml(item.code)}">${escapeHtml(item.status || "")}</option>`)
     .join("");
 }
@@ -1342,7 +1342,7 @@ function renderMetrics() {
   const total = state.stock.reduce((sum, item) => sum + item.qty, 0);
   if ($("#totalQty")) $("#totalQty").textContent = roundQty(total);
   if ($("#skuCount")) $("#skuCount").textContent = new Set(state.stock.map((item) => item.sku)).size;
-  if ($("#holdCount")) $("#holdCount").textContent = state.stock.filter((item) => item.status !== "鍙敤").length;
+  if ($("#holdCount")) $("#holdCount").textContent = state.stock.filter((item) => item.status !== "閸欘垳鏁?).length;
 }
 
 function renderStock() {
@@ -1358,7 +1358,7 @@ function renderStock() {
 
 async function loadStockPage() {
   const requestId = ++stockRequestId;
-  $("#stockList").innerHTML = `<div class="empty-state">搴撳瓨鍔犺浇涓?..</div>`;
+  $("#stockList").innerHTML = `<div class="empty-state">鎼存挸鐡ㄩ崝鐘烘祰娑?..</div>`;
   renderStockPager();
   try {
     const data = await fetchApiPage("/api/stock", stockQueryParams());
@@ -1380,12 +1380,12 @@ function renderStockRows(rows) {
         <table class="data-table stock-table">
           <thead>
             <tr>
-              <th class="sortable-th ${stockSortClass("sku")}" data-stock-sort="sku">鐗╂枡缂栫爜</th>
-              <th class="sortable-th ${stockSortClass("name")}" data-stock-sort="name">鍚嶇О</th>
-              <th class="sortable-th ${stockSortClass("batch")}" data-stock-sort="batch">鎵瑰彿</th>
-              <th class="sortable-th ${stockSortClass("location")}" data-stock-sort="location">浣嶇疆</th>
-              <th class="sortable-th ${stockSortClass("status")}" data-stock-sort="status">鐘舵€?/th>
-              <th class="num-cell sortable-th ${stockSortClass("qty")}" data-stock-sort="qty">鏁伴噺</th>
+              <th class="sortable-th ${stockSortClass("sku")}" data-stock-sort="sku">閻椻晜鏋＄紓鏍垳</th>
+              <th class="sortable-th ${stockSortClass("name")}" data-stock-sort="name">閸氬秶袨</th>
+              <th class="sortable-th ${stockSortClass("batch")}" data-stock-sort="batch">閹电懓褰?/th>
+              <th class="sortable-th ${stockSortClass("location")}" data-stock-sort="location">娴ｅ秶鐤?/th>
+              <th class="sortable-th ${stockSortClass("status")}" data-stock-sort="status">閻樿埖鈧?/th>
+              <th class="num-cell sortable-th ${stockSortClass("qty")}" data-stock-sort="qty">閺佷即鍣?/th>
             </tr>
           </thead>
           <tbody>
@@ -1394,7 +1394,7 @@ function renderStockRows(rows) {
               return `
                 <tr>
                   <td>${escapeHtml(item.sku)}</td>
-                  <td>${escapeHtml(item.name || material?.name || "鏈煡鐗╂枡")}</td>
+                  <td>${escapeHtml(item.name || material?.name || "閺堫亞鐓￠悧鈺傛灐")}</td>
                   <td>${escapeHtml(item.batch)}</td>
                   <td>${escapeHtml(item.location)}</td>
                   <td>${escapeHtml(item.status)}</td>
@@ -1421,11 +1421,11 @@ function renderPager(selector, pageState, prefix) {
   const from = (pageState.page - 1) * pageState.pageSize + 1;
   const to = Math.min(pageState.page * pageState.pageSize, pageState.total);
   target.innerHTML = `
-    <span>鏄剧ず ${from}-${to} / ${pageState.total}</span>
+    <span>閺勫墽銇?${from}-${to} / ${pageState.total}</span>
     <div class="pager-actions">
-      <button class="ghost-button" type="button" data-${prefix}-page="prev" ${pageState.page <= 1 ? "disabled" : ""}>涓婁竴椤?/button>
+      <button class="ghost-button" type="button" data-${prefix}-page="prev" ${pageState.page <= 1 ? "disabled" : ""}>娑撳﹣绔存い?/button>
       <span>${pageState.page} / ${pageState.pages}</span>
-      <button class="ghost-button" type="button" data-${prefix}-page="next" ${pageState.page >= pageState.pages ? "disabled" : ""}>涓嬩竴椤?/button>
+      <button class="ghost-button" type="button" data-${prefix}-page="next" ${pageState.page >= pageState.pages ? "disabled" : ""}>娑撳绔存い?/button>
     </div>`;
 }
 
@@ -1463,7 +1463,7 @@ function renderMaterials() {
 
 async function loadMaterialPage() {
   const requestId = ++materialRequestId;
-  $("#materialList").innerHTML = `<div class="empty-state">鍔犺浇涓?..</div>`;
+  $("#materialList").innerHTML = `<div class="empty-state">閸旂姾娴囨稉?..</div>`;
   try {
     const data = await fetchApiPage("/api/materials", {
       query: $("#materialSearch")?.value.trim() || "",
@@ -1490,7 +1490,7 @@ function renderMaterialRows(rows) {
             <span>${escapeHtml(item.name)}</span>
           </div>
           <div class="card-meta">
-            <button class="secondary-button mini-action" type="button" data-edit-material="${escapeHtml(item.sku)}">淇敼</button>
+            <button class="secondary-button mini-action" type="button" data-edit-material="${escapeHtml(item.sku)}">娣囶喗鏁?/button>
           </div>
         </article>`).join("")
     : emptyHtml();
@@ -1515,7 +1515,7 @@ function renderLocations() {
 
 async function loadLocationPage() {
   const requestId = ++locationRequestId;
-  $("#locationList").innerHTML = `<div class="empty-state">鍔犺浇涓?..</div>`;
+  $("#locationList").innerHTML = `<div class="empty-state">閸旂姾娴囨稉?..</div>`;
   try {
     const data = await fetchApiPage("/api/locations", {
       query: $("#locationSearch")?.value.trim() || "",
@@ -1539,11 +1539,11 @@ function renderLocationRows(rows) {
         <article class="data-card">
           <div>
             <strong>${escapeHtml(item.code)}</strong>
-            <span>${Number(item.stockRows ?? state.stock.filter((stock) => stock.location === item.code).length)} 鏉″簱瀛?/span>
+            <span>${Number(item.stockRows ?? state.stock.filter((stock) => stock.location === item.code).length)} 閺夆€崇氨鐎?/span>
           </div>
           <div class="card-meta">
             <span>${escapeHtml(item.status)}</span>
-            <button class="secondary-button mini-action" type="button" data-edit-location="${escapeHtml(item.code)}">淇敼</button>
+            <button class="secondary-button mini-action" type="button" data-edit-location="${escapeHtml(item.code)}">娣囶喗鏁?/button>
           </div>
         </article>`).join("")
     : emptyHtml();
@@ -1559,7 +1559,7 @@ function renderUsers() {
           </div>
           <div class="card-meta">
             <span>${roleLabel(user.role)}</span>
-            ${user.id === "admin" ? "" : `<button class="mini-danger" type="button" data-delete-user="${escapeHtml(user.id)}">鍒犻櫎</button>`}
+            ${user.id === "admin" ? "" : `<button class="mini-danger" type="button" data-delete-user="${escapeHtml(user.id)}">閸掔娀娅?/button>`}
           </div>
         </article>`).join("")
     : emptyHtml();
@@ -1579,7 +1579,7 @@ function renderLogs() {
 
 async function loadLogPage() {
   const requestId = ++logRequestId;
-  $("#logList").innerHTML = `<div class="empty-state">娴佹按鍔犺浇涓?..</div>`;
+  $("#logList").innerHTML = `<div class="empty-state">濞翠焦鎸夐崝鐘烘祰娑?..</div>`;
   renderLogPager();
   try {
     const data = await fetchApiPage("/api/logs", {
@@ -1603,16 +1603,16 @@ function renderLogRows(rows) {
         <table class="data-table ledger-table">
           <thead>
             <tr>
-              <th>鎿嶄綔鏃ユ湡</th>
-              <th>璐﹀彿</th>
-              <th>绫诲瀷</th>
-              <th>鐗╂枡缂栫爜</th>
-              <th>鎵瑰彿</th>
-              <th>搴撲綅</th>
-              <th>鐩爣搴撲綅</th>
-              <th>鐘舵€?/th>
-              <th class="num-cell">鏁伴噺</th>
-              <th>澶囨敞</th>
+              <th>閹垮秳缍旈弮銉︽埂</th>
+              <th>鐠愶箑褰?/th>
+              <th>缁鐎?/th>
+              <th>閻椻晜鏋＄紓鏍垳</th>
+              <th>閹电懓褰?/th>
+              <th>鎼存挷缍?/th>
+              <th>閻╊喗鐖ｆ惔鎾茬秴</th>
+              <th>閻樿埖鈧?/th>
+              <th class="num-cell">閺佷即鍣?/th>
+              <th>婢跺洦鏁?/th>
             </tr>
           </thead>
           <tbody>
@@ -1648,14 +1648,14 @@ function renderAuditLogs() {
         <table class="data-table audit-table">
           <thead>
             <tr>
-              <th>鎿嶄綔鏃ユ湡</th>
-              <th>璐﹀彿</th>
-              <th>瀵硅薄</th>
-              <th>鎿嶄綔</th>
-              <th>涓婚敭</th>
-              <th>淇敼鍓?/th>
-              <th>淇敼鍚?/th>
-              <th>澶囨敞</th>
+              <th>閹垮秳缍旈弮銉︽埂</th>
+              <th>鐠愶箑褰?/th>
+              <th>鐎电钖?/th>
+              <th>閹垮秳缍?/th>
+              <th>娑撳鏁?/th>
+              <th>娣囶喗鏁奸崜?/th>
+              <th>娣囶喗鏁奸崥?/th>
+              <th>婢跺洦鏁?/th>
             </tr>
           </thead>
           <tbody>
@@ -1700,7 +1700,7 @@ function ledgerQty(item) {
 }
 
 function typeLabel(type) {
-  return { in: "鍏ュ簱", out: "鍑哄簱", move: "绉诲簱", count: "鐩樼偣", adjust: "鐩樼偣璋冩暣", initial: "鏈熷垵" }[type] || type;
+  return { in: "閸忋儱绨?, out: "閸戝搫绨?, move: "缁夎绨?, count: "閻╂鍋?, adjust: "閻╂鍋ｇ拫鍐╂殻", initial: "閺堢喎鍨? }[type] || type;
 }
 
 function emptyHtml() {
@@ -1739,7 +1739,7 @@ function showToast(text) {
   setTimeout(() => toast.classList.remove("show"), 2200);
 }
 
-function setButtonBusy(button, busy, busyText = "澶勭悊涓?) {
+function setButtonBusy(button, busy, busyText = "处理中") {
   if (!button) return;
   if (busy) {
     button.dataset.busy = "1";
@@ -1760,7 +1760,7 @@ function setFormSubmitting(form, busy) {
     button.disabled = busy;
     if (busy) {
       button.dataset.label = button.textContent;
-      button.textContent = "鎻愪氦涓?;
+      button.textContent = "登录中";
     } else if (button.dataset.label) {
       button.textContent = button.dataset.label;
     }
@@ -1770,7 +1770,7 @@ function setFormSubmitting(form, busy) {
 
 async function withButtonBusy(button, busyText, action) {
   if (button?.dataset.busy === "1") return;
-  setButtonBusy(button, true, "登录中");
+  setButtonBusy(button, true, busyText || "处理中");
   try {
     await action();
   } finally {
@@ -1791,31 +1791,31 @@ async function exportStock() {
   const rows = sourceRows.map((item) => {
     const material = findMaterial(item.sku);
     return {
-      鐗╂枡缂栫爜: item.sku,
-      鐗╂枡鍚嶇О: item.name || material?.name || "",
-      鎵瑰彿: item.batch,
-      鏁伴噺: item.qty,
-      搴撲綅: item.location,
-      鐘舵€? item.status
+      閻椻晜鏋＄紓鏍垳: item.sku,
+      閻椻晜鏋￠崥宥囆? item.name || material?.name || "",
+      閹电懓褰? item.batch,
+      閺佷即鍣? item.qty,
+      鎼存挷缍? item.location,
+      閻樿埖鈧? item.status
     };
   });
-  downloadCsv(rows, `搴撳瓨瀵煎嚭-${new Date().toISOString().slice(0, 10)}.csv`);
+  downloadCsv(rows, `鎼存挸鐡ㄧ€电厧鍤?${new Date().toISOString().slice(0, 10)}.csv`);
 }
 
 function downloadTemplate() {
-  downloadCsv([{ 鐗╂枡缂栫爜: "RM-1001", 鐗╂枡鍚嶇О: "鐢樻补", 鎵瑰彿: "B20260501", 鏁伴噺: "120", 搴撲綅: "A-01-01", 鐘舵€? "鍙敤" }], "搴撳瓨瀵煎叆妯℃澘.csv");
+  downloadCsv([{ 閻椻晜鏋＄紓鏍垳: "RM-1001", 閻椻晜鏋￠崥宥囆? "閻㈡ɑ琛?, 閹电懓褰? "B20260501", 閺佷即鍣? "120", 鎼存挷缍? "A-01-01", 閻樿埖鈧? "閸欘垳鏁? }], "鎼存挸鐡ㄧ€电厧鍙嗗Ο鈩冩緲.csv");
 }
 
 function downloadMaterialTemplate() {
-  downloadCsv([{ 鐗╂枡缂栫爜: "RM-1001", 鐗╂枡鍚嶇О: "鐢樻补" }], "鐗╂枡涓绘暟鎹ā鏉?csv");
+  downloadCsv([{ 閻椻晜鏋＄紓鏍垳: "RM-1001", 閻椻晜鏋￠崥宥囆? "閻㈡ɑ琛? }], "閻椻晜鏋℃稉缁樻殶閹诡喗膩閺?csv");
 }
 
 function downloadLocationTemplate() {
-  downloadCsv([{ 搴撲綅: "A-01-01", 鐘舵€? "绌洪棽" }], "搴撲綅涓绘暟鎹ā鏉?csv");
+  downloadCsv([{ 鎼存挷缍? "A-01-01", 閻樿埖鈧? "缁屾椽妫? }], "鎼存挷缍呮稉缁樻殶閹诡喗膩閺?csv");
 }
 
 function downloadCsv(rows, filename) {
-  const headers = Object.keys(rows[0] || { 绌? "" });
+  const headers = Object.keys(rows[0] || { 缁? "" });
   const csv = `\uFEFF${headers.join(",")}\n${rows.map((row) => headers.map((header) => csvCell(row[header])).join(",")).join("\n")}`;
   downloadBlob(new Blob([csv], { type: "text/csv;charset=utf-8" }), filename);
 }
@@ -1835,18 +1835,18 @@ function downloadBlob(blob, filename) {
 }
 
 async function importInventory() {
-  if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
+  if (!isAdmin()) return showToast("濞屸剝婀侀弶鍐");
   const rows = await readSelectedRows("#inventoryFile");
-  if (!rows.length) return showToast("鏂囦欢娌℃湁鍙鍏ユ暟鎹?);
+  if (!rows.length) return showToast("閺傚洣娆㈠▽鈩冩箒閸欘垰顕遍崗銉︽殶閹?);
   const report = validateInventoryRows(rows);
-  renderImportReport("鏈熷垵搴撳瓨鏍￠獙鎶ュ憡", report);
-  if (!report.validRows) return showToast("娌℃湁鏈夋晥搴撳瓨琛岋紝璇锋鏌ユ枃浠?);
-  if (!confirm(importConfirmText("鏈熷垵搴撳瓨", report))) return;
+  renderImportReport("閺堢喎鍨垫惔鎾崇摠閺嶏繝鐛欓幎銉ユ啞", report);
+  if (!report.validRows) return showToast("濞屸剝婀侀張澶嬫櫏鎼存挸鐡ㄧ悰宀嬬礉鐠囬攱顥呴弻銉︽瀮娴?);
+  if (!confirm(importConfirmText("閺堢喎鍨垫惔鎾崇摠", report))) return;
   try {
     const remote = await postMasterData("/api/import-inventory", { rows });
     if (remote) {
       render();
-      return showToast("搴撳瓨瀵煎叆宸叉彁浜?);
+      return showToast("鎼存挸鐡ㄧ€电厧鍙嗗鍙夊絹娴?);
     }
   } catch (error) {
     return showToast(error.message);
@@ -1854,13 +1854,13 @@ async function importInventory() {
   const groupedRows = new Map();
   let rejected = 0;
   rows.forEach((row) => {
-    const sku = normalize(pickField(row, ["鐗╂枡缂栫爜", "瀛樿揣缂栫爜", "sku", "SKU"]));
-    const name = String(pickField(row, ["鐗╂枡鍚嶇О", "瀛樿揣鍚嶇О", "name"]) || "").trim();
-    const batch = normalize(pickField(row, ["鎵瑰彿", "batch"]));
-    const rawQty = pickField(row, ["鏁伴噺", "鍙敤鏁伴噺", "鐜板瓨閲?, "qty"]);
+    const sku = normalize(pickField(row, ["閻椻晜鏋＄紓鏍垳", "鐎涙鎻ｇ紓鏍垳", "sku", "SKU"]));
+    const name = String(pickField(row, ["閻椻晜鏋￠崥宥囆?, "鐎涙鎻ｉ崥宥囆?, "name"]) || "").trim();
+    const batch = normalize(pickField(row, ["閹电懓褰?, "batch"]));
+    const rawQty = pickField(row, ["閺佷即鍣?, "閸欘垳鏁ら弫浼村櫤", "閻滄澘鐡ㄩ柌?, "qty"]);
     const qty = parseSystemQty(rawQty);
-    const location = normalize(pickField(row, ["搴撲綅", "搴撲綅缂栫爜", "浠撳簱鍚嶇О", "浠撳簱", "location"]));
-    const status = String(pickField(row, ["鐘舵€?, "搴撳瓨鐘舵€?, "status"]) || "鍙敤").trim();
+    const location = normalize(pickField(row, ["鎼存挷缍?, "鎼存挷缍呯紓鏍垳", "娴犳挸绨遍崥宥囆?, "娴犳挸绨?, "location"]));
+    const status = String(pickField(row, ["閻樿埖鈧?, "鎼存挸鐡ㄩ悩鑸碘偓?, "status"]) || "閸欘垳鏁?).trim();
     if (!sku || !name || !batch || !location || qty === null) {
       rejected += 1;
       return;
@@ -1875,7 +1875,7 @@ async function importInventory() {
   });
   groupedRows.forEach((item) => {
     upsertMaterial({ sku: item.sku, name: item.name });
-    if (!findLocation(item.location)) state.locations.push({ code: item.location, status: "绌洪棽" });
+    if (!findLocation(item.location)) state.locations.push({ code: item.location, status: "缁屾椽妫? });
     const existing = findStock(item.sku, item.batch, item.location, item.status);
     if (existing) {
       existing.qty = item.qty;
@@ -1886,65 +1886,65 @@ async function importInventory() {
   });
   const imported = groupedRows.size;
   refreshLocationUsage();
-  addLog({ type: "initial", sku: "IMPORT", batch: "", qty: imported, location: "", targetLocation: "", status: "", note: `瀵煎叆鏈熷垵搴撳瓨 ${imported} 琛岋紝鎷掔粷 ${rejected} 琛宍 });
-  addAuditLog({ action: "瀵煎叆鏈熷垵搴撳瓨", entity: "搴撳瓨瀵煎叆", key: "IMPORT", before: null, after: { imported, rejected, sourceRows: rows.length }, note: `瀵煎叆鏈熷垵搴撳瓨 ${imported} 琛岋紝鎷掔粷 ${rejected} 琛宍 });
+  addLog({ type: "initial", sku: "IMPORT", batch: "", qty: imported, location: "", targetLocation: "", status: "", note: `鐎电厧鍙嗛張鐔峰灥鎼存挸鐡?${imported} 鐞涘矉绱濋幏鎺旂卜 ${rejected} 鐞涘畭 });
+  addAuditLog({ action: "鐎电厧鍙嗛張鐔峰灥鎼存挸鐡?, entity: "鎼存挸鐡ㄧ€电厧鍙?, key: "IMPORT", before: null, after: { imported, rejected, sourceRows: rows.length }, note: `鐎电厧鍙嗛張鐔峰灥鎼存挸鐡?${imported} 鐞涘矉绱濋幏鎺旂卜 ${rejected} 鐞涘畭 });
   saveState();
   render();
-  showToast(`宸插鍏?${imported} 琛岋紝鎷掔粷 ${rejected} 琛宍);
+  showToast(`瀹告彃顕遍崗?${imported} 鐞涘矉绱濋幏鎺旂卜 ${rejected} 鐞涘畭);
 }
 
 async function importMaterials() {
-  if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
+  if (!isAdmin()) return showToast("濞屸剝婀侀弶鍐");
   const rows = await readSelectedRows("#materialFile");
-  if (!rows.length) return showToast("鏂囦欢娌℃湁鍙鍏ユ暟鎹?);
+  if (!rows.length) return showToast("閺傚洣娆㈠▽鈩冩箒閸欘垰顕遍崗銉︽殶閹?);
   const report = validateMaterialRows(rows);
-  renderImportReport("鐗╂枡涓绘暟鎹牎楠屾姤鍛?, report);
-  if (!report.validRows) return showToast("娌℃湁鏈夋晥鐗╂枡琛岋紝璇锋鏌ユ枃浠?);
-  if (!confirm(importConfirmText("鐗╂枡涓绘暟鎹?, report))) return;
+  renderImportReport("閻椻晜鏋℃稉缁樻殶閹诡喗鐗庢灞惧Г閸?, report);
+  if (!report.validRows) return showToast("濞屸剝婀侀張澶嬫櫏閻椻晜鏋＄悰宀嬬礉鐠囬攱顥呴弻銉︽瀮娴?);
+  if (!confirm(importConfirmText("閻椻晜鏋℃稉缁樻殶閹?, report))) return;
   try {
     const remote = await postMasterData("/api/import-materials", { rows });
     if (remote) {
       render();
-      return showToast("鐗╂枡涓绘暟鎹鍏ュ凡鎻愪氦");
+      return showToast("閻椻晜鏋℃稉缁樻殶閹诡喖顕遍崗銉ュ嚒閹绘劒姘?);
     }
   } catch (error) {
     return showToast(error.message);
   }
   let imported = 0;
   rows.forEach((row) => {
-    const sku = normalize(pickField(row, ["鐗╂枡缂栫爜", "瀛樿揣缂栫爜", "sku", "SKU"]));
-    const name = String(pickField(row, ["鐗╂枡鍚嶇О", "瀛樿揣鍚嶇О", "name"]) || "").trim();
+    const sku = normalize(pickField(row, ["閻椻晜鏋＄紓鏍垳", "鐎涙鎻ｇ紓鏍垳", "sku", "SKU"]));
+    const name = String(pickField(row, ["閻椻晜鏋￠崥宥囆?, "鐎涙鎻ｉ崥宥囆?, "name"]) || "").trim();
     if (!sku || !name) return;
     upsertMaterial({ sku, name });
     imported += 1;
   });
-  addAuditLog({ action: "瀵煎叆鐗╂枡涓绘暟鎹?, entity: "鐗╂枡涓绘暟鎹?, key: "IMPORT", before: null, after: { imported }, note: `瀵煎叆鐗╂枡 ${imported} 琛宍 });
+  addAuditLog({ action: "鐎电厧鍙嗛悧鈺傛灐娑撶粯鏆熼幑?, entity: "閻椻晜鏋℃稉缁樻殶閹?, key: "IMPORT", before: null, after: { imported }, note: `鐎电厧鍙嗛悧鈺傛灐 ${imported} 鐞涘畭 });
   saveState();
   render();
-  showToast(`宸插鍏ョ墿鏂?${imported} 琛宍);
+  showToast(`瀹告彃顕遍崗銉у⒖閺?${imported} 鐞涘畭);
 }
 
 async function importLocations() {
-  if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
+  if (!isAdmin()) return showToast("濞屸剝婀侀弶鍐");
   const rows = await readSelectedRows("#locationFile");
-  if (!rows.length) return showToast("鏂囦欢娌℃湁鍙鍏ユ暟鎹?);
+  if (!rows.length) return showToast("閺傚洣娆㈠▽鈩冩箒閸欘垰顕遍崗銉︽殶閹?);
   const report = validateLocationRows(rows);
-  renderImportReport("搴撲綅涓绘暟鎹牎楠屾姤鍛?, report);
-  if (!report.validRows) return showToast("娌℃湁鏈夋晥搴撲綅琛岋紝璇锋鏌ユ枃浠?);
-  if (!confirm(importConfirmText("搴撲綅涓绘暟鎹?, report))) return;
+  renderImportReport("鎼存挷缍呮稉缁樻殶閹诡喗鐗庢灞惧Г閸?, report);
+  if (!report.validRows) return showToast("濞屸剝婀侀張澶嬫櫏鎼存挷缍呯悰宀嬬礉鐠囬攱顥呴弻銉︽瀮娴?);
+  if (!confirm(importConfirmText("鎼存挷缍呮稉缁樻殶閹?, report))) return;
   try {
     const remote = await postMasterData("/api/import-locations", { rows });
     if (remote) {
       render();
-      return showToast("搴撲綅涓绘暟鎹鍏ュ凡鎻愪氦");
+      return showToast("鎼存挷缍呮稉缁樻殶閹诡喖顕遍崗銉ュ嚒閹绘劒姘?);
     }
   } catch (error) {
     return showToast(error.message);
   }
   let imported = 0;
   rows.forEach((row) => {
-    const code = normalize(row["搴撲綅"] || row["搴撲綅缂栫爜"] || row.location || row.code);
-    const status = String(row["鐘舵€?] || row.status || "绌洪棽").trim();
+    const code = normalize(row["鎼存挷缍?] || row["鎼存挷缍呯紓鏍垳"] || row.location || row.code);
+    const status = String(row["閻樿埖鈧?] || row.status || "缁屾椽妫?).trim();
     if (!code) return;
     const existing = findLocation(code);
     if (existing) existing.status = status;
@@ -1952,14 +1952,14 @@ async function importLocations() {
     imported += 1;
   });
   refreshLocationUsage();
-  addAuditLog({ action: "瀵煎叆搴撲綅涓绘暟鎹?, entity: "搴撲綅涓绘暟鎹?, key: "IMPORT", before: null, after: { imported }, note: `瀵煎叆搴撲綅 ${imported} 琛宍 });
+  addAuditLog({ action: "鐎电厧鍙嗘惔鎾茬秴娑撶粯鏆熼幑?, entity: "鎼存挷缍呮稉缁樻殶閹?, key: "IMPORT", before: null, after: { imported }, note: `鐎电厧鍙嗘惔鎾茬秴 ${imported} 鐞涘畭 });
   saveState();
   render();
-  showToast(`宸插鍏ュ簱浣?${imported} 琛宍);
+  showToast(`瀹告彃顕遍崗銉ョ氨娴?${imported} 鐞涘畭);
 }
 
 async function downloadBackup() {
-  if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
+  if (!isAdmin()) return showToast("濞屸剝婀侀弶鍐");
   const auth = currentAuthPayload();
   try {
     const response = await fetch("/api/backup", {
@@ -1969,17 +1969,17 @@ async function downloadBackup() {
       }
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "账号或密码错误");
+    if (!response.ok) throw new Error(data.error || "璐﹀彿鎴栧瘑鐮侀敊璇?);
     const filename = `wms-backup-${new Date().toISOString().slice(0, 10)}.json`;
     downloadBlob(new Blob([JSON.stringify(data.data, null, 2)], { type: "application/json;charset=utf-8" }), filename);
-    showToast("澶囦唤宸蹭笅杞?);
+    showToast("婢跺洣鍞ゅ韫瑓鏉?);
   } catch (error) {
-    showToast(error?.message || "登录失败，请重试");
+    showToast(error?.message || "鐧诲綍澶辫触锛岃閲嶈瘯");
   }
 }
 
 async function downloadAutoBackup() {
-  if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
+  if (!isAdmin()) return showToast("濞屸剝婀侀弶鍐");
   const auth = currentAuthPayload();
   try {
     const response = await fetch("/api/auto-backup", {
@@ -1989,20 +1989,20 @@ async function downloadAutoBackup() {
       }
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "账号或密码错误");
+    if (!response.ok) throw new Error(data.error || "璐﹀彿鎴栧瘑鐮侀敊璇?);
     const filename = `wms-auto-backup-${new Date().toISOString().slice(0, 10)}.json`;
     downloadBlob(new Blob([JSON.stringify(data, null, 2)], { type: "application/json;charset=utf-8" }), filename);
-    showToast("鑷姩澶囦唤宸蹭笅杞?);
+    showToast("閼奉亜濮╂径鍥﹀敜瀹歌弓绗呮潪?);
   } catch (error) {
-    showToast(error?.message || "登录失败，请重试");
+    showToast(error?.message || "鐧诲綍澶辫触锛岃閲嶈瘯");
   }
 }
 
 async function restoreBackup() {
-  if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
+  if (!isAdmin()) return showToast("濞屸剝婀侀弶鍐");
   const file = $("#restoreFile").files[0];
-  if (!file) return showToast("璇烽€夋嫨澶囦唤 JSON 鏂囦欢");
-  if (!confirm("鎭㈠澶囦唤浼氳鐩栧綋鍓嶅簱瀛樸€佷富鏁版嵁銆佽处鍙峰拰娴佹按锛岀‘瀹氱户缁悧锛?)) return;
+  if (!file) return showToast("鐠囩兘鈧瀚ㄦ径鍥﹀敜 JSON 閺傚洣娆?);
+  if (!confirm("閹垹顦叉径鍥﹀敜娴兼俺顩惄鏍х秼閸撳秴绨辩€涙ǜ鈧椒瀵岄弫鐗堝祦閵嗕浇澶勯崣宄版嫲濞翠焦鎸夐敍宀€鈥樼€规氨鎴风紒顓炴偋閿?)) return;
   try {
     const backup = JSON.parse(await readTextFile(file));
     const auth = currentAuthPayload();
@@ -2012,16 +2012,16 @@ async function restoreBackup() {
       body: JSON.stringify({ backup, operatorId: auth.operatorId })
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "账号或密码错误");
+    if (!response.ok) throw new Error(data.error || "璐﹀彿鎴栧瘑鐮侀敊璇?);
     const currentUserId = state.currentUserId;
     Object.assign(state, migrateState({ ...defaultState(), ...data }));
     state.currentUserId = currentUserId;
     localStorage.setItem(storeKey, JSON.stringify(state));
     $("#restoreFile").value = "";
     render();
-    showToast("澶囦唤宸叉仮澶?);
+    showToast("婢跺洣鍞ゅ鍙変划婢?);
   } catch (error) {
-    showToast(error.message || "澶囦唤鏂囦欢鏃犳硶璇诲彇");
+    showToast(error.message || "婢跺洣鍞ら弬鍥︽閺冪姵纭剁拠璇插絿");
   }
 }
 
@@ -2038,18 +2038,18 @@ function validateInventoryRows(rows) {
   const report = createReport(rows.length);
   const grouped = new Map();
   rows.forEach((row, index) => {
-    const sku = normalize(pickField(row, ["鐗╂枡缂栫爜", "瀛樿揣缂栫爜", "sku", "SKU"]));
-    const name = String(pickField(row, ["鐗╂枡鍚嶇О", "瀛樿揣鍚嶇О", "name"]) || "").trim();
-    const batch = normalize(pickField(row, ["鎵瑰彿", "batch"]));
-    const rawQty = pickField(row, ["鏁伴噺", "鍙敤鏁伴噺", "鐜板瓨閲?, "qty"]);
+    const sku = normalize(pickField(row, ["閻椻晜鏋＄紓鏍垳", "鐎涙鎻ｇ紓鏍垳", "sku", "SKU"]));
+    const name = String(pickField(row, ["閻椻晜鏋￠崥宥囆?, "鐎涙鎻ｉ崥宥囆?, "name"]) || "").trim();
+    const batch = normalize(pickField(row, ["閹电懓褰?, "batch"]));
+    const rawQty = pickField(row, ["閺佷即鍣?, "閸欘垳鏁ら弫浼村櫤", "閻滄澘鐡ㄩ柌?, "qty"]);
     const qty = parseSystemQty(rawQty);
-    const location = normalize(pickField(row, ["搴撲綅", "搴撲綅缂栫爜", "浠撳簱鍚嶇О", "浠撳簱", "location"]));
-    const status = String(pickField(row, ["鐘舵€?, "搴撳瓨鐘舵€?, "status"]) || "鍙敤").trim();
+    const location = normalize(pickField(row, ["鎼存挷缍?, "鎼存挷缍呯紓鏍垳", "娴犳挸绨遍崥宥囆?, "娴犳挸绨?, "location"]));
+    const status = String(pickField(row, ["閻樿埖鈧?, "鎼存挸鐡ㄩ悩鑸碘偓?, "status"]) || "閸欘垳鏁?).trim();
     const reasons = [];
-    if (!sku) reasons.push("缂哄皯鐗╂枡缂栫爜");
-    if (!name) reasons.push("缂哄皯鐗╂枡鍚嶇О");
-    if (!batch) reasons.push("缂哄皯鎵瑰彿");
-    if (!location) reasons.push("缂哄皯搴撲綅");
+    if (!sku) reasons.push("缂傚搫鐨悧鈺傛灐缂傛牜鐖?);
+    if (!name) reasons.push("缂傚搫鐨悧鈺傛灐閸氬秶袨");
+    if (!batch) reasons.push("缂傚搫鐨幍鐟板娇");
+    if (!location) reasons.push("缂傚搫鐨惔鎾茬秴");
     if (qty === null) reasons.push(qtyErrorText(rawQty));
     if (reasons.length) return addInvalid(report, index, reasons);
     report.validRows += 1;
@@ -2066,11 +2066,11 @@ function validateMaterialRows(rows) {
   const report = createReport(rows.length);
   const seen = new Set();
   rows.forEach((row, index) => {
-    const sku = normalize(pickField(row, ["鐗╂枡缂栫爜", "瀛樿揣缂栫爜", "sku", "SKU"]));
-    const name = String(pickField(row, ["鐗╂枡鍚嶇О", "瀛樿揣鍚嶇О", "name"]) || "").trim();
+    const sku = normalize(pickField(row, ["閻椻晜鏋＄紓鏍垳", "鐎涙鎻ｇ紓鏍垳", "sku", "SKU"]));
+    const name = String(pickField(row, ["閻椻晜鏋￠崥宥囆?, "鐎涙鎻ｉ崥宥囆?, "name"]) || "").trim();
     const reasons = [];
-    if (!sku) reasons.push("缂哄皯鐗╂枡缂栫爜");
-    if (!name) reasons.push("缂哄皯鐗╂枡鍚嶇О");
+    if (!sku) reasons.push("缂傚搫鐨悧鈺傛灐缂傛牜鐖?);
+    if (!name) reasons.push("缂傚搫鐨悧鈺傛灐閸氬秶袨");
     if (reasons.length) return addInvalid(report, index, reasons);
     report.validRows += 1;
     if (seen.has(sku)) report.duplicateRows += 1;
@@ -2084,8 +2084,8 @@ function validateLocationRows(rows) {
   const report = createReport(rows.length);
   const seen = new Set();
   rows.forEach((row, index) => {
-    const code = normalize(pickField(row, ["搴撲綅", "搴撲綅缂栫爜", "浠撳簱鍚嶇О", "浠撳簱", "location", "code"]));
-    if (!code) return addInvalid(report, index, ["缂哄皯搴撲綅缂栫爜"]);
+    const code = normalize(pickField(row, ["鎼存挷缍?, "鎼存挷缍呯紓鏍垳", "娴犳挸绨遍崥宥囆?, "娴犳挸绨?, "location", "code"]));
+    if (!code) return addInvalid(report, index, ["缂傚搫鐨惔鎾茬秴缂傛牜鐖?]);
     report.validRows += 1;
     if (seen.has(code)) report.duplicateRows += 1;
     seen.add(code);
@@ -2100,7 +2100,7 @@ function createReport(sourceRows) {
 
 function addInvalid(report, index, reasons) {
   report.invalidRows += 1;
-  if (report.invalidSamples.length < 8) report.invalidSamples.push(`绗?${index + 2} 琛岋細${reasons.join("锛?)}`);
+  if (report.invalidSamples.length < 8) report.invalidSamples.push(`缁?${index + 2} 鐞涘矉绱?{reasons.join("閿?)}`);
 }
 
 function renderImportReport(title, report) {
@@ -2110,18 +2110,18 @@ function renderImportReport(title, report) {
   const invalid = report.invalidSamples.length ? `<br>${report.invalidSamples.map(escapeHtml).join("<br>")}` : "";
   target.innerHTML = `
     <strong>${escapeHtml(title)}</strong>
-    鍘熷 ${report.sourceRows} 琛岋紱鏈夋晥 ${report.validRows} 琛岋紱鏃犳晥 ${report.invalidRows} 琛岋紱閲嶅鍚堝苟 ${report.duplicateRows} 琛岋紱鏈€缁堝鍏?${report.mergedRows} 琛屻€?    ${report.totalQty ? `<br>鏈夋晥鏁伴噺鍚堣锛?{report.totalQty}` : ""}
+    閸樼喎顫?${report.sourceRows} 鐞涘矉绱遍張澶嬫櫏 ${report.validRows} 鐞涘矉绱遍弮鐘虫櫏 ${report.invalidRows} 鐞涘矉绱遍柌宥咁槻閸氬牆鑻?${report.duplicateRows} 鐞涘矉绱遍張鈧紒鍫濐嚤閸?${report.mergedRows} 鐞涘被鈧?    ${report.totalQty ? `<br>閺堝鏅ラ弫浼村櫤閸氬牐顓搁敍?{report.totalQty}` : ""}
     ${invalid}`;
 }
 
 function importConfirmText(title, report) {
-  return `${title}瀵煎叆鏍￠獙锛歕n鍘熷 ${report.sourceRows} 琛孿n鏈夋晥 ${report.validRows} 琛孿n鏃犳晥 ${report.invalidRows} 琛孿n閲嶅鍚堝苟 ${report.duplicateRows} 琛孿n鏈€缁堝鍏?${report.mergedRows} 琛孿n\n鏄惁缁х画瀵煎叆鏈夋晥鏁版嵁锛焋;
+  return `${title}鐎电厧鍙嗛弽锟犵崣閿涙瓡n閸樼喎顫?${report.sourceRows} 鐞涘n閺堝鏅?${report.validRows} 鐞涘n閺冪姵鏅?${report.invalidRows} 鐞涘n闁插秴顦查崥鍫濊嫙 ${report.duplicateRows} 鐞涘n閺堚偓缂佸牆顕遍崗?${report.mergedRows} 鐞涘n\n閺勵垰鎯佺紒褏鐢荤€电厧鍙嗛張澶嬫櫏閺佺増宓侀敍鐒?
 }
 
 async function readSelectedRows(selector) {
   const file = $(selector).files[0];
   if (!file) {
-    showToast("璇烽€夋嫨 Excel 鎴?CSV 鏂囦欢");
+    showToast("鐠囩兘鈧瀚?Excel 閹?CSV 閺傚洣娆?);
     return [];
   }
   return readRows(file);
@@ -2221,13 +2221,13 @@ function upsertMaterial(material) {
 
 async function addMaterial(event) {
   event.preventDefault();
-  if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
+  if (!isAdmin()) return showToast("濞屸剝婀侀弶鍐");
   const sku = normalize($("#newSku").value);
   const name = $("#newName").value.trim();
   const previousSku = editingMaterialSku;
-  if (!sku || !name) return showToast("鐗╂枡缂栫爜鍜屽悕绉颁笉鑳戒负绌?);
-  if (!previousSku && state.materials.some((item) => item.sku === sku)) return showToast("鐗╂枡缂栫爜宸插瓨鍦紝璇锋悳绱㈠悗鐐逛慨鏀?);
-  if (previousSku && previousSku !== sku && state.materials.some((item) => item.sku === sku)) return showToast("鐗╂枡缂栫爜宸插瓨鍦?);
+  if (!sku || !name) return showToast("閻椻晜鏋＄紓鏍垳閸滃苯鎮曠粔棰佺瑝閼虫垝璐熺粚?);
+  if (!previousSku && state.materials.some((item) => item.sku === sku)) return showToast("閻椻晜鏋＄紓鏍垳瀹告彃鐡ㄩ崷顭掔礉鐠囬攱鎮崇槐銏犳倵閻愰€涙叏閺€?);
+  if (previousSku && previousSku !== sku && state.materials.some((item) => item.sku === sku)) return showToast("閻椻晜鏋＄紓鏍垳瀹告彃鐡ㄩ崷?);
   try {
     const remote = await postMasterData("/api/materials", { previousSku, sku, name });
     if (!remote) {
@@ -2241,7 +2241,7 @@ async function addMaterial(event) {
           touchStock(row);
         }
       });
-      addAuditLog({ action: existing ? (previousSku && previousSku !== sku ? "淇敼鐗╂枡缂栫爜" : "淇敼鐗╂枡") : "鏂板鐗╂枡", entity: "鐗╂枡涓绘暟鎹?, key: sku, before, after: { sku, name } });
+      addAuditLog({ action: existing ? (previousSku && previousSku !== sku ? "娣囶喗鏁奸悧鈺傛灐缂傛牜鐖? : "娣囶喗鏁奸悧鈺傛灐") : "閺傛澘顤冮悧鈺傛灐", entity: "閻椻晜鏋℃稉缁樻殶閹?, key: sku, before, after: { sku, name } });
       saveState();
     }
   } catch (error) {
@@ -2251,18 +2251,18 @@ async function addMaterial(event) {
   materialPage.page = 1;
   resetMaterialEdit();
   render();
-  showToast("鐗╂枡涓绘暟鎹凡淇濆瓨");
+  showToast("閻椻晜鏋℃稉缁樻殶閹诡喖鍑℃穱婵嗙摠");
 }
 
 async function addLocation(event) {
   event.preventDefault();
-  if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
+  if (!isAdmin()) return showToast("濞屸剝婀侀弶鍐");
   const code = normalize($("#newLocation").value);
   const previousCode = editingLocationCode;
   const status = $("#newLocationStatus").value;
-  if (!code) return showToast("搴撲綅缂栫爜涓嶈兘涓虹┖");
-  if (!previousCode && state.locations.some((item) => item.code === code)) return showToast("搴撲綅宸插瓨鍦紝璇锋悳绱㈠悗鐐逛慨鏀?);
-  if (previousCode && previousCode !== code && state.locations.some((item) => item.code === code)) return showToast("搴撲綅缂栫爜宸插瓨鍦?);
+  if (!code) return showToast("鎼存挷缍呯紓鏍垳娑撳秷鍏樻稉铏光敄");
+  if (!previousCode && state.locations.some((item) => item.code === code)) return showToast("鎼存挷缍呭鎻掔摠閸︻煉绱濈拠閿嬫偝缁便垹鎮楅悙閫涙叏閺€?);
+  if (previousCode && previousCode !== code && state.locations.some((item) => item.code === code)) return showToast("鎼存挷缍呯紓鏍垳瀹告彃鐡ㄩ崷?);
   try {
     const remote = await postMasterData("/api/locations", { previousCode, code, status });
     if (!remote) {
@@ -2278,7 +2278,7 @@ async function addLocation(event) {
         if (row.targetLocation === previousCode) row.targetLocation = code;
       });
       refreshLocationUsage();
-      addAuditLog({ action: existing ? (previousCode && previousCode !== code ? "淇敼搴撲綅缂栫爜" : "淇敼搴撲綅") : "鏂板搴撲綅", entity: "搴撲綅涓绘暟鎹?, key: code, before, after: findLocation(code) || { code, status } });
+      addAuditLog({ action: existing ? (previousCode && previousCode !== code ? "娣囶喗鏁兼惔鎾茬秴缂傛牜鐖? : "娣囶喗鏁兼惔鎾茬秴") : "閺傛澘顤冩惔鎾茬秴", entity: "鎼存挷缍呮稉缁樻殶閹?, key: code, before, after: findLocation(code) || { code, status } });
       saveState();
     }
   } catch (error) {
@@ -2288,7 +2288,7 @@ async function addLocation(event) {
   locationPage.page = 1;
   resetLocationEdit();
   render();
-  showToast("搴撲綅涓绘暟鎹凡淇濆瓨");
+  showToast("鎼存挷缍呮稉缁樻殶閹诡喖鍑℃穱婵嗙摠");
 }
 
 function editMaterial(sku) {
@@ -2297,7 +2297,7 @@ function editMaterial(sku) {
   editingMaterialSku = material.sku;
   $("#newSku").value = material.sku;
   $("#newName").value = material.name;
-  $("#materialSaveButton").textContent = "淇濆瓨淇敼";
+  $("#materialSaveButton").textContent = "娣囨繂鐡ㄦ穱顔芥暭";
   $("#cancelMaterialEdit").classList.remove("hidden");
   $("#newName").focus();
 }
@@ -2305,7 +2305,7 @@ function editMaterial(sku) {
 function resetMaterialEdit() {
   editingMaterialSku = "";
   $("#materialForm").reset();
-  $("#materialSaveButton").textContent = "淇濆瓨";
+  $("#materialSaveButton").textContent = "娣囨繂鐡?;
   $("#cancelMaterialEdit").classList.add("hidden");
 }
 
@@ -2314,8 +2314,8 @@ function editLocation(code) {
   if (!location) return;
   editingLocationCode = location.code;
   $("#newLocation").value = location.code;
-  $("#newLocationStatus").value = location.status || "绌洪棽";
-  $("#locationSaveButton").textContent = "淇濆瓨淇敼";
+  $("#newLocationStatus").value = location.status || "缁屾椽妫?;
+  $("#locationSaveButton").textContent = "娣囨繂鐡ㄦ穱顔芥暭";
   $("#cancelLocationEdit").classList.remove("hidden");
   $("#newLocation").focus();
 }
@@ -2323,18 +2323,18 @@ function editLocation(code) {
 function resetLocationEdit() {
   editingLocationCode = "";
   $("#locationForm").reset();
-  $("#locationSaveButton").textContent = "淇濆瓨";
+  $("#locationSaveButton").textContent = "娣囨繂鐡?;
   $("#cancelLocationEdit").classList.add("hidden");
 }
 
 async function addUser(event) {
   event.preventDefault();
-  if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
+  if (!isAdmin()) return showToast("濞屸剝婀侀弶鍐");
   const id = normalize($("#newUserId").value);
   const existing = state.users.find((user) => user.id === id);
   const password = $("#newUserPassword").value.trim();
   const user = { id, name: $("#newUserName").value.trim(), role: $("#newUserRole").value };
-  if (!existing && !password) return showToast("鏂板璐﹀彿蹇呴』璁剧疆瀵嗙爜");
+  if (!existing && !password) return showToast("閺傛澘顤冪拹锕€褰胯箛鍛淬€忕拋鍓х枂鐎靛棛鐖?);
   try {
     const remote = await postUserData("/api/users", { id, name: user.name, role: user.role, userPassword: password });
     if (!remote) {
@@ -2342,7 +2342,7 @@ async function addUser(event) {
       if (existing) Object.assign(existing, user);
       else state.users.push(user);
       const afterUser = state.users.find((item) => item.id === id);
-      addAuditLog({ action: existing ? "淇敼璐﹀彿" : "鏂板璐﹀彿", entity: "璐﹀彿鏉冮檺", key: id, before, after: { id: afterUser.id, name: afterUser.name, role: afterUser.role } });
+      addAuditLog({ action: existing ? "娣囶喗鏁肩拹锕€褰? : "閺傛澘顤冪拹锕€褰?, entity: "鐠愶箑褰块弶鍐", key: id, before, after: { id: afterUser.id, name: afterUser.name, role: afterUser.role } });
       saveState();
     }
   } catch (error) {
@@ -2350,13 +2350,18 @@ async function addUser(event) {
   }
   if (id.toLowerCase() === "admin" && password && sessionAuth.userId?.toLowerCase() === "admin") {
     sessionAuth = { ...sessionAuth, mustChangePassword: false };
+  }
+  render();
+  showToast("管理员信息已更新");
+}
+
 async function loginAsync() {
   const userId = $("#loginUserInput").value.trim();
   const password = $("#loginPasswordInput").value;
   const button = $("#loginButton");
   if (button.dataset.busy === "1") return;
-  setButtonBusy(button, true, "\u6b63\u5728\u767b\u5f55");
-  showToast("\u6b63\u5728\u767b\u5f55");
+  setButtonBusy(button, true, "正在登录");
+  showToast("正在登录");
   try {
     const response = await fetch("/api/login", {
       method: "POST",
@@ -2364,7 +2369,7 @@ async function loginAsync() {
       body: JSON.stringify({ userId, password })
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "\u8d26\u53f7\u6216\u5bc6\u7801\u9519\u8bef");
+    if (!response.ok) throw new Error(data.error || "账号或密码错误");
     Object.assign(state, migrateState({ ...defaultState(), ...(data.state || {}) }));
     state.currentUserId = data.user.id;
     saveSessionAuth(data.user.id, data.token, data.expiresAt, data.mustChangePassword);
@@ -2376,21 +2381,11 @@ async function loginAsync() {
     $("#accountBadge").textContent = `${data.user.id} / ${roleLabel(data.user.role)}`;
     renderPermissions();
     render();
-    showToast(`\u767b\u5f55\u6210\u529f\uff0c\u5f53\u524d\u7528\u6237\uff1a${data.user.id}`);
+    showToast(`登录成功，当前用户：${data.user.id}`);
     if (data.mustChangePassword) {
       activateView("users");
-      showToast("\u7ba1\u7406\u5458\u4ecd\u5728\u4f7f\u7528\u9ed8\u8ba4\u5bc6\u7801\uff0c\u8bf7\u5148\u4fee\u6539\u5bc6\u7801");
+      showToast("管理员仍在使用默认密码，请先修改密码");
     }
-  } catch (error) {
-    showToast(error?.message || "\u767b\u5f55\u5931\u8d25\uff0c\u8bf7\u91cd\u8bd5");
-  } finally {
-    setButtonBusy(button, false);
-  }
-}
-
-function logout() {
-
-function logout() {
   } catch (error) {
     showToast(error?.message || "登录失败，请重试");
   } finally {
@@ -2415,16 +2410,16 @@ function logout() {
 }
 
 async function deleteUser(userId) {
-  if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
-  if (userId === "admin") return showToast("涓嶈兘鍒犻櫎绠＄悊鍛樿处鍙?);
-  if (!confirm(`纭畾鍒犻櫎璐﹀彿 ${userId}锛焋)) return;
+  if (!isAdmin()) return showToast("没有权限");
+  if (userId === "admin") return showToast("不能删除管理员账号");
+  if (!confirm(`确认删除用户 ${userId} 吗？`)) return;
   try {
     const remote = await postUserData("/api/users/delete", { targetId: userId });
     if (!remote) {
       const before = state.users.find((user) => user.id === userId);
       state.users = state.users.filter((user) => user.id !== userId);
       if (state.currentUserId === userId) state.currentUserId = "";
-      if (before) addAuditLog({ action: "鍒犻櫎璐﹀彿", entity: "璐﹀彿鏉冮檺", key: userId, before: { id: before.id, name: before.name, role: before.role }, after: null });
+      if (before) addAuditLog({ action: "閸掔娀娅庣拹锕€褰?, entity: "鐠愶箑褰块弶鍐", key: userId, before: { id: before.id, name: before.name, role: before.role }, after: null });
       saveState();
     }
   } catch (error) {
@@ -2483,8 +2478,8 @@ function registerServiceWorker() {
 
 $$(".tab").forEach((button) => {
   button.addEventListener("click", () => {
-    if (!isAdmin() && !["operate", "count", "stock"].includes(button.dataset.view)) return showToast("娌℃湁鏉冮檺");
-    if (!canOpenView(button.dataset.view)) return showToast("娌℃湁鏉冮檺");
+    if (!isAdmin() && !["operate", "count", "stock"].includes(button.dataset.view)) return showToast("濞屸剝婀侀弶鍐");
+    if (!canOpenView(button.dataset.view)) return showToast("濞屸剝婀侀弶鍐");
     activateView(button.dataset.view);
   });
 });
@@ -2528,7 +2523,7 @@ $("#qtyInput").addEventListener("blur", (event) => {
   if (event.target.value && parseSystemQty(event.target.value) === null) showToast(qtyErrorText(event.target.value));
   const qty = parseSystemQty(event.target.value);
   const maxQty = Number(event.target.dataset.maxQty || 0);
-  if (qty !== null && maxQty && qty > maxQty) showToast("鏈鏁伴噺涓嶈兘瓒呰繃鐜版湁搴撳瓨");
+  if (qty !== null && maxQty && qty > maxQty) showToast("閺堫剚顐奸弫浼村櫤娑撳秷鍏樼搾鍛扮箖閻滅増婀佹惔鎾崇摠");
 });
 $("#qtyInput").addEventListener("input", updateOperationHelper);
 $("#operationForm").addEventListener("submit", submitOperation);
@@ -2599,12 +2594,12 @@ $("#exportStock").addEventListener("click", exportStock);
 $("#downloadTemplate").addEventListener("click", downloadTemplate);
 $("#downloadMaterialTemplate").addEventListener("click", downloadMaterialTemplate);
 $("#downloadLocationTemplate").addEventListener("click", downloadLocationTemplate);
-$("#importInventory").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "瀵煎叆涓?, importInventory));
-$("#importMaterials").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "瀵煎叆涓?, importMaterials));
-$("#importLocations").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "瀵煎叆涓?, importLocations));
-$("#downloadBackup").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "澶囦唤涓?, downloadBackup));
-$("#downloadAutoBackup").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "涓嬭浇涓?, downloadAutoBackup));
-$("#restoreBackup").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "鎭㈠涓?, restoreBackup));
+$("#importInventory").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "鐎电厧鍙嗘稉?, importInventory));
+$("#importMaterials").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "鐎电厧鍙嗘稉?, importMaterials));
+$("#importLocations").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "鐎电厧鍙嗘稉?, importLocations));
+$("#downloadBackup").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "婢跺洣鍞ゆ稉?, downloadBackup));
+$("#downloadAutoBackup").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "娑撳娴囨稉?, downloadAutoBackup));
+$("#restoreBackup").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "閹垹顦叉稉?, restoreBackup));
 $("#materialForm").addEventListener("submit", addMaterial);
 $("#locationForm").addEventListener("submit", addLocation);
 $("#cancelMaterialEdit").addEventListener("click", resetMaterialEdit);
@@ -2625,7 +2620,7 @@ $("#userList").addEventListener("click", (event) => {
 window.addEventListener("storage", (event) => {
   if (event.key !== storeKey || !event.newValue) return;
   Object.assign(state, JSON.parse(event.newValue));
-  setSyncStatus("鏀跺埌鏇存柊");
+  setSyncStatus("閺€璺哄煂閺囧瓨鏌?);
   render();
 });
 
@@ -2640,7 +2635,7 @@ if (channel) {
     if (event.data?.type !== "state-updated") return;
     Object.assign(state, event.data.state);
     saveState(false);
-    setSyncStatus("鏀跺埌鏇存柊");
+    setSyncStatus("閺€璺哄煂閺囧瓨鏌?);
     render();
   });
 }
@@ -2649,4 +2644,8 @@ setupInstallPrompt();
 registerServiceWorker();
 render();
 initApiSync();
+
+
+
+
 
