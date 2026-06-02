@@ -13,7 +13,7 @@
     <link rel="apple-touch-icon" href="./assets/icon-192.png" />
     <link rel="stylesheet" href="./styles.css" />
     <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script defer src="./runtime.js?v=loginfix-20260602"></script>
+    <script defer src="./runtime.js?v=login-ok-1d80916"></script>
   </head>
   <body>
     <main class="app-shell">
@@ -31,7 +31,7 @@
         </div>
       </header>
 
-      <form class="login-panel" id="loginPanel">
+      <section class="login-panel" id="loginPanel">
         <label>
           账号
           <input id="loginUserInput" autocomplete="username" placeholder="请输入账号" />
@@ -40,9 +40,9 @@
           密码
           <input id="loginPasswordInput" type="password" autocomplete="current-password" placeholder="请输入密码" />
         </label>
-        <button class="primary-button" id="loginButton" type="submit">登录</button>
+        <button class="primary-button" id="loginButton" type="button">登录</button>
         <button class="secondary-button" id="resetAdminButton" type="button">重置管理员密码</button>
-      </form>
+      </section>
 
       <section class="connection-banner hidden" id="connectionBanner" aria-live="polite" style="display: none;">
         服务器未连接，当前只能查看已缓存数据；入库、出库、移库、盘点和主数据维护已暂停。

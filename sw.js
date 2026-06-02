@@ -1,9 +1,9 @@
-const CACHE_NAME = "wms-lite-shell-v14";
+const CACHE_NAME = "wms-lite-shell-v15";
 const SHELL_FILES = [
   "./",
   "./index.html",
   "./styles.css",
-  "./runtime.js?v=20260602",
+  "./runtime.js?v=login-ok-1d80916",
   "./manifest.webmanifest",
   "./assets/icon-192.png",
   "./assets/icon-512.png"
