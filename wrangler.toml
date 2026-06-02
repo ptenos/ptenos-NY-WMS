@@ -1,10 +1,9 @@
 name = "wms-lite"
 compatibility_date = "2026-06-02"
+pages_build_output_dir = "cloudflare-dist"
+compatibility_flags = ["nodejs_compat"]
 
 [[d1_databases]]
 binding = "WMS_DB"
 database_name = "wms-lite"
 database_id = "REPLACE_WITH_D1_DATABASE_ID"
-
-[env.production]
-# Cloudflare Pages uses the same binding name in Pages Functions.
