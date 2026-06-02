@@ -44,6 +44,7 @@ async function resolveStorage(env) {
 async function readState(env) {
   const db = env?.WMS_DB;
   if (!db) throw new Error("Cloudflare D1 binding WMS_DB is missing");
+  await ensureSchema(db);
   const row = await db.prepare(`SELECT payload, version FROM ${STATE_TABLE} WHERE id = ?`).bind(STATE_KEY).first();
   if (!row) {
     const seed = await initialState();
@@ -60,6 +61,7 @@ async function readState(env) {
 async function writeState(env, dbState) {
   const db = env?.WMS_DB;
   if (!db) throw new Error("Cloudflare D1 binding WMS_DB is missing");
+  await ensureSchema(db);
   const current = await db.prepare(`SELECT payload, version FROM ${STATE_TABLE} WHERE id = ?`).bind(STATE_KEY).first();
   const nextVersion = Number(current?.version || 0) + 1;
   const payload = JSON.stringify(dbState);
@@ -85,8 +87,69 @@ async function writeState(env, dbState) {
 async function readBackup(env, key) {
   const db = env?.WMS_DB;
   if (!db) throw new Error("Cloudflare D1 binding WMS_DB is missing");
+  await ensureSchema(db);
   const row = await db.prepare(`SELECT payload FROM ${BACKUP_TABLE} WHERE backup_key = ?`).bind(key).first();
   return row ? JSON.parse(row.payload) : null;
+}
+
+async function ensureSchema(db) {
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS ${STATE_TABLE} (
+      id TEXT PRIMARY KEY,
+      payload TEXT NOT NULL,
+      version INTEGER NOT NULL DEFAULT 1,
+      updated_at TEXT NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS ${BACKUP_TABLE} (
+      backup_key TEXT PRIMARY KEY,
+      payload TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS wms_stock (
+      id TEXT PRIMARY KEY,
+      sku TEXT NOT NULL,
+      batch TEXT NOT NULL,
+      location TEXT NOT NULL,
+      status TEXT NOT NULL,
+      qty REAL NOT NULL,
+      version INTEGER NOT NULL DEFAULT 1,
+      updated_at TEXT NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS wms_logs (
+      id TEXT PRIMARY KEY,
+      time TEXT NOT NULL,
+      operator_id TEXT NOT NULL,
+      operator_name TEXT NOT NULL,
+      type TEXT NOT NULL,
+      sku TEXT NOT NULL,
+      batch TEXT NOT NULL,
+      qty REAL NOT NULL,
+      before_qty REAL,
+      location TEXT NOT NULL,
+      target_location TEXT,
+      status TEXT NOT NULL,
+      note TEXT,
+      gps TEXT
+    );
+    CREATE TABLE IF NOT EXISTS wms_audit_logs (
+      id TEXT PRIMARY KEY,
+      time TEXT NOT NULL,
+      operator_id TEXT NOT NULL,
+      operator_name TEXT NOT NULL,
+      action TEXT NOT NULL,
+      entity TEXT NOT NULL,
+      key TEXT NOT NULL,
+      before TEXT,
+      after TEXT,
+      note TEXT
+    );
+    CREATE TABLE IF NOT EXISTS wms_users (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      role TEXT NOT NULL,
+      password_hash TEXT NOT NULL
+    );
+  `);
 }
 
 async function readBody(request) {
