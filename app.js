@@ -177,16 +177,29 @@ async function initApiSync() {
     const healthResponse = await fetch("/api/health", { headers: { Accept: "application/json" } });
     const healthData = await healthResponse.json().catch(() => null);
     if (!healthResponse.ok || !healthData?.ok) throw new Error("API unavailable");
-    const response = await fetch("/api/state", { headers: { Accept: "application/json" } });
-    if (!response.ok) throw new Error("API unavailable");
-    const currentUserId = sessionAuth.token && sessionAuth.userId === state.currentUserId ? state.currentUserId : "";
-    Object.assign(state, migrateState({ ...defaultState(), ...(await response.json()) }));
-    state.currentUserId = currentUserId;
+
+    const liteResponse = await fetch("/api/state?lite=1", { headers: { Accept: "application/json" } });
+    if (!liteResponse.ok) throw new Error("API unavailable");
+    const liteState = await liteResponse.json();
+    Object.assign(state, migrateState({ ...defaultState(), ...liteState }));
+    state.currentUserId = "";
     apiAvailable = true;
     apiSyncAttempted = true;
     localStorage.setItem(storeKey, JSON.stringify(state));
     setSyncStatus(syncStatusText());
     render();
+
+    fetch("/api/state", { headers: { Accept: "application/json" } })
+      .then((response) => response.ok ? response.json() : null)
+      .then((fullState) => {
+        if (!fullState) return;
+        const currentUserId = state.currentUserId;
+        Object.assign(state, migrateState({ ...defaultState(), ...fullState }));
+        state.currentUserId = currentUserId;
+        localStorage.setItem(storeKey, JSON.stringify(state));
+        render();
+      })
+      .catch(() => {});
   } catch {
     apiAvailable = false;
     apiSyncAttempted = true;
@@ -194,7 +207,6 @@ async function initApiSync() {
     renderRuntimeState();
   }
 }
-
 function scheduleRemoteSave() {
   if (!apiAvailable) return;
   clearTimeout(remoteSaveTimer);
@@ -223,9 +235,9 @@ function setSyncStatus(text) {
 }
 
 function syncStatusText() {
-  if (!apiSyncAttempted) return "杩炴帴涓?;
-  if (apiAvailable) return "鏈嶅姟鍣ㄥ悓姝?;
-  return serverRequired ? "鏈嶅姟鍣ㄦ湭杩炴帴" : "鏈満婕旂ず";
+  if (!apiSyncAttempted) return "连接中";
+  if (apiAvailable) return "服务器已连接";
+  return serverRequired ? "服务器连接失败" : "本机演示";
 }
 
 function requireLiveServer(action = "鎿嶄綔") {
@@ -237,7 +249,7 @@ function requireLiveServer(action = "鎿嶄綔") {
 function renderRuntimeState() {
   const blocked = serverRequired && apiSyncAttempted && !apiAvailable;
   const pending = serverRequired && !apiSyncAttempted;
-  $("#connectionBanner")?.classList.toggle("hidden", !blocked || !currentUser());
+  $("#connectionBanner")?.classList.toggle("hidden", !blocked);
   $$(".server-write").forEach((button) => {
     button.disabled = pending || blocked || button.dataset.logicDisabled === "1";
   });
