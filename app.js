@@ -1,4 +1,3 @@
-console.log("runtime boot parsefix-20260603");
 window.__runtimeBooted = true;
 const storeKey = "wms-lite-state-v4";
 const authKey = "wms-lite-auth-v2";
@@ -32,7 +31,7 @@ const wmsLocalStorage = safeStorage("localStorage");
 const wmsSessionStorage = safeStorage("sessionStorage");
 
 const state = loadState();
-const frontendBuildVersion = "runtime-parsefix-20260603";
+const frontendBuildVersion = "runtime-userflow-20260603";
 let sessionAuth = loadSessionAuth();
 if (!sessionAuth.token || sessionAuth.userId !== state.currentUserId) state.currentUserId = "";
 let operationType = "in";
@@ -78,21 +77,16 @@ if (document.readyState === "loading") {
 function bindLoginButton() {
   const loginButton = document.getElementById("loginButton");
   if (!loginButton) {
-    debugLogin("login button not found");
     return;
   }
-  debugLogin("login button found");
   if (loginButton.dataset.bound === "1") {
-    debugLogin("login button already bound");
     return;
   }
   loginButton.dataset.bound = "1";
   loginButton.addEventListener("click", (event) => {
     event.preventDefault();
-    debugLogin("login button clicked");
     login();
   });
-  debugLogin("login button bind success");
 }
 
 function defaultState() {
@@ -226,9 +220,7 @@ function saveState(sync = true) {
 }
 
 function debugLogin(message) {
-  console.log(`[WMS Login] ${message}`);
-  const target = $("#buildMarker");
-  if (target) target.textContent = `BUILD: ${frontendBuildVersion} | ${message}`;
+  return message;
 }
 
 async function initApiSync() {
@@ -1218,6 +1210,7 @@ function renderPermissions() {
   const admin = isAdmin();
   const keeper = isKeeper();
   const passwordWarning = admin && sessionAuth.userId === currentUser()?.id && sessionAuth.mustChangePassword;
+  const lockdown = passwordWarning;
   $("#loginPanel").classList.toggle("hidden", loggedIn);
   $("#logoutButton").classList.toggle("hidden", !loggedIn);
   $(".tabbar").classList.toggle("hidden", !loggedIn);
@@ -1225,6 +1218,12 @@ function renderPermissions() {
   $$(".view").forEach((item) => item.classList.toggle("hidden", !loggedIn));
   $("#accountBadge").textContent = loggedIn ? `${currentUser().id} / ${roleLabel(currentUser().role)}` : "未登录";
   if (!loggedIn) return;
+  if (lockdown) {
+    $$(".tab").forEach((item) => item.classList.toggle("hidden", item.dataset.view !== "users"));
+    $$(".view").forEach((item) => item.classList.toggle("hidden", item.id !== "users"));
+    activateView("users");
+    return;
+  }
   $$(".admin-only, .admin-view").forEach((item) => item.classList.toggle("hidden", !admin));
   $$(".keeper-only").forEach((item) => item.classList.toggle("hidden", !keeper));
   $$(".admin-option").forEach((item) => item.hidden = !admin);

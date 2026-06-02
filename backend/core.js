@@ -751,7 +751,8 @@ async function applyOperation(db, operation, token = "") {
   } else if (type === "out") {
     if (qty <= 0) return { error: "出库数量必须大于 0" };
     const row = findStock(db, { sku, batch, location, status });
-    if (!row || row.qty < qty) return { error: "库存不足或状态不匹配" };
+    if (!row) return { error: "库存不足或状态不匹配" };
+    if (Number(row.qty || 0) < qty) return { error: "库存不足，不能出库" };
     const versionError = assertVersion(row, operation.expectedVersion);
     if (versionError) return { error: versionError };
     row.qty = roundQty(row.qty - qty);
@@ -763,7 +764,8 @@ async function applyOperation(db, operation, token = "") {
     if (target.status === "冻结") return { error: "目标库位已冻结" };
     if (targetLocation === location) return { error: "目标库位不能和原库位相同" };
     const row = findStock(db, { sku, batch, location, status });
-    if (!row || row.qty < qty) return { error: "原库位库存不足" };
+    if (!row) return { error: "原库位库存不足" };
+    if (Number(row.qty || 0) < qty) return { error: "原库位库存不足，不能移出" };
     const versionError = assertVersion(row, operation.expectedVersion);
     if (versionError) return { error: versionError };
     row.qty = roundQty(row.qty - qty);
