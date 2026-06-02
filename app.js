@@ -1,12 +1,36 @@
-const storeKey = "wms-lite-state-v4";
+﻿const storeKey = "wms-lite-state-v4";
 const authKey = "wms-lite-auth-v2";
 const channel = "BroadcastChannel" in window ? new BroadcastChannel("wms-lite-sync") : null;
 const serverRequired = location.protocol !== "file:";
 const materialCache = new Map();
 const locationCache = new Map();
 
+function createMemoryStorage() {
+  const data = new Map();
+  return {
+    getItem: (key) => data.has(key) ? data.get(key) : null,
+    setItem: (key, value) => data.set(key, String(value)),
+    removeItem: (key) => data.delete(key)
+  };
+}
+
+function safeStorage(name) {
+  try {
+    const storage = window[name];
+    const key = "__wms_storage_test__";
+    storage.setItem(key, "1");
+    storage.removeItem(key);
+    return storage;
+  } catch {
+    return createMemoryStorage();
+  }
+}
+
+const wmsLocalStorage = safeStorage("localStorage");
+const wmsSessionStorage = safeStorage("sessionStorage");
+
 const state = loadState();
-const frontendBuildVersion = "debug-bind-20260603";
+const frontendBuildVersion = "debug-storage-20260603";
 let sessionAuth = loadSessionAuth();
 if (!sessionAuth.token || sessionAuth.userId !== state.currentUserId) state.currentUserId = "";
 let operationType = "in";
@@ -86,14 +110,14 @@ function defaultState() {
 }
 
 function loadState() {
-  const saved = localStorage.getItem(storeKey);
+  const saved = wmsLocalStorage.getItem(storeKey);
   const loaded = saved ? { ...defaultState(), ...JSON.parse(saved) } : defaultState();
   return migrateState(loaded);
 }
 
 function loadSessionAuth() {
   try {
-    return JSON.parse(sessionStorage.getItem(authKey) || "{}");
+    return JSON.parse(wmsSessionStorage.getItem(authKey) || "{}");
   } catch {
     return {};
   }
@@ -101,12 +125,12 @@ function loadSessionAuth() {
 
 function saveSessionAuth(userId, token, expiresAt = "", mustChangePassword = false) {
   sessionAuth = { userId, token, expiresAt, mustChangePassword: !!mustChangePassword };
-  sessionStorage.setItem(authKey, JSON.stringify(sessionAuth));
+  wmsSessionStorage.setItem(authKey, JSON.stringify(sessionAuth));
 }
 
 function clearSessionAuth() {
   sessionAuth = {};
-  sessionStorage.removeItem(authKey);
+  wmsSessionStorage.removeItem(authKey);
 }
 
 function migrateState(data) {
@@ -194,7 +218,7 @@ function roleLabel(role) {
 }
 
 function saveState(sync = true) {
-  localStorage.setItem(storeKey, JSON.stringify(state));
+  wmsLocalStorage.setItem(storeKey, JSON.stringify(state));
   if (sync && channel) channel.postMessage({ type: "state-updated", state });
   setSyncStatus(syncStatusText());
 }
@@ -226,7 +250,7 @@ async function initApiSync() {
         } else {
           state.currentUserId = "";
         }
-        localStorage.setItem(storeKey, JSON.stringify(state));
+        wmsLocalStorage.setItem(storeKey, JSON.stringify(state));
       }
     } catch {
       // Keep the connection status online even if state sync is temporarily unavailable.
@@ -431,7 +455,7 @@ async function postOperation(payload) {
   const currentUserId = state.currentUserId;
   Object.assign(state, migrateState({ ...defaultState(), ...data }));
   state.currentUserId = currentUserId;
-  localStorage.setItem(storeKey, JSON.stringify(state));
+  wmsLocalStorage.setItem(storeKey, JSON.stringify(state));
   return data;
 }
 
@@ -457,7 +481,7 @@ async function postMasterData(path, payload) {
   } else if (path.endsWith("/locations")) {
     state.locations = data;
   }
-  localStorage.setItem(storeKey, JSON.stringify(state));
+  wmsLocalStorage.setItem(storeKey, JSON.stringify(state));
   return data;
 }
 
@@ -477,7 +501,7 @@ async function postUserData(path, payload) {
   const currentUserId = state.currentUserId;
   Object.assign(state, migrateState({ ...defaultState(), ...data }));
   state.currentUserId = currentUserId;
-  localStorage.setItem(storeKey, JSON.stringify(state));
+  wmsLocalStorage.setItem(storeKey, JSON.stringify(state));
   return data;
 }
 
@@ -2034,7 +2058,7 @@ async function restoreBackup() {
     const currentUserId = state.currentUserId;
     Object.assign(state, migrateState({ ...defaultState(), ...data }));
     state.currentUserId = currentUserId;
-    localStorage.setItem(storeKey, JSON.stringify(state));
+    wmsLocalStorage.setItem(storeKey, JSON.stringify(state));
     $("#restoreFile").value = "";
     render();
     showToast("备份已恢复");
@@ -2369,7 +2393,7 @@ async function addUser(event) {
   }
   if (id.toLowerCase() === "admin" && password && sessionAuth.userId?.toLowerCase() === "admin") {
     sessionAuth = { ...sessionAuth, mustChangePassword: false };
-    sessionStorage.setItem(authKey, JSON.stringify(sessionAuth));
+    wmsSessionStorage.setItem(authKey, JSON.stringify(sessionAuth));
   }
   event.target.reset();
   render();
@@ -2671,3 +2695,4 @@ setupInstallPrompt();
 registerServiceWorker();
 render();
 initApiSync();
+
