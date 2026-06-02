@@ -52,6 +52,14 @@
         管理员仍在使用默认密码，请到“账号权限”修改后再正式使用。
       </section>
 
+      <section class="mobile-home hidden" id="mobileHome">
+        <button class="home-action" type="button" data-home-action="in">入库</button>
+        <button class="home-action" type="button" data-home-action="out">出库</button>
+        <button class="home-action" type="button" data-home-action="move">移库</button>
+        <button class="home-action" type="button" data-home-action="stock">查库存</button>
+        <button class="home-action keeper-only" type="button" data-home-action="count">盘点</button>
+      </section>
+
       <nav class="tabbar hidden" aria-label="主导航">
         <button class="tab active" data-view="operate" type="button">作业</button>
         <button class="tab keeper-only" data-view="count" type="button">盘点</button>
@@ -71,7 +79,7 @@
               <select id="operationTypeInput">
                 <option value="in">入库</option>
                 <option value="out">出库</option>
-                <option class="admin-option" value="move">移库</option>
+                <option value="move">移库</option>
               </select>
             </label>
 
@@ -349,8 +357,22 @@
 
     </main>
 
-    <template id="emptyTemplate">
+      <template id="emptyTemplate">
       <div class="empty-state">暂无数据</div>
     </template>
+
+    <section class="confirm-sheet hidden" id="operationConfirmSheet" aria-live="polite">
+      <div class="confirm-card">
+        <div class="panel-title">
+          <h2>请确认本次操作</h2>
+          <p id="operationConfirmText"></p>
+        </div>
+        <div class="confirm-grid" id="operationConfirmGrid"></div>
+        <div class="button-row confirm-actions">
+          <button class="secondary-button" id="operationConfirmCancel" type="button">返回修改</button>
+          <button class="primary-button" id="operationConfirmSubmit" type="button">确认提交</button>
+        </div>
+      </div>
+    </section>
   </body>
 </html>

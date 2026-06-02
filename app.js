@@ -63,6 +63,7 @@ let materialOptionTimer = null;
 let locationOptionTimer = null;
 let selectedOperationStock = null;
 let selectedCountStock = null;
+let pendingOperationPayload = null;
 window.__loginJustCompleted = false;
 
 const $ = (selector) => document.querySelector(selector);
@@ -551,7 +552,7 @@ function addAuditLog(payload) {
   });
 }
 
-async function submitOperation(event) {
+async function submitOperation(event, overridePayload = null) {
   event.preventDefault();
   if (event.target.dataset.submitting === "1") return;
   const inputSku = normalize($("#skuInput").value);
@@ -583,10 +584,19 @@ async function submitOperation(event) {
     if (targetLocation === (selectedRow?.location || location)) return showToast("目标库位不能和原库位相同");
   }
 
+  const sourceLocation = selectedRow?.location || location;
+  const operationPayload = overridePayload || { type: operationType, sku, batch, qty: rawQty, location: sourceLocation, targetLocation, status, note, expectedVersion: selectedOperationVersion };
+
+  if (!overridePayload) {
+    openOperationConfirm({
+      ...operationPayload,
+      name: material?.name || selectedOperationStock?.name || ""
+    });
+    return;
+  }
+
   setFormSubmitting(event.target, true);
   try {
-    const sourceLocation = selectedRow?.location || location;
-    const operationPayload = { type: operationType, sku, batch, qty: rawQty, location: sourceLocation, targetLocation, status, note, expectedVersion: selectedOperationVersion };
     try {
       const remote = await postOperation(operationPayload);
       if (remote) {
@@ -1222,21 +1232,76 @@ function renderPermissions() {
     $$(".tab").forEach((item) => item.classList.toggle("hidden", item.dataset.view !== "users"));
     $$(".view").forEach((item) => item.classList.toggle("hidden", item.id !== "users"));
     activateView("users");
+    $("#mobileHome").classList.toggle("hidden", true);
     return;
   }
   $$(".admin-only, .admin-view").forEach((item) => item.classList.toggle("hidden", !admin));
   $$(".keeper-only").forEach((item) => item.classList.toggle("hidden", !keeper));
   $$(".admin-option").forEach((item) => item.hidden = !admin);
-  if (!admin && operationType === "move") {
-    operationType = "in";
-    $("#operationTypeInput").value = "in";
-  }
   const activeView = $(".view.active");
   if (activeView && !canOpenView(activeView.id)) activateView("operate");
+  $("#mobileHome").classList.toggle("hidden", !loggedIn);
 }
 
 function renderUserSelect() {
   // Login uses typed account/password. This render hook is kept for the wider render flow.
+}
+
+function isMobileViewport() {
+  return window.matchMedia("(max-width: 720px)").matches;
+}
+
+function homeActionToView(action) {
+  const map = { in: "operate", out: "operate", move: "operate", stock: "stock", count: "count" };
+  return map[action] || "operate";
+}
+
+function selectHomeAction(action) {
+  const view = homeActionToView(action);
+  activateView(view);
+  if (view === "operate") {
+    operationType = action;
+    $("#operationTypeInput").value = action;
+    updateOperationStockList();
+    updateOperationHelper();
+  }
+  if (view === "stock") {
+    renderStock();
+  }
+  if (view === "count") {
+    updateCountPreview();
+  }
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function openOperationConfirm(payload) {
+  pendingOperationPayload = payload;
+  const rows = [
+    ["操作类型", typeLabel(payload.type)],
+    ["物料编码", payload.sku],
+    ["物料名称", payload.name || findMaterial(payload.sku)?.name || ""],
+    ["批号", payload.batch],
+    ["原库位", payload.location],
+    ["目标库位", payload.targetLocation || "-"],
+    ["状态", payload.status],
+    ["数量", payload.qty]
+  ];
+  $("#operationConfirmText").textContent = `请确认本次${typeLabel(payload.type)}信息。`;
+  $("#operationConfirmGrid").innerHTML = rows.map(([label, value]) => `<div class="confirm-row"><span>${escapeHtml(label)}</span><span>${escapeHtml(value)}</span></div>`).join("");
+  $("#operationConfirmSheet").classList.remove("hidden");
+}
+
+function closeOperationConfirm() {
+  pendingOperationPayload = null;
+  $("#operationConfirmSheet").classList.add("hidden");
+}
+
+async function commitPendingOperation() {
+  if (!pendingOperationPayload) return;
+  const event = { target: $("#operationForm") };
+  const payload = pendingOperationPayload;
+  closeOperationConfirm();
+  await submitOperation(event, payload);
 }
 
 function renderOptions() {
@@ -1416,8 +1481,29 @@ async function loadStockPage() {
 
 function renderStockRows(rows) {
   cacheMaterials(rows.filter((item) => item.sku && item.name).map((item) => ({ sku: item.sku, name: item.name })));
+  const mobile = isMobileViewport();
   $("#stockList").innerHTML = rows.length
-    ? `
+    ? mobile
+      ? `
+        <div class="cards-list">
+          ${rows.map((item) => {
+            const material = findMaterial(item.sku);
+            return `
+              <article class="data-card stock-card">
+                <div>
+                  <strong>${escapeHtml(item.sku)}</strong>
+                  <span>${escapeHtml(item.name || material?.name || "未知物料")}</span>
+                  <span>批号：${escapeHtml(item.batch)}</span>
+                  <span>库位：${escapeHtml(item.location)}</span>
+                </div>
+                <div class="card-meta">
+                  <b>${item.qty}</b>
+                  <span>${escapeHtml(item.status)}</span>
+                </div>
+              </article>`;
+          }).join("")}
+        </div>`
+      : `
       <div class="table-wrap">
         <table class="data-table stock-table">
           <thead>
@@ -2547,6 +2633,13 @@ $("#operationTypeInput").addEventListener("change", (event) => {
   updateMaterialPicker();
   updateOperationStockList();
 });
+
+$$("#mobileHome [data-home-action]").forEach((button) => {
+  button.addEventListener("click", () => selectHomeAction(button.dataset.homeAction));
+});
+
+$("#operationConfirmCancel").addEventListener("click", closeOperationConfirm);
+$("#operationConfirmSubmit").addEventListener("click", commitPendingOperation);
 
 bindLoginButton();
 $("#resetAdminButton").addEventListener("click", ensureAdminAccount);
