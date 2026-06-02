@@ -1,10 +1,10 @@
-import { emptyState, handleApiRequest, migrateDb } from "../backend/core.js";
+import { emptyState, handleApiRequest, migrateDb } from "../../backend/core.js";
 
 const STATE_KEY = "state";
 const BACKUP_TABLE = "wms_backups";
 const STATE_TABLE = "wms_state";
 
-export async function onRequest(context) {
+export async function handlePagesApiRequest(context) {
   const { request, env } = context;
   if (request.method === "OPTIONS") return corsResponse(204, {});
 
@@ -42,7 +42,7 @@ async function readState(env) {
       .run();
     return seed;
   }
-  const data = migrateDb(JSON.parse(row.payload || "{}"));
+  const data = await migrateDb(JSON.parse(row.payload || "{}"));
   data._etag = String(row.version || 1);
   return data;
 }
