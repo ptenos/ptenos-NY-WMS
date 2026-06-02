@@ -98,7 +98,7 @@ function defaultState() {
     logs: [],
     auditLogs: [],
     users: [
-      { id: "admin", name: "绠＄悊鍛?, role: "admin" },
+      { id: "admin", name: "管理员", role: "admin" },
       { id: "WH-001", name: "浠撳簱鍛樺伐", role: "employee" },
       { id: "WH-MGR", name: "浠撶", role: "keeper" }
     ],
