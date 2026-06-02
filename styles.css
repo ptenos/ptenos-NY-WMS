@@ -125,8 +125,8 @@ button:disabled {
 }
 
 .confirm-card {
-  width: min(560px, 100%);
-  padding: 16px;
+  width: min(460px, 100%);
+  padding: 14px;
   border-radius: 12px;
   background: #fff;
   border: 1px solid var(--line);
@@ -135,19 +135,19 @@ button:disabled {
 
 .confirm-grid {
   display: grid;
-  gap: 8px;
-  margin: 12px 0 14px;
+  gap: 6px;
+  margin: 10px 0 12px;
 }
 
 .confirm-row {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #f8fafc;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .confirm-row span:last-child {

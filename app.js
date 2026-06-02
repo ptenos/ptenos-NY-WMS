@@ -1289,16 +1289,13 @@ function selectHomeAction(action) {
 function openOperationConfirm(payload) {
   pendingOperationPayload = payload;
   const rows = [
-    ["操作类型", typeLabel(payload.type)],
-    ["物料编码", payload.sku],
-    ["物料名称", payload.name || findMaterial(payload.sku)?.name || ""],
+    ["操作", typeLabel(payload.type)],
+    ["物料", `${payload.sku}${payload.name || findMaterial(payload.sku)?.name ? ` / ${payload.name || findMaterial(payload.sku)?.name || ""}` : ""}`],
     ["批号", payload.batch],
-    ["原库位", payload.location],
-    ["目标库位", payload.targetLocation || "-"],
-    ["状态", payload.status],
+    ["库位", payload.type === "move" ? `${payload.location} → ${payload.targetLocation || "-"}` : payload.location],
     ["数量", payload.qty]
   ];
-  $("#operationConfirmText").textContent = `请确认本次${typeLabel(payload.type)}信息。`;
+  $("#operationConfirmText").textContent = "请核对后提交。";
   $("#operationConfirmGrid").innerHTML = rows.map(([label, value]) => `<div class="confirm-row"><span>${escapeHtml(label)}</span><span>${escapeHtml(value)}</span></div>`).join("");
   $("#operationConfirmSheet").classList.remove("hidden");
 }
