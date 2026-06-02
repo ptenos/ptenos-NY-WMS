@@ -31,7 +31,7 @@
         </div>
       </header>
 
-      <section class="login-panel" id="loginPanel">
+      <form class="login-panel" id="loginPanel">
         <label>
           账号
           <input id="loginUserInput" autocomplete="username" placeholder="请输入账号" />
@@ -40,9 +40,9 @@
           密码
           <input id="loginPasswordInput" type="password" autocomplete="current-password" placeholder="请输入密码" />
         </label>
-        <button class="primary-button" id="loginButton" type="button">登录</button>
+        <button class="primary-button" id="loginButton" type="submit">登录</button>
         <button class="secondary-button" id="resetAdminButton" type="button">重置管理员密码</button>
-      </section>
+      </form>
 
       <section class="connection-banner hidden" id="connectionBanner" aria-live="polite" style="display: none;">
         服务器未连接，当前只能查看已缓存数据；入库、出库、移库、盘点和主数据维护已暂停。

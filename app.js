@@ -12,6 +12,7 @@ if (!sessionAuth.token || sessionAuth.userId !== state.currentUserId) state.curr
 let operationType = "in";
 let apiAvailable = false;
 let apiSyncAttempted = false;
+let apiConnectionState = "connecting";
 let remoteSaveTimer = null;
 let currentStockRows = [];
 let selectedOperationVersion = null;
@@ -173,6 +174,7 @@ function saveState(sync = true) {
 
 async function initApiSync() {
   apiSyncAttempted = false;
+  apiConnectionState = "connecting";
   try {
     const healthResponse = await fetch("/api/health", { headers: { Accept: "application/json" } });
     const healthData = await healthResponse.json().catch(() => null);
@@ -185,6 +187,7 @@ async function initApiSync() {
     state.currentUserId = "";
     apiAvailable = true;
     apiSyncAttempted = true;
+    apiConnectionState = "connected";
     localStorage.setItem(storeKey, JSON.stringify(state));
     setSyncStatus(syncStatusText());
     render();
@@ -203,6 +206,7 @@ async function initApiSync() {
   } catch {
     apiAvailable = false;
     apiSyncAttempted = true;
+    apiConnectionState = "failed";
     setSyncStatus(syncStatusText());
     renderRuntimeState();
   }
@@ -235,9 +239,10 @@ function setSyncStatus(text) {
 }
 
 function syncStatusText() {
-  if (!apiSyncAttempted) return "连接中";
-  if (apiAvailable) return "服务器已连接";
-  return serverRequired ? "服务器连接失败" : "本机演示";
+  if (apiConnectionState === "connecting") return "连接中";
+  if (apiConnectionState === "connected") return "服务器已连接";
+  if (apiConnectionState === "failed") return serverRequired ? "服务器连接失败" : "本机演示";
+  return "连接中";
 }
 
 function requireLiveServer(action = "鎿嶄綔") {
@@ -392,7 +397,7 @@ async function postOperation(payload) {
     body: JSON.stringify({ ...payload, operatorId: auth.operatorId })
   });
   const data = await response.json();
-  if (!response.ok) throw new Error(data.error || "鎿嶄綔澶辫触");
+    if (!response.ok) throw new Error(data.error || "账号或密码错误");
   const currentUserId = state.currentUserId;
   Object.assign(state, migrateState({ ...defaultState(), ...data }));
   state.currentUserId = currentUserId;
@@ -412,7 +417,7 @@ async function postMasterData(path, payload) {
     body: JSON.stringify({ ...payload, operatorId: auth.operatorId })
   });
   const data = await response.json();
-  if (!response.ok) throw new Error(data.error || "淇濆瓨澶辫触");
+    if (!response.ok) throw new Error(data.error || "账号或密码错误");
   const currentUserId = state.currentUserId;
   if (data.materials || data.locations || data.stock) {
     Object.assign(state, migrateState({ ...defaultState(), ...data }));
@@ -438,7 +443,7 @@ async function postUserData(path, payload) {
     body: JSON.stringify({ ...payload, operatorId: auth.operatorId })
   });
   const data = await response.json();
-  if (!response.ok) throw new Error(data.error || "璐﹀彿淇濆瓨澶辫触");
+    if (!response.ok) throw new Error(data.error || "账号或密码错误");
   const currentUserId = state.currentUserId;
   Object.assign(state, migrateState({ ...defaultState(), ...data }));
   state.currentUserId = currentUserId;
@@ -459,7 +464,7 @@ async function fetchApiPage(path, params = {}) {
   });
   const response = await fetch(`${url.pathname}${url.search}`, { headers: { Accept: "application/json" } });
   const data = await response.json();
-  if (!response.ok) throw new Error(data.error || "鏁版嵁鍔犺浇澶辫触");
+    if (!response.ok) throw new Error(data.error || "账号或密码错误");
   return data;
 }
 
@@ -1163,7 +1168,7 @@ function renderPermissions() {
   $(".tabbar").classList.toggle("hidden", !loggedIn);
   $("#passwordWarning")?.classList.toggle("hidden", !passwordWarning);
   $$(".view").forEach((item) => item.classList.toggle("hidden", !loggedIn));
-  $("#accountBadge").textContent = loggedIn ? `${currentUser().id} / ${roleLabel(currentUser().role)}` : "鏈櫥褰?;
+  $("#accountBadge").textContent = loggedIn ? `${currentUser().id} / ${roleLabel(currentUser().role)}` : "未登录";
   if (!loggedIn) return;
   $$(".admin-only, .admin-view").forEach((item) => item.classList.toggle("hidden", !admin));
   $$(".keeper-only").forEach((item) => item.classList.toggle("hidden", !keeper));
@@ -1173,7 +1178,9 @@ function renderPermissions() {
     $("#operationTypeInput").value = "in";
   }
   const activeView = $(".view.active");
-  if (activeView && !canOpenView(activeView.id)) activateView("operate");
+  if (!activeView || activeView.classList.contains("hidden") || !canOpenView(activeView.id)) {
+    activateView("operate");
+  }
 }
 
 function renderUserSelect() {
@@ -1753,7 +1760,7 @@ function setFormSubmitting(form, busy) {
 
 async function withButtonBusy(button, busyText, action) {
   if (button?.dataset.busy === "1") return;
-  setButtonBusy(button, true, busyText);
+  setButtonBusy(button, true, "登录中");
   try {
     await action();
   } finally {
@@ -1952,7 +1959,7 @@ async function downloadBackup() {
       }
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "澶囦唤澶辫触");
+    if (!response.ok) throw new Error(data.error || "账号或密码错误");
     const filename = `wms-backup-${new Date().toISOString().slice(0, 10)}.json`;
     downloadBlob(new Blob([JSON.stringify(data.data, null, 2)], { type: "application/json;charset=utf-8" }), filename);
     showToast("澶囦唤宸蹭笅杞?);
@@ -1972,7 +1979,7 @@ async function downloadAutoBackup() {
       }
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "鑷姩澶囦唤涓嬭浇澶辫触");
+    if (!response.ok) throw new Error(data.error || "账号或密码错误");
     const filename = `wms-auto-backup-${new Date().toISOString().slice(0, 10)}.json`;
     downloadBlob(new Blob([JSON.stringify(data, null, 2)], { type: "application/json;charset=utf-8" }), filename);
     showToast("鑷姩澶囦唤宸蹭笅杞?);
@@ -1995,7 +2002,7 @@ async function restoreBackup() {
       body: JSON.stringify({ backup, operatorId: auth.operatorId })
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "鎭㈠澶辫触");
+    if (!response.ok) throw new Error(data.error || "账号或密码错误");
     const currentUserId = state.currentUserId;
     Object.assign(state, migrateState({ ...defaultState(), ...data }));
     state.currentUserId = currentUserId;
@@ -2349,6 +2356,7 @@ async function loginAsync() {
   const button = $("#loginButton");
   if (button.dataset.busy === "1") return;
   setButtonBusy(button, true, "登录中");
+  showToast("正在登录");
   try {
     const response = await fetch("/api/login", {
       method: "POST",
@@ -2362,8 +2370,11 @@ async function loginAsync() {
     saveSessionAuth(data.user.id, data.token, data.expiresAt, data.mustChangePassword);
     apiAvailable = true;
     apiSyncAttempted = true;
+    apiConnectionState = "connected";
     $("#loginPasswordInput").value = "";
     saveState();
+    $("#accountBadge").textContent = `${data.user.id} / ${roleLabel(data.user.role)}`;
+    renderPermissions();
     render();
     showToast(`登录成功，当前用户：${data.user.id}`);
     if (data.mustChangePassword) {
@@ -2376,6 +2387,7 @@ async function loginAsync() {
     setButtonBusy(button, false);
   }
 }
+
 function logout() {
   const token = sessionAuth.token;
   if (apiAvailable && token) {
@@ -2480,6 +2492,7 @@ $("#operationTypeInput").addEventListener("change", (event) => {
 });
 
 $("#loginButton").addEventListener("click", login);
+$("#loginPanel").addEventListener("submit", (event) => { event.preventDefault(); login(); });
 $("#resetAdminButton").addEventListener("click", ensureAdminAccount);
 $("#logoutButton").addEventListener("click", logout);
 $("#skuInput").addEventListener("input", () => {
