@@ -175,18 +175,13 @@ async function initApiSync() {
     const healthResponse = await fetch("/api/health", { headers: { Accept: "application/json" } });
     const healthData = await healthResponse.json().catch(() => null);
     if (!healthResponse.ok || !healthData?.ok) throw new Error("API unavailable");
+    const response = await fetch("/api/state?lite=1", { headers: { Accept: "application/json" } });
+    if (!response.ok) throw new Error("API unavailable");
+    const currentUserId = sessionAuth.token && sessionAuth.userId === state.currentUserId ? state.currentUserId : "";
+    Object.assign(state, migrateState({ ...defaultState(), ...(await response.json()) }));
+    state.currentUserId = currentUserId;
     apiAvailable = true;
-    try {
-      const response = await fetch("/api/state?lite=1", { headers: { Accept: "application/json" } });
-      if (response.ok) {
-        const currentUserId = sessionAuth.token && sessionAuth.userId === state.currentUserId ? state.currentUserId : "";
-        Object.assign(state, migrateState({ ...defaultState(), ...(await response.json()) }));
-        state.currentUserId = currentUserId;
-        localStorage.setItem(storeKey, JSON.stringify(state));
-      }
-    } catch {
-      // Keep the connection status online even if state sync is temporarily unavailable.
-    }
+    localStorage.setItem(storeKey, JSON.stringify(state));
     setSyncStatus(syncStatusText());
     render();
   } catch {

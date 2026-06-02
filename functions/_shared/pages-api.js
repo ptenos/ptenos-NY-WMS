@@ -29,17 +29,15 @@ export async function handlePagesApiRequest(context) {
 }
 
 async function resolveStorage(env) {
-  if (env?.WMS_DB) {
-    return {
-      readDb: async () => readState(env),
-      writeDb: async (db) => writeState(env, db),
-      readBackup: async (key) => readBackup(env, key)
-    };
+  if (!env?.WMS_DB) {
+    const error = new Error("Cloudflare D1 binding WMS_DB is missing");
+    error.status = 503;
+    throw error;
   }
   return {
-    readDb: async () => readCacheState(),
-    writeDb: async (db) => writeCacheState(db),
-    readBackup: async (key) => readCacheBackup(key)
+    readDb: async () => readState(env),
+    writeDb: async (db) => writeState(env, db),
+    readBackup: async (key) => readBackup(env, key)
   };
 }
 
@@ -89,73 +87,6 @@ async function readBackup(env, key) {
   if (!db) throw new Error("Cloudflare D1 binding WMS_DB is missing");
   const row = await db.prepare(`SELECT payload FROM ${BACKUP_TABLE} WHERE backup_key = ?`).bind(key).first();
   return row ? JSON.parse(row.payload) : null;
-}
-
-async function readCacheState() {
-  const cached = await readCacheJson(cacheKey("state"));
-  if (!cached) return migrateDb(emptyState);
-  return migrateDb(cached);
-}
-
-async function writeCacheState(dbState) {
-  const payload = JSON.parse(JSON.stringify(dbState));
-  await writeCacheJson(cacheKey("state"), payload);
-  const day = new Date().toISOString().slice(0, 10);
-  await writeCacheJson(cacheKey("backup/latest"), makeBackupPayload(payload));
-  await writeCacheJson(cacheKey(`backup/daily-${day}`), makeBackupPayload(payload));
-}
-
-async function readCacheBackup(key) {
-  return readCacheJson(cacheKey(`backup/${key}`));
-}
-
-function cacheKey(path) {
-  return new Request(`https://wms-lite.local/${path}`, { method: "GET" });
-}
-
-async function readCacheJson(request) {
-  const response = await caches.default.match(request);
-  if (!response) return null;
-  try {
-    return await response.json();
-  } catch {
-    return null;
-  }
-}
-
-async function writeCacheJson(request, data) {
-  await caches.default.put(
-    request,
-    new Response(JSON.stringify(data), {
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-        "Cache-Control": "public, max-age=31536000"
-      }
-    })
-  );
-}
-
-function makeBackupPayload(dbState) {
-  const data = {
-    ...dbState,
-    sessions: []
-  };
-  return {
-    backupAt: new Date().toISOString(),
-    backupAtLocal: new Intl.DateTimeFormat("en-CA", {
-      timeZone: "Asia/Jakarta",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-      hourCycle: "h23"
-    }).format(new Date()).replace(",", ""),
-    timeZone: "Asia/Jakarta",
-    version: 1,
-    data
-  };
 }
 
 async function readBody(request) {
