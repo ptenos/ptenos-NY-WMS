@@ -93,18 +93,18 @@ async function readBackup(env, key) {
 }
 
 async function ensureSchema(db) {
-  await db.exec(`CREATE TABLE IF NOT EXISTS ${STATE_TABLE} (
+  await runSql(db, `CREATE TABLE IF NOT EXISTS ${STATE_TABLE} (
     id TEXT PRIMARY KEY,
     payload TEXT NOT NULL,
     version INTEGER NOT NULL DEFAULT 1,
     updated_at TEXT NOT NULL
   )`);
-  await db.exec(`CREATE TABLE IF NOT EXISTS ${BACKUP_TABLE} (
+  await runSql(db, `CREATE TABLE IF NOT EXISTS ${BACKUP_TABLE} (
     backup_key TEXT PRIMARY KEY,
     payload TEXT NOT NULL,
     created_at TEXT NOT NULL
   )`);
-  await db.exec(`CREATE TABLE IF NOT EXISTS wms_stock (
+  await runSql(db, `CREATE TABLE IF NOT EXISTS wms_stock (
     id TEXT PRIMARY KEY,
     sku TEXT NOT NULL,
     batch TEXT NOT NULL,
@@ -114,7 +114,7 @@ async function ensureSchema(db) {
     version INTEGER NOT NULL DEFAULT 1,
     updated_at TEXT NOT NULL
   )`);
-  await db.exec(`CREATE TABLE IF NOT EXISTS wms_logs (
+  await runSql(db, `CREATE TABLE IF NOT EXISTS wms_logs (
     id TEXT PRIMARY KEY,
     time TEXT NOT NULL,
     operator_id TEXT NOT NULL,
@@ -130,7 +130,7 @@ async function ensureSchema(db) {
     note TEXT,
     gps TEXT
   )`);
-  await db.exec(`CREATE TABLE IF NOT EXISTS wms_audit_logs (
+  await runSql(db, `CREATE TABLE IF NOT EXISTS wms_audit_logs (
     id TEXT PRIMARY KEY,
     time TEXT NOT NULL,
     operator_id TEXT NOT NULL,
@@ -142,12 +142,16 @@ async function ensureSchema(db) {
     after TEXT,
     note TEXT
   )`);
-  await db.exec(`CREATE TABLE IF NOT EXISTS wms_users (
+  await runSql(db, `CREATE TABLE IF NOT EXISTS wms_users (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
     role TEXT NOT NULL,
     password_hash TEXT NOT NULL
   )`);
+}
+
+async function runSql(db, sql) {
+  await db.prepare(sql).run();
 }
 
 async function readBody(request) {
