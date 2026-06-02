@@ -4,9 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "check:js": "node --check app.js",
+    "check": "npm run check:js",
+    "prebuild:cloudflare": "npm run check:js",
     "build": "node scripts/build-netlify.mjs",
     "build:cloudflare": "node scripts/build-cloudflare.mjs",
     "build:all": "node scripts/build-netlify.mjs && node scripts/build-cloudflare.mjs",
+    "smoke:login": "node scripts/smoke-login.mjs",
     "start": "node backend/server.js"
   },
   "dependencies": {
