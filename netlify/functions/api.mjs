@@ -50,7 +50,7 @@ async function readBody(request) {
 async function readSnapshot() {
   const store = getStateStore();
   const entry = await store.getWithMetadata(stateKey, { consistency: "strong", type: "json" });
-  if (entry?.data) return { db: migrateDb(entry.data), etag: entry.etag };
+  if (entry?.data) return { db: await migrateDb(entry.data), etag: entry.etag };
   return { db: await initialState(), etag: null };
 }
 
@@ -96,9 +96,9 @@ function getStateStore() {
 async function initialState() {
   try {
     const file = new URL("../../backend/data/wms-lite.json", import.meta.url);
-    return migrateDb(JSON.parse(await readFile(file, "utf8")));
+    return await migrateDb(JSON.parse(await readFile(file, "utf8")));
   } catch {
-    return migrateDb(emptyState);
+    return await migrateDb(emptyState);
   }
 }
 

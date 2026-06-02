@@ -1,7 +1,6 @@
 import { createServer } from "node:http";
 import { readFile, writeFile, mkdir, stat } from "node:fs/promises";
 import { createReadStream } from "node:fs";
-import { randomUUID } from "node:crypto";
 import { dirname, extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -450,7 +449,7 @@ function addStock(db, row) {
     existing.qty = roundQty(existing.qty + row.qty);
     touchStock(existing);
   } else {
-    db.stock.push({ id: randomUUID(), ...row, qty: roundQty(row.qty), version: 1, updatedAt: new Date().toISOString() });
+    db.stock.push({ id: globalThis.crypto.randomUUID(), ...row, qty: roundQty(row.qty), version: 1, updatedAt: new Date().toISOString() });
   }
 }
 
@@ -460,7 +459,7 @@ function setStock(db, row) {
     existing.qty = roundQty(row.qty);
     touchStock(existing);
   } else if (row.qty > 0) {
-    db.stock.push({ id: randomUUID(), ...row, qty: roundQty(row.qty), version: 1, updatedAt: new Date().toISOString() });
+    db.stock.push({ id: globalThis.crypto.randomUUID(), ...row, qty: roundQty(row.qty), version: 1, updatedAt: new Date().toISOString() });
   }
 }
 
@@ -511,7 +510,7 @@ function refreshLocationUsage(db) {
 function makeLog(payload) {
   const time = new Date();
   return {
-    id: randomUUID(),
+    id: globalThis.crypto.randomUUID(),
     time: formatMinute(time),
     operatorId: payload.operatorId || "",
     operatorName: payload.operatorName || "",
@@ -532,7 +531,7 @@ function makeLog(payload) {
 function makeAuditLog(payload) {
   const actor = payload.actor || {};
   return {
-    id: randomUUID(),
+    id: globalThis.crypto.randomUUID(),
     time: formatMinute(),
     operatorId: actor.id || payload.operatorId || "",
     operatorName: actor.name || payload.operatorName || "",

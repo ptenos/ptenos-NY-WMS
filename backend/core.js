@@ -1,5 +1,3 @@
-import { pbkdf2Sync, randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
-
 const appTimeZone = "Asia/Jakarta";
 
 const defaultUsers = [
@@ -19,7 +17,7 @@ const emptyState = {
   currentUserId: "admin"
 };
 
-function migrateDb(data = {}) {
+async function migrateDb(data = {}) {
   const merged = { ...emptyState, ...data };
   merged.materials = (Array.isArray(merged.materials) ? merged.materials : []).map((item) => ({
     sku: item.sku,
@@ -38,11 +36,13 @@ function migrateDb(data = {}) {
   defaultUsers.forEach((user) => {
     if (!merged.users.some((item) => item.id === user.id)) merged.users.push({ ...user });
   });
-  merged.users.forEach((user) => {
+  for (const user of merged.users) {
     if (user.role === "operator") user.role = "employee";
-    if (!user.passwordHash) user.passwordHash = hashPassword(user.password || (user.role === "admin" ? "admin123" : "123456"));
+    if (!user.passwordHash) {
+      user.passwordHash = await hashPassword(user.password || (user.role === "admin" ? "admin123" : "123456"));
+    }
     delete user.password;
-  });
+  }
   cleanupSessions(merged);
   return merged;
 }
@@ -55,13 +55,13 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
   if (method === "POST" && pathname === "/api/login") {
     const db = await storage.readDb();
     const user = findUserById(db, body.userId);
-    if (!user || !verifyPassword(user, body.password)) return json(401, { error: "账号或密码错误" });
+    if (!user || !(await verifyPassword(user, body.password))) return json(401, { error: "账号或密码错误" });
     cleanupSessions(db);
-    const token = randomUUID();
+    const token = globalThis.crypto.randomUUID();
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
     db.sessions.unshift({ token, userId: user.id, expiresAt, createdAt: new Date().toISOString() });
     await storage.writeDb(db);
-    const mustChangePassword = isDefaultAdminPassword(user);
+    const mustChangePassword = await isDefaultAdminPassword(user);
     return json(200, {
       user: { ...sanitizeUser(user), mustChangePassword },
       token,
@@ -87,14 +87,14 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
 
   if (method === "GET" && pathname === "/api/backup") {
     const db = await storage.readDb();
-    const denied = requireAdmin(db, "", "", authToken(body, headers));
+    const denied = await requireAdmin(db, "", "", authToken(body, headers));
     if (denied) return json(403, { error: denied });
     return json(200, backupPayload(db));
   }
 
   if (method === "GET" && pathname === "/api/auto-backup") {
     const db = await storage.readDb();
-    const denied = requireAdmin(db, "", "", authToken(body, headers));
+    const denied = await requireAdmin(db, "", "", authToken(body, headers));
     if (denied) return json(403, { error: denied });
     const backup = await storage.readBackup?.("latest");
     if (!backup) return json(404, { error: "暂无自动备份" });
@@ -103,10 +103,10 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
 
   if (method === "POST" && pathname === "/api/restore-backup") {
     const db = await storage.readDb();
-    const denied = requireAdmin(db, body.operatorId, body.password, authToken(body, headers));
+    const denied = await requireAdmin(db, body.operatorId, body.password, authToken(body, headers));
     if (denied) return json(403, { error: denied });
-    const actor = getActor(db, body.operatorId, body.password, authToken(body, headers));
-    const restored = restorePayload(body);
+    const actor = await getActor(db, body.operatorId, body.password, authToken(body, headers));
+    const restored = await restorePayload(body);
     if (restored.error) return json(422, { error: restored.error });
     const nextDb = restored.db;
     nextDb.sessions = db.sessions;
@@ -157,9 +157,9 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
 
   if (method === "POST" && pathname === "/api/materials") {
     const db = await storage.readDb();
-    const denied = requireAdmin(db, body.operatorId, body.password, authToken(body, headers));
+    const denied = await requireAdmin(db, body.operatorId, body.password, authToken(body, headers));
     if (denied) return json(403, { error: denied });
-    const actor = getActor(db, body.operatorId, body.password, authToken(body, headers));
+    const actor = await getActor(db, body.operatorId, body.password, authToken(body, headers));
     const sku = normalizeCode(body.sku);
     if (!sku || !body.name) return json(422, { error: "sku and name are required" });
     const previousSku = normalizeCode(body.previousSku);
@@ -198,9 +198,9 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
 
   if (method === "POST" && pathname === "/api/locations") {
     const db = await storage.readDb();
-    const denied = requireAdmin(db, body.operatorId, body.password, authToken(body, headers));
+    const denied = await requireAdmin(db, body.operatorId, body.password, authToken(body, headers));
     if (denied) return json(403, { error: denied });
-    const actor = getActor(db, body.operatorId, body.password, authToken(body, headers));
+    const actor = await getActor(db, body.operatorId, body.password, authToken(body, headers));
     const code = normalizeCode(body.code);
     if (!code) return json(422, { error: "code is required" });
     const previousCode = normalizeCode(body.previousCode);
@@ -242,7 +242,7 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
 
   if (method === "POST" && pathname === "/api/operations") {
     const db = await storage.readDb();
-    const result = applyOperation(db, body, authToken(body, headers));
+    const result = await applyOperation(db, body, authToken(body, headers));
     if (result.error) return json(422, result);
     await storage.writeDb(db);
     return json(200, statePayload(headers, db));
@@ -250,9 +250,9 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
 
   if (method === "POST" && pathname === "/api/users") {
     const db = await storage.readDb();
-    const denied = requireAdmin(db, body.operatorId, body.password, authToken(body, headers));
+    const denied = await requireAdmin(db, body.operatorId, body.password, authToken(body, headers));
     if (denied) return json(403, { error: denied });
-    const actor = getActor(db, body.operatorId, body.password, authToken(body, headers));
+    const actor = await getActor(db, body.operatorId, body.password, authToken(body, headers));
     const id = normalizeCode(body.id);
     const name = String(body.name || "").trim();
     const role = String(body.role || "").trim();
@@ -261,7 +261,7 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     const existing = db.users.find((user) => user.id === id);
     if (!existing && !userPassword) return json(422, { error: "新增账号必须设置密码" });
     const user = { id, name, role };
-    if (userPassword) user.passwordHash = hashPassword(userPassword);
+    if (userPassword) user.passwordHash = await hashPassword(userPassword);
     const before = existing ? sanitizeUser(existing) : null;
     if (existing) Object.assign(existing, user);
     else db.users.push(user);
@@ -279,9 +279,9 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
 
   if (method === "POST" && pathname === "/api/users/delete") {
     const db = await storage.readDb();
-    const denied = requireAdmin(db, body.operatorId, body.password, authToken(body, headers));
+    const denied = await requireAdmin(db, body.operatorId, body.password, authToken(body, headers));
     if (denied) return json(403, { error: denied });
-    const actor = getActor(db, body.operatorId, body.password, authToken(body, headers));
+    const actor = await getActor(db, body.operatorId, body.password, authToken(body, headers));
     const targetId = normalizeCode(body.targetId);
     if (targetId === "ADMIN") return json(422, { error: "不能删除管理员账号" });
     const before = sanitizeUser(db.users.find((user) => user.id === targetId));
@@ -302,9 +302,9 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
 
   if (method === "POST" && pathname === "/api/import-materials") {
     const db = await storage.readDb();
-    const denied = requireAdmin(db, body.operatorId, body.password, authToken(body, headers));
+    const denied = await requireAdmin(db, body.operatorId, body.password, authToken(body, headers));
     if (denied) return json(403, { error: denied });
-    const actor = getActor(db, body.operatorId, body.password, authToken(body, headers));
+    const actor = await getActor(db, body.operatorId, body.password, authToken(body, headers));
     const rows = Array.isArray(body.rows) ? body.rows : [];
     let imported = 0;
     for (const row of rows) {
@@ -329,9 +329,9 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
 
   if (method === "POST" && pathname === "/api/import-locations") {
     const db = await storage.readDb();
-    const denied = requireAdmin(db, body.operatorId, body.password, authToken(body, headers));
+    const denied = await requireAdmin(db, body.operatorId, body.password, authToken(body, headers));
     if (denied) return json(403, { error: denied });
-    const actor = getActor(db, body.operatorId, body.password, authToken(body, headers));
+    const actor = await getActor(db, body.operatorId, body.password, authToken(body, headers));
     const rows = Array.isArray(body.rows) ? body.rows : [];
     let imported = 0;
     for (const row of rows) {
@@ -359,9 +359,9 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
 
   if (method === "POST" && pathname === "/api/import-inventory") {
     const db = await storage.readDb();
-    const denied = requireAdmin(db, body.operatorId, body.password, authToken(body, headers));
+    const denied = await requireAdmin(db, body.operatorId, body.password, authToken(body, headers));
     if (denied) return json(403, { error: denied });
-    const actor = getActor(db, body.operatorId, body.password, authToken(body, headers));
+    const actor = await getActor(db, body.operatorId, body.password, authToken(body, headers));
     const rows = Array.isArray(body.rows) ? body.rows : [];
     const groupedRows = new Map();
     for (const row of rows) {
@@ -479,10 +479,10 @@ function backupPayload(db) {
   };
 }
 
-function restorePayload(body = {}) {
+async function restorePayload(body = {}) {
   const candidate = body.data || body.backup?.data || body.backup || body;
   if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) return { error: "备份文件格式不正确" };
-  const db = migrateDb(candidate);
+  const db = await migrateDb(candidate);
   if (!Array.isArray(db.materials) || !Array.isArray(db.locations) || !Array.isArray(db.stock)) {
     return { error: "备份文件缺少库存基础数据" };
   }
@@ -724,9 +724,9 @@ function queryValue(query, key) {
   return query[key] || "";
 }
 
-function applyOperation(db, operation, token = "") {
+async function applyOperation(db, operation, token = "") {
   const type = operation.type;
-  const actor = getActor(db, operation.operatorId, operation.password, operation.sessionToken || operation.token || token);
+  const actor = await getActor(db, operation.operatorId, operation.password, operation.sessionToken || operation.token || token);
   const denied = authorizeOperation(actor, type);
   if (denied) return { error: denied };
   const logActor = {
@@ -828,7 +828,7 @@ function addStock(db, row) {
     existing.qty = roundQty(existing.qty + row.qty);
     touchStock(existing);
   } else {
-    db.stock.push({ id: randomUUID(), ...row, qty: roundQty(row.qty), version: 1, updatedAt: new Date().toISOString() });
+    db.stock.push({ id: globalThis.crypto.randomUUID(), ...row, qty: roundQty(row.qty), version: 1, updatedAt: new Date().toISOString() });
   }
 }
 
@@ -838,7 +838,7 @@ function setStock(db, row) {
     existing.qty = roundQty(row.qty);
     touchStock(existing);
   } else if (row.qty > 0) {
-    db.stock.push({ id: randomUUID(), ...row, qty: roundQty(row.qty), version: 1, updatedAt: new Date().toISOString() });
+    db.stock.push({ id: globalThis.crypto.randomUUID(), ...row, qty: roundQty(row.qty), version: 1, updatedAt: new Date().toISOString() });
   }
 }
 
@@ -852,12 +852,12 @@ function assertVersion(row, expectedVersion) {
   return Number(row.version || 1) === Number(expectedVersion) ? null : "库存已被其他人更新，请刷新后重试";
 }
 
-function getActor(db, operatorId, password, token = "") {
+async function getActor(db, operatorId, password, token = "") {
   const sessionActor = getActorByToken(db, token);
   if (sessionActor) return sessionActor;
   const user = findUserById(db, operatorId);
   if (!user) return null;
-  if (!password || !verifyPassword(user, password)) return null;
+  if (!password || !(await verifyPassword(user, password))) return null;
   return user;
 }
 
@@ -879,8 +879,8 @@ function authorizeOperation(actor, type) {
   return "账号权限无效";
 }
 
-function requireAdmin(db, operatorId, password, token = "") {
-  const actor = getActor(db, operatorId, password, token);
+async function requireAdmin(db, operatorId, password, token = "") {
+  const actor = await getActor(db, operatorId, password, token);
   if (!actor) return "请先登录";
   return actor.role === "admin" ? null : "只有管理员可以执行该操作";
 }
@@ -900,7 +900,7 @@ function refreshLocationUsage(db) {
 function makeLog(payload) {
   const time = new Date();
   return {
-    id: randomUUID(),
+    id: globalThis.crypto.randomUUID(),
     time: formatMinute(time),
     operatorId: payload.operatorId || "",
     operatorName: payload.operatorName || "",
@@ -921,7 +921,7 @@ function makeLog(payload) {
 function makeAuditLog(payload) {
   const actor = payload.actor || {};
   return {
-    id: randomUUID(),
+    id: globalThis.crypto.randomUUID(),
     time: formatMinute(),
     operatorId: actor.id || payload.operatorId || "",
     operatorName: actor.name || payload.operatorName || "",
@@ -939,8 +939,8 @@ function sanitizeUser(user) {
   return { id: user.id, name: user.name, role: user.role };
 }
 
-function isDefaultAdminPassword(user) {
-  return String(user?.id || "").toLowerCase() === "admin" && verifyPassword(user, "admin123");
+async function isDefaultAdminPassword(user) {
+  return String(user?.id || "").toLowerCase() === "admin" && await verifyPassword(user, "admin123");
 }
 
 function findUserById(db, userId) {
@@ -949,24 +949,45 @@ function findUserById(db, userId) {
   return db.users?.find((item) => String(item.id).toLowerCase() === key) || null;
 }
 
-function hashPassword(password) {
-  const salt = randomBytes(16).toString("hex");
-  const iterations = 100000;
-  const hash = pbkdf2Sync(String(password || ""), salt, iterations, 32, "sha256").toString("hex");
-  return `pbkdf2$${iterations}$${salt}$${hash}`;
+async function hashPassword(password) {
+  const saltBytes = new Uint8Array(16);
+  globalThis.crypto.getRandomValues(saltBytes);
+  const salt = bytesToHex(saltBytes);
+  const digest = await digestText(`${salt}:${String(password || "")}`);
+  return `sha256$${salt}$${digest}`;
 }
 
-function verifyPassword(user, password) {
+async function verifyPassword(user, password) {
   const stored = String(user?.passwordHash || "");
   const legacy = user?.password;
   if (!stored && legacy !== undefined) return String(legacy) === String(password || "");
   const parts = stored.split("$");
-  if (parts.length !== 4 || parts[0] !== "pbkdf2") return false;
-  const iterations = Number(parts[1]);
-  const salt = parts[2];
-  const expected = Buffer.from(parts[3], "hex");
-  const actual = pbkdf2Sync(String(password || ""), salt, iterations, expected.length, "sha256");
-  return expected.length === actual.length && timingSafeEqual(expected, actual);
+  if (parts.length !== 3 || parts[0] !== "sha256") return false;
+  const salt = parts[1];
+  const expected = parts[2];
+  const actual = await digestText(`${salt}:${String(password || "")}`);
+  return timingSafeEqualText(expected, actual);
+}
+
+async function digestText(text) {
+  const encoded = new TextEncoder().encode(text);
+  const digest = await globalThis.crypto.subtle.digest("SHA-256", encoded);
+  return bytesToHex(new Uint8Array(digest));
+}
+
+function bytesToHex(bytes) {
+  return [...bytes].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function timingSafeEqualText(leftValue, rightValue) {
+  const left = String(leftValue || "");
+  const right = String(rightValue || "");
+  if (left.length !== right.length) return false;
+  let mismatch = 0;
+  for (let index = 0; index < left.length; index += 1) {
+    mismatch |= left.charCodeAt(index) ^ right.charCodeAt(index);
+  }
+  return mismatch === 0;
 }
 
 function cleanupSessions(db) {
