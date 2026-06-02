@@ -1,4 +1,6 @@
-﻿const storeKey = "wms-lite-state-v4";
+console.log("runtime boot debug-bind-20260603");
+window.__runtimeBooted = true;
+const storeKey = "wms-lite-state-v4";
 const authKey = "wms-lite-auth-v2";
 const channel = "BroadcastChannel" in window ? new BroadcastChannel("wms-lite-sync") : null;
 const serverRequired = location.protocol !== "file:";
@@ -30,7 +32,7 @@ const wmsLocalStorage = safeStorage("localStorage");
 const wmsSessionStorage = safeStorage("sessionStorage");
 
 const state = loadState();
-const frontendBuildVersion = "debug-storage-20260603";
+const frontendBuildVersion = "runtime-boot-debug-20260603";
 let sessionAuth = loadSessionAuth();
 if (!sessionAuth.token || sessionAuth.userId !== state.currentUserId) state.currentUserId = "";
 let operationType = "in";
