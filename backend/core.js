@@ -55,7 +55,7 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
   if (method === "POST" && pathname === "/api/login") {
     const db = await storage.readDb();
     const user = findUserById(db, body.userId);
-    if (!user || !(await verifyPassword(user, body.password))) return json(401, { error: "璐﹀彿鎴栧瘑鐮侀敊璇? });
+    if (!user || !(await verifyPassword(user, body.password))) return json(401, { error: "账号或密码错误" });
     cleanupSessions(db);
     const token = globalThis.crypto.randomUUID();
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
