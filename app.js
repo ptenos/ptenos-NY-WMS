@@ -44,6 +44,7 @@ let selectedOperationVersion = null;
 let selectedCountVersion = null;
 let editingMaterialSku = "";
 let editingLocationCode = "";
+let pendingPasswordUserId = "";
 let installPromptEvent = null;
 let stockSortBy = "sku";
 let stockSortDir = "asc";
@@ -1734,14 +1735,14 @@ function renderUsers() {
             </tr>
           </thead>
           <tbody>
-            ${state.users.map((user) => `
+              ${state.users.map((user) => `
               <tr>
                 <td><strong>${escapeHtml(user.id)}</strong></td>
                 <td>${escapeHtml(roleLabel(user.role))}</td>
                 <td>${escapeHtml(permissionScope(user.role))}</td>
                 <td>
                   <div class="button-row button-row-tight">
-                    <button class="secondary-button mini-action" type="button" data-edit-user="${escapeHtml(user.id)}">权限</button>
+                    <button class="secondary-button mini-action" type="button" data-password-user="${escapeHtml(user.id)}">修改密码</button>
                     ${user.role === "admin"
                       ? `<span class="muted">系统管理员，不可删除</span>`
                       : `<button class="mini-danger" type="button" data-delete-user="${escapeHtml(user.id)}">删除</button>`}
@@ -2549,6 +2550,48 @@ async function addUser(event) {
   render();
 }
 
+function openPasswordDialog(userId) {
+  const user = state.users.find((item) => item.id === userId);
+  if (!user) return;
+  pendingPasswordUserId = user.id;
+  $("#passwordDialogAccount").textContent = user.id;
+  $("#passwordDialogRole").textContent = roleLabel(user.role);
+  $("#passwordDialogNew").value = "";
+  $("#passwordDialogConfirm").value = "";
+  $("#passwordDialog").classList.remove("hidden");
+  $("#passwordDialogNew").focus();
+}
+
+function closePasswordDialog() {
+  pendingPasswordUserId = "";
+  $("#passwordDialogNew").value = "";
+  $("#passwordDialogConfirm").value = "";
+  $("#passwordDialog").classList.add("hidden");
+}
+
+async function submitPasswordChange() {
+  if (!isAdmin()) return showToast("没有权限");
+  if (!pendingPasswordUserId) return showToast("请选择账号");
+  const newPassword = $("#passwordDialogNew").value.trim();
+  const confirmPassword = $("#passwordDialogConfirm").value.trim();
+  if (!newPassword) return showToast("请输入新密码");
+  if (newPassword.length < 6) return showToast("密码至少 6 位");
+  if (newPassword !== confirmPassword) return showToast("两次输入的密码不一致");
+  const account = pendingPasswordUserId;
+  if (!confirm(`确认修改账号 ${account} 的密码？`)) return;
+  try {
+    await postUserData("/api/users/password", {
+      targetId: account,
+      userPassword: newPassword
+    });
+    showToast("密码修改成功");
+    closePasswordDialog();
+    render();
+  } catch (error) {
+    showToast(error.message || "密码修改失败");
+  }
+}
+
 function login() {
   debugLogin("login clicked");
   loginAsync();
@@ -2613,7 +2656,8 @@ function logout() {
 
 async function deleteUser(userId) {
   if (!isAdmin()) return showToast("没有权限");
-  if (userId === "admin") return showToast("不能删除管理员账号");
+  const target = state.users.find((user) => user.id === userId);
+  if (target?.role === "admin") return showToast("不能删除管理员账号");
   if (!confirm(`确认删除账号 ${userId}？\n删除后该账号将无法登录。`)) return;
   try {
     const remote = await postUserData("/api/users/delete", { targetId: userId });
@@ -2631,12 +2675,7 @@ async function deleteUser(userId) {
 }
 
 function editUserModules(userId) {
-  const user = state.users.find((item) => item.id === userId);
-  if (!user) return;
-  $("#newUserId").value = user.id;
-  $("#newUserPassword").value = "";
-  $("#newUserRole").value = user.role;
-  $("#newUserModules").value = (Array.isArray(user.modules) && user.modules.length ? user.modules : defaultModulesForRole(user.role)).join(",");
+  openPasswordDialog(userId);
 }
 
 function activateView(viewId) {
@@ -2831,10 +2870,15 @@ $("#locationList").addEventListener("click", (event) => {
 });
 $("#userForm").addEventListener("submit", addUser);
 $("#userList").addEventListener("click", (event) => {
-  const editButton = event.target.closest("[data-edit-user]");
-  if (editButton) editUserModules(editButton.dataset.editUser);
+  const passwordButton = event.target.closest("[data-password-user]");
+  if (passwordButton) openPasswordDialog(passwordButton.dataset.passwordUser);
   const button = event.target.closest("[data-delete-user]");
   if (button) deleteUser(button.dataset.deleteUser);
+});
+$("#passwordDialogCancel").addEventListener("click", closePasswordDialog);
+$("#passwordDialogSubmit").addEventListener("click", submitPasswordChange);
+$("#passwordDialog").addEventListener("click", (event) => {
+  if (event.target.id === "passwordDialog") closePasswordDialog();
 });
 window.addEventListener("storage", (event) => {
   if (event.key !== storeKey || !event.newValue) return;

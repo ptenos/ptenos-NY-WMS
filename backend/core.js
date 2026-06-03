@@ -254,10 +254,10 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     if (denied) return json(403, { error: denied });
     const actor = await getActor(db, body.operatorId, body.password, authToken(body, headers));
     const id = normalizeCode(body.id);
-    const name = String(body.name || "").trim();
     const role = String(body.role || "").trim();
     const userPassword = String(body.userPassword || "").trim();
-    if (!id || !name || !["employee", "keeper", "admin"].includes(role)) return json(422, { error: "账号、姓名和角色不能为空" });
+    const name = String(body.name || id).trim() || id;
+    if (!id || !["employee", "keeper", "admin"].includes(role)) return json(422, { error: "账号和角色不能为空" });
     const existing = db.users.find((user) => user.id === id);
     if (!existing && !userPassword) return json(422, { error: "新增账号必须设置密码" });
     const user = { id, name, role };
@@ -277,14 +277,42 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     return json(200, statePayload(headers, db));
   }
 
+  if (method === "POST" && pathname === "/api/users/password") {
+    const db = await storage.readDb();
+    const denied = await requireAdmin(db, body.operatorId, body.password, authToken(body, headers));
+    if (denied) return json(403, { error: denied });
+    const actor = await getActor(db, body.operatorId, body.password, authToken(body, headers));
+    const targetId = normalizeCode(body.targetId);
+    const userPassword = String(body.userPassword || "").trim();
+    if (!targetId) return json(422, { error: "账号不能为空" });
+    if (userPassword.length < 6) return json(422, { error: "密码至少 6 位" });
+    const target = db.users.find((user) => user.id === targetId);
+    if (!target) return json(404, { error: "账号不存在" });
+    const before = sanitizeUser(target);
+    target.passwordHash = await hashPassword(userPassword);
+    delete target.password;
+    db.auditLogs.unshift(makeAuditLog({
+      actor,
+      action: "修改密码",
+      entity: "账号权限",
+      key: targetId,
+      before,
+      after: sanitizeUser(target),
+      note: "管理员重置账号密码"
+    }));
+    await storage.writeDb(db);
+    return json(200, statePayload(headers, db));
+  }
+
   if (method === "POST" && pathname === "/api/users/delete") {
     const db = await storage.readDb();
     const denied = await requireAdmin(db, body.operatorId, body.password, authToken(body, headers));
     if (denied) return json(403, { error: denied });
     const actor = await getActor(db, body.operatorId, body.password, authToken(body, headers));
     const targetId = normalizeCode(body.targetId);
-    if (targetId === "ADMIN") return json(422, { error: "不能删除管理员账号" });
-    const before = sanitizeUser(db.users.find((user) => user.id === targetId));
+    const target = db.users.find((user) => user.id === targetId);
+    if (target?.role === "admin") return json(422, { error: "不能删除管理员账号" });
+    const before = sanitizeUser(target);
     db.users = db.users.filter((user) => user.id !== targetId);
     if (before) {
       db.auditLogs.unshift(makeAuditLog({
@@ -938,7 +966,7 @@ function makeAuditLog(payload) {
 
 function sanitizeUser(user) {
   if (!user) return null;
-  return { id: user.id, name: user.name, role: user.role };
+  return { id: user.id, role: user.role };
 }
 
 async function isDefaultAdminPassword(user) {

@@ -155,6 +155,18 @@ button:disabled {
   text-align: right;
 }
 
+.confirm-card label {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.confirm-card input {
+  min-width: 0;
+}
+
 .login-panel,
 .operator-strip {
   display: grid;
