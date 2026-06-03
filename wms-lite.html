@@ -1,5 +1,5 @@
 ﻿<!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -20,10 +20,10 @@
       <header class="app-header">
         <div>
           <p class="eyebrow">Mobile Web WMS Lite</p>
-          <h1>杞婚噺浠撳簱鎵ц绯荤粺</h1>
+          <h1>WMS Lite Warehouse Execution System</h1>
         </div>
         <div class="header-actions">
-          <span class="sync-chip" id="syncStatus">杩炴帴涓?/span>
+          <span class="sync-chip" id="syncStatus">Connecting</span>
           <div class="account-badge" id="accountBadge">Not logged in</div>
           <button class="ghost-button hidden" id="installAppButton" type="button">Install</button>
           <button class="ghost-button" id="logoutButton" type="button">Keluar</button>
@@ -227,54 +227,56 @@
       <section class="view hidden" id="stock">
         <section class="panel">
           <div class="toolbar stock-toolbar">
-            <input id="stockSearch" type="search" placeholder="鎼滅储搴撲綅銆佺墿鏂欑紪鐮併€佸悕绉般€佹壒鍙枫€佺姸鎬? />
-            <button class="secondary-button" id="exportStock" type="button">瀵煎嚭褰撳墠搴撳瓨</button>
+            <input id="stockSearch" type="search" placeholder="Search location, material code, name, batch, status" />
+            <button class="secondary-button" id="exportStock" type="button">Export Current Stock</button>
           </div>
           <div class="cards-list" id="stockList"></div>
           <div class="pager" id="stockPager"></div>
         </section>
       </section>
+      </section>
 
       <section class="view admin-view hidden" id="import">
         <section class="panel">
           <div class="panel-title">
-            <h2>鏈熷垵搴撳瓨瀵煎叆</h2>
-            <p>浠呯鐞嗗憳鍙銆傚瓧娈碉細鐗╂枡缂栫爜銆佺墿鏂欏悕绉般€佹壒鍙枫€佹暟閲忋€佸簱浣嶃€佺姸鎬併€?/p>
+            <h2>Initial Stock Import</h2>
+            <p>Admin only. Fields: Material Code, Material Name, Batch No., Qty, Location Code, Status.</p>
           </div>
           <input id="inventoryFile" type="file" accept=".xlsx,.xls,.csv" />
           <div class="button-row">
-            <button class="primary-button server-write" id="importInventory" type="button">瀵煎叆搴撳瓨</button>
-            <button class="secondary-button" id="downloadTemplate" type="button">涓嬭浇搴撳瓨妯℃澘</button>
-            <button class="secondary-button server-write" id="downloadBackup" type="button">涓嬭浇澶囦唤</button>
-            <button class="secondary-button server-write" id="downloadAutoBackup" type="button">涓嬭浇鑷姩澶囦唤</button>
+            <button class="primary-button server-write" id="importInventory" type="button">Import Stock</button>
+            <button class="secondary-button" id="downloadTemplate" type="button">Download Stock Template</button>
+            <button class="secondary-button server-write" id="downloadBackup" type="button">Download Backup</button>
+            <button class="secondary-button server-write" id="downloadAutoBackup" type="button">Download Auto Backup</button>
           </div>
           <input id="restoreFile" type="file" accept=".json" />
           <div class="button-row">
-            <button class="secondary-button danger-button server-write" id="restoreBackup" type="button">浠庡浠芥仮澶?/button>
+            <button class="secondary-button danger-button server-write" id="restoreBackup" type="button">Restore from Backup</button>
           </div>
           <div class="import-report hidden" id="importReport"></div>
-          <div class="hint-box">鏁伴噺鍙兘浣跨敤绯荤粺鏁板瓧鏍煎紡锛屼緥濡?1000 鎴?1000.123456锛涙渶澶?6 浣嶅皬鏁帮紝涓嶅厑璁?1.000 鎴?1.000,5銆?/div>
+          <div class="hint-box">Use standard numbers only, e.g. 1000 or 1000.123456; up to 6 decimals. Do not use 1.000 or 1.000,5.</div>
         </section>
+      </section>
       </section>
 
       <section class="view admin-view hidden" id="master">
         <section class="split-grid">
           <div class="panel">
             <div class="panel-title">
-              <h2>鐗╂枡涓绘暟鎹?/h2>
-              <p>鏀寔鎵嬪姩缁存姢锛屼篃鏀寔鍚庣画鏂囦欢瀵煎叆杩藉姞鎴栨洿鏂般€?/p>
+              <h2>Material Master Data</h2>
+              <p>Supports manual maintenance and file import append/update.</p>
             </div>
             <form id="materialForm" class="compact-form">
-              <input id="newSku" required placeholder="鐗╂枡缂栫爜" />
-              <input id="newName" required placeholder="鐗╂枡鍚嶇О" />
-              <button class="primary-button server-write" id="materialSaveButton" type="submit">淇濆瓨</button>
-              <button class="ghost-button hidden" id="cancelMaterialEdit" type="button">鍙栨秷淇敼</button>
+              <input id="newSku" required placeholder="Material Code" />
+              <input id="newName" required placeholder="Material Name" />
+              <button class="primary-button server-write" id="materialSaveButton" type="submit">Save</button>
+              <button class="ghost-button hidden" id="cancelMaterialEdit" type="button">Cancel Edit</button>
             </form>
-            <input id="materialSearch" type="search" placeholder="鎼滅储鐗╂枡缂栫爜銆佸悕绉? />
+            <input id="materialSearch" type="search" placeholder="Search material code, name" />
             <input id="materialFile" type="file" accept=".xlsx,.xls,.csv" />
             <div class="button-row">
-              <button class="secondary-button server-write" id="importMaterials" type="button">瀵煎叆鐗╂枡涓绘暟鎹?/button>
-              <button class="secondary-button" id="downloadMaterialTemplate" type="button">涓嬭浇鐗╂枡妯℃澘</button>
+              <button class="secondary-button server-write" id="importMaterials" type="button">Import Material Master Data</button>
+              <button class="secondary-button" id="downloadMaterialTemplate" type="button">Download Material Template</button>
             </div>
             <div class="cards-list" id="materialList"></div>
             <div class="pager" id="materialPager"></div>
@@ -282,95 +284,99 @@
 
           <div class="panel">
             <div class="panel-title">
-              <h2>搴撲綅涓绘暟鎹?/h2>
-              <p>鏀寔鎵嬪姩缁存姢锛屼篃鏀寔鍚庣画鏂囦欢瀵煎叆杩藉姞鎴栨洿鏂般€?/p>
+              <h2>Location Master Data</h2>
+              <p>Supports manual maintenance and file import append/update.</p>
             </div>
             <form id="locationForm" class="compact-form location-form">
-              <input id="newLocation" required placeholder="搴撲綅缂栫爜锛屽 A-01-01" />
+              <input id="newLocation" required placeholder="Location Code, e.g. A-01-01" />
               <select id="newLocationStatus">
-                <option>绌洪棽</option>
-                <option>鍗犵敤</option>
-                <option>鍐荤粨</option>
+                <option>Empty</option>
+                <option>Occupied</option>
+                <option>Frozen</option>
               </select>
-              <button class="primary-button server-write" id="locationSaveButton" type="submit">淇濆瓨</button>
-              <button class="ghost-button hidden" id="cancelLocationEdit" type="button">鍙栨秷淇敼</button>
+              <button class="primary-button server-write" id="locationSaveButton" type="submit">Save</button>
+              <button class="ghost-button hidden" id="cancelLocationEdit" type="button">Cancel Edit</button>
             </form>
-            <input id="locationSearch" type="search" placeholder="鎼滅储搴撲綅缂栫爜銆佺姸鎬? />
+            <input id="locationSearch" type="search" placeholder="Search location code, status" />
             <input id="locationFile" type="file" accept=".xlsx,.xls,.csv" />
             <div class="button-row">
-              <button class="secondary-button server-write" id="importLocations" type="button">瀵煎叆搴撲綅涓绘暟鎹?/button>
-              <button class="secondary-button" id="downloadLocationTemplate" type="button">涓嬭浇搴撲綅妯℃澘</button>
+              <button class="secondary-button server-write" id="importLocations" type="button">Import Location Master Data</button>
+              <button class="secondary-button" id="downloadLocationTemplate" type="button">Download Location Template</button>
             </div>
             <div class="cards-list" id="locationList"></div>
             <div class="pager" id="locationPager"></div>
           </div>
         </section>
       </section>
+      </section>
 
       <section class="view admin-view hidden" id="users">
         <section class="panel">
           <div class="panel-title">
-            <h2>璐﹀彿涓庢潈闄?/h2>
-            <p>绠＄悊鍛樺彲浠ユ柊澧炶处鍙枫€佽缃鑹层€侀噸缃瘑鐮侊紝骞剁淮鎶ゆā鍧楁潈闄愩€?/p>
+            <h2>Account & Permissions</h2>
+            <p>Admins can add accounts, set roles, reset passwords, and manage module access.</p>
           </div>
           <form id="userForm" class="compact-form user-form">
-            <input id="newUserId" required placeholder="璐﹀彿锛屽 WH-001" />
-            <input id="newUserPassword" type="password" placeholder="瀵嗙爜锛岀暀绌哄垯涓嶄慨鏀? />
+            <input id="newUserId" required placeholder="Account, e.g. WH-001" />
+            <input id="newUserPassword" type="password" placeholder="Password, leave blank to keep unchanged" />
             <select id="newUserRole">
-              <option value="employee">鍛樺伐</option>
-              <option value="keeper">浠撶</option>
-              <option value="admin">绠＄悊鍛?/option>
+              <option value="employee">Employee</option>
+              <option value="keeper">Keeper</option>
+              <option value="admin">Admin</option>
             </select>
             <input id="newUserModules" type="hidden" />
-            <button class="primary-button server-write" type="submit">淇濆瓨</button>
+            <button class="primary-button server-write" type="submit">Save</button>
           </form>
           <div class="cards-list" id="userList"></div>
         </section>
+      </section>
       </section>
 
       <section class="view admin-view hidden" id="logs">
         <section class="panel">
           <div class="panel-title">
-            <h2>鍑哄叆搴撴祦姘磋处</h2>
-            <p>姝ｅ紡閮ㄧ讲鍚庡彧鍏佽绯荤粺鑷姩杩藉姞锛屼笉鍏佽浜哄伐淇敼鎴栧垹闄ゃ€?/p>
+            <h2>Transaction Log</h2>
+            <p>After formal deployment, only system auto-appends are allowed; manual edits or deletes are blocked.</p>
           </div>
           <div class="toolbar">
-            <input id="logSearch" type="search" placeholder="鎼滅储璐﹀彿銆佹棩鏈熴€佺被鍨嬨€佺墿鏂欍€佹壒鍙枫€佸簱浣? />
+            <input id="logSearch" type="search" placeholder="Search account, date, type, material, batch, location" />
           </div>
           <div class="cards-list" id="logList"></div>
           <div class="pager" id="logPager"></div>
         </section>
       </section>
+      </section>
 
       <section class="view admin-view hidden" id="audit">
         <section class="panel">
           <div class="panel-title">
-            <h2>涓绘暟鎹慨鏀硅褰?/h2>
-            <p>璁板綍绠＄悊鍛樺鐗╂枡銆佸簱浣嶃€佽处鍙峰拰瀵煎叆鍔ㄤ綔鐨勫彉鏇达紝姝ｅ紡閮ㄧ讲鍚庡彧杩藉姞涓嶅垹闄ゃ€?/p>
+            <h2>Master Data Change Log</h2>
+            <p>Records admin changes to materials, locations, accounts, and imports; after formal deployment, append only.</p>
           </div>
           <div class="toolbar">
-            <input id="auditSearch" type="search" placeholder="鎼滅储璐﹀彿銆佸璞°€佹搷浣溿€佷富閿€佷慨鏀瑰唴瀹? />
+            <input id="auditSearch" type="search" placeholder="Search account, object, action, key, change details" />
           </div>
           <div class="cards-list" id="auditList"></div>
         </section>
+      </section>
       </section>
 
     </main>
 
       <template id="emptyTemplate">
-      <div class="empty-state">鏆傛棤鏁版嵁</div>
+      <div class="empty-state">No data</div>
     </template>
 
     <section class="confirm-sheet hidden" id="operationConfirmSheet" aria-live="polite">
       <div class="confirm-card">
         <div class="panel-title">
-          <h2>纭鎻愪氦</h2>
+          <h2>Confirm Submission</h2>
           <p id="operationConfirmText"></p>
         </div>
         <div class="confirm-grid" id="operationConfirmGrid"></div>
         <div class="button-row confirm-actions">
-          <button class="secondary-button" id="operationConfirmCancel" type="button">杩斿洖淇敼</button>
-          <button class="primary-button" id="operationConfirmSubmit" type="button">纭鎻愪氦</button>
+          <button class="secondary-button" id="operationConfirmCancel" type="button">Back</button>
+          <button class="primary-button" id="operationConfirmSubmit" type="button">Confirm Submit</button>
         </div>
       </div>
     </section>
@@ -378,28 +384,27 @@
     <section class="confirm-sheet hidden" id="passwordDialog" aria-live="polite">
       <div class="confirm-card">
         <div class="panel-title">
-          <h2>淇敼瀵嗙爜</h2>
-          <p>璇蜂负璇ヨ处鍙疯缃柊瀵嗙爜銆?/p>
+          <h2>Change Password</h2>
+          <p>Please set a new password for this account.</p>
         </div>
         <div class="confirm-grid">
-          <div class="confirm-row"><span>璐﹀彿</span><span id="passwordDialogAccount"></span></div>
-          <div class="confirm-row"><span>瑙掕壊</span><span id="passwordDialogRole"></span></div>
+          <div class="confirm-row"><span>Account</span><span id="passwordDialogAccount"></span></div>
+          <div class="confirm-row"><span>Role</span><span id="passwordDialogRole"></span></div>
           <label>
-            鏂板瘑鐮?
-            <input id="passwordDialogNew" type="password" placeholder="鑷冲皯 6 浣? />
+            New Password
+            <input id="passwordDialogNew" type="password" placeholder="At least 6 characters" />
           </label>
           <label>
-            纭鏂板瘑鐮?
-            <input id="passwordDialogConfirm" type="password" placeholder="鍐嶆杈撳叆鏂板瘑鐮? />
+            Confirm New Password
+            <input id="passwordDialogConfirm" type="password" placeholder="Re-enter new password" />
           </label>
         </div>
         <div class="button-row confirm-actions">
-          <button class="secondary-button" id="passwordDialogCancel" type="button">鍙栨秷</button>
-          <button class="primary-button" id="passwordDialogSubmit" type="button">淇濆瓨瀵嗙爜</button>
+          <button class="secondary-button" id="passwordDialogCancel" type="button">Cancel</button>
+          <button class="primary-button" id="passwordDialogSubmit" type="button">Save Password</button>
         </div>
       </div>
     </section>
   </body>
 </html>
-
 

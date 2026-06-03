@@ -96,6 +96,77 @@ button:disabled {
   white-space: nowrap;
 }
 
+.mobile-home {
+  display: none;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 10px;
+}
+
+.home-action {
+  min-height: 58px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 700;
+  box-shadow: var(--shadow);
+}
+
+.confirm-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 14px;
+  background: rgba(15, 23, 42, 0.42);
+}
+
+.confirm-card {
+  width: min(460px, 100%);
+  padding: 14px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.18);
+}
+
+.confirm-grid {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 12px;
+}
+
+.confirm-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f8fafc;
+  font-size: 12px;
+}
+
+.confirm-row span:last-child {
+  font-weight: 700;
+  text-align: right;
+}
+
+.confirm-card label {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.confirm-card input {
+  min-width: 0;
+}
+
 .login-panel,
 .operator-strip {
   display: grid;
@@ -202,6 +273,33 @@ button:disabled {
 
 .view.active {
   display: block;
+}
+
+@media (max-width: 720px) {
+  .app-shell {
+    padding: 6px;
+  }
+
+  .app-header {
+    align-items: flex-start;
+  }
+
+  .tabbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mobile-home {
+    display: grid;
+  }
+
+  .confirm-row {
+    flex-direction: column;
+  }
+
+  .header-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
 }
 
 .panel {
@@ -532,6 +630,19 @@ textarea:focus {
   grid-template-columns: repeat(3, auto);
   justify-content: start;
   margin-top: 12px;
+}
+
+.button-row-tight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .import-report {

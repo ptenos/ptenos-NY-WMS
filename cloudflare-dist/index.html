@@ -1,5 +1,5 @@
-<!doctype html>
-<html lang="zh-CN">
+﻿<!doctype html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,65 +13,73 @@
     <link rel="apple-touch-icon" href="./assets/icon-192.png" />
     <link rel="stylesheet" href="./styles.css" />
     <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script defer src="./app.js"></script>
+    <script defer src="./runtime.js?v=runtime-userflow-20260603b"></script>
   </head>
   <body>
     <main class="app-shell">
       <header class="app-header">
         <div>
           <p class="eyebrow">Mobile Web WMS Lite</p>
-          <h1>轻量仓库执行系统</h1>
+          <h1>WMS Lite Warehouse Execution System</h1>
         </div>
         <div class="header-actions">
-          <span class="sync-chip" id="syncStatus">本机演示</span>
-          <div class="account-badge" id="accountBadge">未登录</div>
-          <button class="ghost-button hidden" id="installAppButton" type="button">安装</button>
-          <button class="ghost-button" id="logoutButton" type="button">退出</button>
-          <button class="ghost-button admin-only local-demo-only hidden" id="seedDemo" type="button">载入演示</button>
+          <span class="sync-chip" id="syncStatus">Connecting</span>
+          <div class="account-badge" id="accountBadge">Not logged in</div>
+          <button class="ghost-button hidden" id="installAppButton" type="button">Install</button>
+          <button class="ghost-button" id="logoutButton" type="button">Keluar</button>
+          <button class="ghost-button admin-only local-demo-only hidden" id="seedDemo" type="button">Load Demo</button>
         </div>
       </header>
 
       <section class="login-panel" id="loginPanel">
         <label>
-          账号
-          <input id="loginUserInput" autocomplete="username" placeholder="请输入账号" />
+          Username
+          <input id="loginUserInput" autocomplete="username" placeholder="Masukkan username" />
         </label>
         <label>
-          密码
-          <input id="loginPasswordInput" type="password" autocomplete="current-password" placeholder="请输入密码" />
+          Password
+          <input id="loginPasswordInput" type="password" autocomplete="current-password" placeholder="Masukkan password" />
         </label>
-        <button class="primary-button" id="loginButton" type="button">登录</button>
-        <button class="secondary-button" id="resetAdminButton" type="button">重置管理员密码</button>
+        <button class="primary-button" id="loginButton" type="button">Masuk</button>
+        <button class="secondary-button" id="resetAdminButton" type="button">Reset Password Admin</button>
       </section>
 
-      <section class="connection-banner hidden" id="connectionBanner" aria-live="polite">
-        服务器未连接，当前只能查看已缓存数据；入库、出库、移库、盘点和主数据维护已暂停。
+      <section class="connection-banner hidden" id="connectionBanner" aria-live="polite" style="display: none;">
+        Server belum tersambung. Hanya data cache yang bisa dilihat untuk sementara.
       </section>
 
       <section class="security-banner hidden" id="passwordWarning" aria-live="polite">
-        管理员仍在使用默认密码，请到“账号权限”修改后再正式使用。
+        Administrator masih memakai password default, harap ubah di menu akun sebelum dipakai resmi.
       </section>
 
-      <nav class="tabbar" aria-label="主导航">
-        <button class="tab active" data-view="operate" type="button">作业</button>
-        <button class="tab keeper-only" data-view="count" type="button">盘点</button>
-        <button class="tab" data-view="stock" type="button">库存</button>
-        <button class="tab admin-only" data-view="import" type="button">导入</button>
-        <button class="tab admin-only" data-view="master" type="button">主数据</button>
-        <button class="tab admin-only" data-view="users" type="button">账号权限</button>
-        <button class="tab admin-only" data-view="logs" type="button">流水账</button>
-        <button class="tab admin-only" data-view="audit" type="button">修改记录</button>
+      <section class="mobile-home hidden" id="mobileHome">
+        <button class="home-action" type="button" data-home-action="in">Barang Masuk</button>
+        <button class="home-action" type="button" data-home-action="out">Barang Keluar</button>
+        <button class="home-action" type="button" data-home-action="move">Pindah Lokasi</button>
+        <button class="home-action" type="button" data-home-action="stock">Cek Stok</button>
+        <button class="home-action keeper-only" type="button" data-home-action="count">Stock Opname</button>
+      </section>
+
+      <nav class="tabbar hidden" aria-label="Main navigation">
+        <button class="tab active" data-view="operate" type="button">Operation</button>
+        <button class="tab keeper-only" data-view="count" type="button">Stock Opname</button>
+        <button class="tab" data-view="stock" type="button">Stock</button>
+        <button class="tab admin-only" data-view="import" type="button">Import</button>
+        <button class="tab admin-only" data-view="master" type="button">Master Data</button>
+        <button class="tab admin-only" data-view="users" type="button">Account Permissions</button>
+        <button class="tab admin-only" data-view="logs" type="button">Transaction Log</button>
+        <button class="tab admin-only" data-view="audit" type="button">Change Log</button>
       </nav>
 
-      <section class="view active" id="operate">
+      <section class="view hidden" id="operate">
         <section class="panel action-panel">
           <form id="operationForm" class="form-grid">
             <label class="wide">
-              作业类型
+              Jenis Pekerjaan
               <select id="operationTypeInput">
-                <option value="in">入库</option>
-                <option value="out">出库</option>
-                <option class="admin-option" value="move">移库</option>
+                <option value="in">Barang Masuk</option>
+                <option value="out">Barang Keluar</option>
+                <option value="move">Pindah Lokasi</option>
               </select>
             </label>
 
@@ -79,17 +87,17 @@
 
             <div class="operation-stock-list wide hidden" id="operationStockWrap">
               <div class="panel-title compact-title">
-                <h2>现有库存明细</h2>
-                <p id="operationStockHint">搜索并选择要操作的库存。</p>
+                <h2>Detail Stok Tersedia</h2>
+                <p id="operationStockHint">Cari dan pilih stok yang akan diproses.</p>
               </div>
-              <input id="operationStockSearch" type="search" placeholder="搜索物料、名称、批号、库位" />
+              <input id="operationStockSearch" type="search" placeholder="Cari material, nama, batch, lokasi" />
               <div class="selected-stock hidden" id="selectedStockInfo"></div>
               <div class="cards-list" id="operationStockList"></div>
             </div>
 
             <label class="operation-field">
-              物料编码
-              <input id="skuInput" list="materialOptions" autocomplete="off" required placeholder="搜索物料编码或名称" />
+              Kode Material
+              <input id="skuInput" list="materialOptions" autocomplete="off" required placeholder="Cari kode material atau nama" />
               <datalist id="materialOptions"></datalist>
             </label>
 
@@ -98,175 +106,177 @@
             </div>
 
             <label class="operation-field">
-              物料名称
-              <input id="materialNameInput" disabled placeholder="选择主数据后自动带出" />
+              Nama Material
+              <input id="materialNameInput" disabled placeholder="Akan terisi otomatis setelah pilih master data" />
             </label>
 
             <label class="operation-field">
-              批号
-              <input id="batchInput" autocomplete="off" required placeholder="如 B20260528" />
+              Batch
+              <input id="batchInput" autocomplete="off" required placeholder="Contoh B20260528" />
             </label>
 
             <label>
-              数量
-              <input id="qtyInput" inputmode="decimal" required placeholder="如 1000 或 1000.123456" />
+              Jumlah
+              <input id="qtyInput" inputmode="decimal" required placeholder="Contoh 1000 atau 1000.123456" />
               <small class="field-hint" id="qtyHint"></small>
             </label>
 
             <label class="operation-field">
-              当前库位
-              <input id="locationInput" list="locationOptions" autocomplete="off" required placeholder="搜索库位" />
+              Lokasi Saat Ini
+              <input id="locationInput" list="locationOptions" autocomplete="off" required placeholder="Cari lokasi" />
               <datalist id="locationOptions"></datalist>
             </label>
 
             <label id="targetLocationWrap" class="hidden">
-              目标库位
-              <input id="targetLocationInput" list="targetLocationOptions" autocomplete="off" placeholder="搜索目标库位" />
+              Lokasi Tujuan
+              <input id="targetLocationInput" list="targetLocationOptions" autocomplete="off" placeholder="Cari lokasi tujuan" />
               <datalist id="targetLocationOptions"></datalist>
             </label>
 
             <label class="operation-field">
-              状态
+              Status
               <select id="statusInput">
-                <option>可用</option>
-                <option>待检</option>
-                <option>冻结</option>
-                <option>已预留</option>
+                <option>Aktif</option>
+                <option>QC</option>
+                <option>Frozen</option>
+                <option>Reserved</option>
               </select>
             </label>
 
             <label class="wide">
-              备注
-              <textarea id="noteInput" placeholder="单号、客户、异常原因、盘点说明"></textarea>
+              Catatan
+              <textarea id="noteInput" placeholder="Nomor dokumen, pelanggan, alasan, catatan opname"></textarea>
             </label>
 
-            <button class="primary-button wide server-write" id="operationSubmitButton" type="submit">提交作业</button>
+            <button class="primary-button wide server-write" id="operationSubmitButton" type="submit">Kirim Pekerjaan</button>
           </form>
         </section>
       </section>
 
-      <section class="view" id="count">
+      <section class="view hidden" id="count">
         <section class="panel action-panel">
           <form id="countForm" class="form-grid">
             <div class="count-stock-list wide">
               <div class="panel-title compact-title">
-                <h2>现有库存明细</h2>
-                <p>先搜索并选择要盘点的库存。</p>
+                <h2>Detail Stok Tersedia</h2>
+                <p>Cari dan pilih stok yang akan dihitung.</p>
               </div>
-              <input id="countStockSearch" type="search" placeholder="搜索物料、名称、批号、库位" />
+              <input id="countStockSearch" type="search" placeholder="Cari material, nama, batch, lokasi" />
               <div class="selected-stock hidden" id="selectedCountInfo"></div>
               <div class="cards-list" id="countStockList"></div>
             </div>
 
             <label class="count-field">
-              物料编码
-              <input id="countSkuInput" list="materialOptions" autocomplete="off" required placeholder="搜索物料编码或名称" />
+              Kode Material
+              <input id="countSkuInput" list="materialOptions" autocomplete="off" required placeholder="Cari kode material atau nama" />
             </label>
 
             <label class="count-field">
-              物料名称
-              <input id="countMaterialNameInput" disabled placeholder="选择主数据后自动带出" />
+              Nama Material
+              <input id="countMaterialNameInput" disabled placeholder="Akan terisi otomatis setelah pilih master data" />
             </label>
 
             <label class="count-field">
-              批号
-              <input id="countBatchInput" autocomplete="off" required placeholder="如 B20260528" />
+              Batch
+              <input id="countBatchInput" autocomplete="off" required placeholder="Contoh B20260528" />
             </label>
 
             <label class="count-field">
-              状态
+              Status
               <select id="countStatusInput">
-                <option value="">全部状态</option>
-                <option>可用</option>
-                <option>待检</option>
-                <option>冻结</option>
-                <option>已预留</option>
+                <option value="">Semua status</option>
+                <option>Aktif</option>
+                <option>QC</option>
+                <option>Frozen</option>
+                <option>Reserved</option>
               </select>
             </label>
 
             <div class="inventory-preview wide hidden">
               <div>
-                <span>现有库存数量</span>
+                <span>Jumlah Stok Saat Ini</span>
                 <strong id="currentCountQty">-</strong>
               </div>
               <div>
-                <span>现有库位</span>
+                <span>Lokasi Saat Ini</span>
                 <strong id="currentCountLocation">-</strong>
               </div>
             </div>
 
             <label>
-              盘点数量
-              <input id="countQtyInput" inputmode="decimal" required placeholder="如 1000 或 1000.123456" />
+              Jumlah Opname
+              <input id="countQtyInput" inputmode="decimal" required placeholder="Contoh 1000 atau 1000.123456" />
               <small class="field-hint" id="countQtyHint"></small>
             </label>
 
             <label>
-              盘点库位
-              <input id="countLocationInput" list="locationOptions" autocomplete="off" required placeholder="搜索盘点库位" />
+              Lokasi Opname
+              <input id="countLocationInput" list="locationOptions" autocomplete="off" required placeholder="Cari lokasi opname" />
             </label>
 
             <label class="wide">
-              备注
-              <textarea id="countNoteInput" placeholder="盘点说明"></textarea>
+              Catatan
+              <textarea id="countNoteInput" placeholder="Keterangan opname"></textarea>
             </label>
 
-            <button class="primary-button wide server-write" id="countSubmitButton" type="submit">提交盘点</button>
+            <button class="primary-button wide server-write" id="countSubmitButton" type="submit">Kirim Opname</button>
           </form>
         </section>
       </section>
 
-      <section class="view" id="stock">
+      <section class="view hidden" id="stock">
         <section class="panel">
           <div class="toolbar stock-toolbar">
-            <input id="stockSearch" type="search" placeholder="搜索库位、物料编码、名称、批号、状态" />
-            <button class="secondary-button" id="exportStock" type="button">导出当前库存</button>
+            <input id="stockSearch" type="search" placeholder="Search location, material code, name, batch, status" />
+            <button class="secondary-button" id="exportStock" type="button">Export Current Stock</button>
           </div>
           <div class="cards-list" id="stockList"></div>
           <div class="pager" id="stockPager"></div>
         </section>
       </section>
+      </section>
 
-      <section class="view admin-view" id="import">
+      <section class="view admin-view hidden" id="import">
         <section class="panel">
           <div class="panel-title">
-            <h2>期初库存导入</h2>
-            <p>仅管理员可见。字段：物料编码、物料名称、批号、数量、库位、状态。</p>
+            <h2>Initial Stock Import</h2>
+            <p>Admin only. Fields: Material Code, Material Name, Batch No., Qty, Location Code, Status.</p>
           </div>
           <input id="inventoryFile" type="file" accept=".xlsx,.xls,.csv" />
           <div class="button-row">
-            <button class="primary-button server-write" id="importInventory" type="button">导入库存</button>
-            <button class="secondary-button" id="downloadTemplate" type="button">下载库存模板</button>
-            <button class="secondary-button server-write" id="downloadBackup" type="button">下载备份</button>
-            <button class="secondary-button server-write" id="downloadAutoBackup" type="button">下载自动备份</button>
+            <button class="primary-button server-write" id="importInventory" type="button">Import Stock</button>
+            <button class="secondary-button" id="downloadTemplate" type="button">Download Stock Template</button>
+            <button class="secondary-button server-write" id="downloadBackup" type="button">Download Backup</button>
+            <button class="secondary-button server-write" id="downloadAutoBackup" type="button">Download Auto Backup</button>
           </div>
           <input id="restoreFile" type="file" accept=".json" />
           <div class="button-row">
-            <button class="secondary-button danger-button server-write" id="restoreBackup" type="button">从备份恢复</button>
+            <button class="secondary-button danger-button server-write" id="restoreBackup" type="button">Restore from Backup</button>
           </div>
           <div class="import-report hidden" id="importReport"></div>
-          <div class="hint-box">数量只能使用系统数字格式，例如 1000 或 1000.123456；最多 6 位小数，不允许 1.000 或 1.000,5。</div>
+          <div class="hint-box">Use standard numbers only, e.g. 1000 or 1000.123456; up to 6 decimals. Do not use 1.000 or 1.000,5.</div>
         </section>
       </section>
+      </section>
 
-      <section class="view admin-view" id="master">
+      <section class="view admin-view hidden" id="master">
         <section class="split-grid">
           <div class="panel">
             <div class="panel-title">
-              <h2>物料主数据</h2>
-              <p>支持手动维护，也支持后续文件导入追加或更新。</p>
+              <h2>Material Master Data</h2>
+              <p>Supports manual maintenance and file import append/update.</p>
             </div>
             <form id="materialForm" class="compact-form">
-              <input id="newSku" required placeholder="物料编码" />
-              <input id="newName" required placeholder="物料名称" />
-              <button class="primary-button server-write" id="materialSaveButton" type="submit">保存</button>
-              <button class="ghost-button hidden" id="cancelMaterialEdit" type="button">取消修改</button>
+              <input id="newSku" required placeholder="Material Code" />
+              <input id="newName" required placeholder="Material Name" />
+              <button class="primary-button server-write" id="materialSaveButton" type="submit">Save</button>
+              <button class="ghost-button hidden" id="cancelMaterialEdit" type="button">Cancel Edit</button>
             </form>
-            <input id="materialSearch" type="search" placeholder="搜索物料编码、名称" />
+            <input id="materialSearch" type="search" placeholder="Search material code, name" />
             <input id="materialFile" type="file" accept=".xlsx,.xls,.csv" />
             <div class="button-row">
-              <button class="secondary-button server-write" id="importMaterials" type="button">导入物料主数据</button>
-              <button class="secondary-button" id="downloadMaterialTemplate" type="button">下载物料模板</button>
+              <button class="secondary-button server-write" id="importMaterials" type="button">Import Material Master Data</button>
+              <button class="secondary-button" id="downloadMaterialTemplate" type="button">Download Material Template</button>
             </div>
             <div class="cards-list" id="materialList"></div>
             <div class="pager" id="materialPager"></div>
@@ -274,82 +284,127 @@
 
           <div class="panel">
             <div class="panel-title">
-              <h2>库位主数据</h2>
-              <p>支持手动维护，也支持后续文件导入追加或更新。</p>
+              <h2>Location Master Data</h2>
+              <p>Supports manual maintenance and file import append/update.</p>
             </div>
             <form id="locationForm" class="compact-form location-form">
-              <input id="newLocation" required placeholder="库位编码，如 A-01-01" />
+              <input id="newLocation" required placeholder="Location Code, e.g. A-01-01" />
               <select id="newLocationStatus">
-                <option>空闲</option>
-                <option>占用</option>
-                <option>冻结</option>
+                <option>Empty</option>
+                <option>Occupied</option>
+                <option>Frozen</option>
               </select>
-              <button class="primary-button server-write" id="locationSaveButton" type="submit">保存</button>
-              <button class="ghost-button hidden" id="cancelLocationEdit" type="button">取消修改</button>
+              <button class="primary-button server-write" id="locationSaveButton" type="submit">Save</button>
+              <button class="ghost-button hidden" id="cancelLocationEdit" type="button">Cancel Edit</button>
             </form>
-            <input id="locationSearch" type="search" placeholder="搜索库位编码、状态" />
+            <input id="locationSearch" type="search" placeholder="Search location code, status" />
             <input id="locationFile" type="file" accept=".xlsx,.xls,.csv" />
             <div class="button-row">
-              <button class="secondary-button server-write" id="importLocations" type="button">导入库位主数据</button>
-              <button class="secondary-button" id="downloadLocationTemplate" type="button">下载库位模板</button>
+              <button class="secondary-button server-write" id="importLocations" type="button">Import Location Master Data</button>
+              <button class="secondary-button" id="downloadLocationTemplate" type="button">Download Location Template</button>
             </div>
             <div class="cards-list" id="locationList"></div>
             <div class="pager" id="locationPager"></div>
           </div>
         </section>
       </section>
+      </section>
 
-      <section class="view admin-view" id="users">
+      <section class="view admin-view hidden" id="users">
         <section class="panel">
           <div class="panel-title">
-            <h2>账号与权限</h2>
-            <p>管理员可维护账号角色。普通用户只能看到作业和库存。</p>
+            <h2>Account & Permissions</h2>
+            <p>Admins can add accounts, set roles, reset passwords, and manage module access.</p>
           </div>
           <form id="userForm" class="compact-form user-form">
-            <input id="newUserId" required placeholder="账号，如 WH-001" />
-            <input id="newUserName" required placeholder="姓名" />
-            <input id="newUserPassword" type="password" placeholder="密码，留空则不修改" />
+            <input id="newUserId" required placeholder="Account, e.g. WH-001" />
+            <input id="newUserPassword" type="password" placeholder="Password, leave blank to keep unchanged" />
             <select id="newUserRole">
-              <option value="employee">员工</option>
-              <option value="keeper">仓管</option>
-              <option value="admin">管理员</option>
+              <option value="employee">Employee</option>
+              <option value="keeper">Keeper</option>
+              <option value="admin">Admin</option>
             </select>
-            <button class="primary-button server-write" type="submit">保存</button>
+            <input id="newUserModules" type="hidden" />
+            <button class="primary-button server-write" type="submit">Save</button>
           </form>
           <div class="cards-list" id="userList"></div>
         </section>
       </section>
+      </section>
 
-      <section class="view admin-view" id="logs">
+      <section class="view admin-view hidden" id="logs">
         <section class="panel">
           <div class="panel-title">
-            <h2>出入库流水账</h2>
-            <p>正式部署后只允许系统自动追加，不允许人工修改或删除。</p>
+            <h2>Transaction Log</h2>
+            <p>After formal deployment, only system auto-appends are allowed; manual edits or deletes are blocked.</p>
           </div>
           <div class="toolbar">
-            <input id="logSearch" type="search" placeholder="搜索账号、日期、类型、物料、批号、库位" />
+            <input id="logSearch" type="search" placeholder="Search account, date, type, material, batch, location" />
           </div>
           <div class="cards-list" id="logList"></div>
           <div class="pager" id="logPager"></div>
         </section>
       </section>
+      </section>
 
-      <section class="view admin-view" id="audit">
+      <section class="view admin-view hidden" id="audit">
         <section class="panel">
           <div class="panel-title">
-            <h2>主数据修改记录</h2>
-            <p>记录管理员对物料、库位、账号和导入动作的变更，正式部署后只追加不删除。</p>
+            <h2>Master Data Change Log</h2>
+            <p>Records admin changes to materials, locations, accounts, and imports; after formal deployment, append only.</p>
           </div>
           <div class="toolbar">
-            <input id="auditSearch" type="search" placeholder="搜索账号、对象、操作、主键、修改内容" />
+            <input id="auditSearch" type="search" placeholder="Search account, object, action, key, change details" />
           </div>
           <div class="cards-list" id="auditList"></div>
         </section>
       </section>
+      </section>
+
     </main>
 
-    <template id="emptyTemplate">
-      <div class="empty-state">暂无数据</div>
+      <template id="emptyTemplate">
+      <div class="empty-state">No data</div>
     </template>
+
+    <section class="confirm-sheet hidden" id="operationConfirmSheet" aria-live="polite">
+      <div class="confirm-card">
+        <div class="panel-title">
+          <h2>Confirm Submission</h2>
+          <p id="operationConfirmText"></p>
+        </div>
+        <div class="confirm-grid" id="operationConfirmGrid"></div>
+        <div class="button-row confirm-actions">
+          <button class="secondary-button" id="operationConfirmCancel" type="button">Back</button>
+          <button class="primary-button" id="operationConfirmSubmit" type="button">Confirm Submit</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="confirm-sheet hidden" id="passwordDialog" aria-live="polite">
+      <div class="confirm-card">
+        <div class="panel-title">
+          <h2>Change Password</h2>
+          <p>Please set a new password for this account.</p>
+        </div>
+        <div class="confirm-grid">
+          <div class="confirm-row"><span>Account</span><span id="passwordDialogAccount"></span></div>
+          <div class="confirm-row"><span>Role</span><span id="passwordDialogRole"></span></div>
+          <label>
+            New Password
+            <input id="passwordDialogNew" type="password" placeholder="At least 6 characters" />
+          </label>
+          <label>
+            Confirm New Password
+            <input id="passwordDialogConfirm" type="password" placeholder="Re-enter new password" />
+          </label>
+        </div>
+        <div class="button-row confirm-actions">
+          <button class="secondary-button" id="passwordDialogCancel" type="button">Cancel</button>
+          <button class="primary-button" id="passwordDialogSubmit" type="button">Save Password</button>
+        </div>
+      </div>
+    </section>
   </body>
 </html>
+
