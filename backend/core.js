@@ -287,7 +287,7 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     const userPassword = String(body.userPassword || "").trim();
     if (!targetId) return json(422, { errorCode: "USER_NOT_FOUND", error: "账号不能为空" });
     if (userPassword.length < 6) return json(422, { errorCode: "PASSWORD_TOO_SHORT", error: "密码至少 6 位" });
-    const target = db.users.find((user) => user.id === targetId);
+    const target = findUserById(db, targetId);
     if (!target) return json(404, { errorCode: "USER_NOT_FOUND", error: "账号不存在" });
     const before = sanitizeUser(target);
     target.passwordHash = await hashPassword(userPassword);
@@ -311,7 +311,7 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     if (denied) return json(403, { error: denied });
     const actor = await getActor(db, body.operatorId, body.password, authToken(body, headers));
     const targetId = normalizeCode(body.targetId);
-    const target = db.users.find((user) => user.id === targetId);
+    const target = findUserById(db, targetId);
     if (target?.role === "admin") return json(422, { errorCode: "ADMIN_CANNOT_BE_DELETED", error: "不能删除管理员账号" });
     const before = sanitizeUser(target);
     db.users = db.users.filter((user) => user.id !== targetId);
