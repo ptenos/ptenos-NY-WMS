@@ -249,6 +249,29 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     return json(200, statePayload(headers, db));
   }
 
+  if (method === "POST" && pathname === "/api/operations/batch") {
+    const db = await storage.readDb();
+    const batchItems = Array.isArray(body.batchItems) ? body.batchItems : [];
+    if (!batchItems.length) return json(422, { errorCode: "INVALID_QTY", error: "batchItems are required" });
+    const working = await migrateDb(db);
+    for (const item of batchItems) {
+      const result = await applyOperation(working, {
+        ...body,
+        batchItems: undefined,
+        batch: item.batch,
+        location: item.location,
+        targetLocation: item.targetLocation,
+        qty: item.qty,
+        status: item.status,
+        expectedVersion: item.expectedVersion,
+        note: item.note
+      }, authToken(body, headers));
+      if (result.error) return json(422, { ...result, lineNo: item.lineNo });
+    }
+    await storage.writeDb(working);
+    return json(200, statePayload(headers, working));
+  }
+
   if (method === "POST" && pathname === "/api/users") {
     const db = await storage.readDb();
     const denied = await requireAdmin(db, body.operatorId, body.password, authToken(body, headers));

@@ -672,6 +672,26 @@ async function postOperation(payload) {
   return data;
 }
 
+async function postOperationBatch(payload) {
+  if (!apiAvailable) {
+    if (serverRequired) throw new Error("Server belum tersambung, silakan coba lagi setelah jaringan kembali");
+    return null;
+  }
+  const auth = currentAuthPayload();
+  const response = await fetch("/api/operations/batch", {
+    method: "POST",
+    headers: authHeaders(auth),
+    body: JSON.stringify({ ...payload, operatorId: auth.operatorId })
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(apiErrorText(data, "操作失败", "operation"));
+  const currentUserId = state.currentUserId;
+  Object.assign(state, migrateState({ ...defaultState(), ...data }));
+  state.currentUserId = currentUserId;
+  wmsLocalStorage.setItem(storeKey, JSON.stringify(state));
+  return data;
+}
+
 async function postMasterData(path, payload) {
   if (!apiAvailable) {
     if (serverRequired) throw new Error("Server belum tersambung, silakan coba lagi setelah jaringan kembali");
@@ -737,6 +757,124 @@ async function fetchApiPage(path, params = {}) {
 
 function removeZeroStock() {
   state.stock = state.stock.filter((item) => item.qty > 0);
+}
+
+function cloneBatchState() {
+  return JSON.parse(JSON.stringify({
+    materials: state.materials,
+    locations: state.locations,
+    stock: state.stock,
+    logs: state.logs,
+    auditLogs: state.auditLogs,
+    sessions: state.sessions,
+    users: state.users,
+    currentUserId: state.currentUserId
+  }));
+}
+
+function findStockInData(data, { sku, batch, location, status }) {
+  return (data.stock || []).find(
+    (item) => item.sku === sku && item.batch === batch && item.location === location && item.status === status
+  );
+}
+
+function upsertStockInData(data, { sku, batch, location, status, qty }) {
+  const row = findStockInData(data, { sku, batch, location, status });
+  if (row) {
+    row.qty = roundQty(Number(row.qty || 0) + qty);
+    row.version = Number(row.version || 0) + 1;
+    row.updatedAt = new Date().toISOString();
+  } else {
+    (data.stock || (data.stock = [])).push({
+      id: uid(),
+      sku,
+      batch,
+      location,
+      status,
+      qty: roundQty(qty),
+      version: 1,
+      updatedAt: new Date().toISOString()
+    });
+  }
+}
+
+function removeZeroStockFromData(data) {
+  data.stock = (data.stock || []).filter((item) => Number(item.qty || 0) > 0);
+}
+
+function refreshLocationUsageInData(data) {
+  (data.locations || []).forEach((location) => {
+    if (location.status !== "Frozen") {
+      location.status = (data.stock || []).some((item) => item.location === location.code) ? "Occupied" : "Empty";
+    }
+  });
+}
+
+function addLogToData(data, payload) {
+  const user = currentUser();
+  (data.logs || (data.logs = [])).unshift({
+    id: uid(),
+    operatorId: user?.id || "",
+    operatorName: user?.name || "",
+    operator: user ? `${user.id} ${user.name || user.id}` : "Not selected",
+    time: formatMinute(),
+    ...payload
+  });
+}
+
+function applyBatchOperationLocally(payload) {
+  const draft = cloneBatchState();
+  const user = currentUser();
+  const batchItems = Array.isArray(payload.batchItems) ? payload.batchItems : [];
+  for (const item of batchItems) {
+    const qty = Number(item.qty);
+    const status = item.status || getDefaultStockStatus();
+    const sourceKey = { sku: payload.sku, batch: item.batch, location: item.location, status };
+    const sourceRow = findStockInData(draft, sourceKey) || (item.location ? (draft.stock || []).filter((stock) => stock.sku === payload.sku && stock.batch === item.batch && stock.location === item.location).length === 1 ? (draft.stock || []).find((stock) => stock.sku === payload.sku && stock.batch === item.batch && stock.location === item.location) : null : null);
+    if (payload.type === "in") {
+      upsertStockInData(draft, { sku: payload.sku, batch: item.batch, location: item.location, status, qty });
+    } else if (payload.type === "out") {
+      if (!sourceRow || Number(sourceRow.qty || 0) < qty) return { error: `Baris ${item.lineNo}: stok tidak cukup` };
+      const versionError = sourceRow && item.expectedVersion !== undefined && item.expectedVersion !== null && item.expectedVersion !== "" && Number(sourceRow.version || 1) !== Number(item.expectedVersion)
+        ? "Stok đã berubah, silakan refresh lalu coba lagi"
+        : null;
+      if (versionError) return { error: versionError };
+      sourceRow.qty = roundQty(Number(sourceRow.qty || 0) - qty);
+      sourceRow.version = Number(sourceRow.version || 0) + 1;
+      sourceRow.updatedAt = new Date().toISOString();
+    } else if (payload.type === "move") {
+      const targetLocation = item.targetLocation;
+      const target = (draft.locations || []).find((location) => location.code === targetLocation);
+      if (!sourceRow || Number(sourceRow.qty || 0) < qty) return { error: `Baris ${item.lineNo}: stok tidak cukup` };
+      const versionError = sourceRow && item.expectedVersion !== undefined && item.expectedVersion !== null && item.expectedVersion !== "" && Number(sourceRow.version || 1) !== Number(item.expectedVersion)
+        ? "Stok đã berubah, silakan refresh lalu coba lagi"
+        : null;
+      if (versionError) return { error: versionError };
+      if (!target) return { error: `Baris ${item.lineNo}: lokasi tujuan tidak valid` };
+      if (target.status === "Frozen") return { error: `Baris ${item.lineNo}: lokasi tujuan dibekukan` };
+      if (targetLocation === item.location) return { error: `Baris ${item.lineNo}: lokasi tujuan tidak boleh sama dengan lokasi awal` };
+      sourceRow.qty = roundQty(Number(sourceRow.qty || 0) - qty);
+      sourceRow.version = Number(sourceRow.version || 0) + 1;
+      sourceRow.updatedAt = new Date().toISOString();
+      upsertStockInData(draft, { sku: payload.sku, batch: item.batch, location: targetLocation, status, qty });
+    }
+    addLogToData(draft, {
+      type: payload.type,
+      sku: payload.sku,
+      name: payload.name,
+      batch: item.batch,
+      qty,
+      location: item.location,
+      targetLocation: item.targetLocation,
+      status,
+      note: item.note || ""
+    });
+  }
+  removeZeroStockFromData(draft);
+  refreshLocationUsageInData(draft);
+  Object.assign(state, draft);
+  saveState();
+  return { ok: true };
 }
 
 function refreshLocationUsage() {
@@ -944,45 +1082,17 @@ function buildBatchOperationPayload() {
 async function submitBatchOperation(event, payload) {
   setFormSubmitting(event.target, true);
   try {
-    const failed = [];
-    for (const item of payload.batchItems) {
-      const operationPayload = {
-        type: payload.type,
-        sku: payload.sku,
-        batch: item.batch,
-        qty: String(item.qty),
-        location: item.location,
-        targetLocation: item.targetLocation,
-        status: item.status || getDefaultStockStatus(),
-        note: item.note || "",
-        expectedVersion: item.expectedVersion
-      };
-      const remote = await postOperation(operationPayload);
-      if (remote === false) {
-        failed.push(item.lineNo);
-        break;
-      }
-      if (remote) continue;
-      if (payload.type === "in") {
-        upsertStock({ sku: payload.sku, batch: item.batch, location: item.location, status: item.status || getDefaultStockStatus(), qty: item.qty });
-      } else if (payload.type === "out") {
-        const row = findStock(payload.sku, item.batch, item.location, item.status || getDefaultStockStatus()) || findUniqueStockRow(payload.sku, item.batch, item.location);
-        if (!row || row.qty < item.qty) return showToast(`Baris ${item.lineNo}: stok tidak cukup`);
-        row.qty = roundQty(row.qty - item.qty);
-        touchStock(row);
-      } else if (payload.type === "move") {
-        const row = findStock(payload.sku, item.batch, item.location, item.status || getDefaultStockStatus()) || findUniqueStockRow(payload.sku, item.batch, item.location);
-        if (!row || row.qty < item.qty) return showToast(`Baris ${item.lineNo}: stok tidak cukup`);
-        row.qty = roundQty(row.qty - item.qty);
-        touchStock(row);
-        upsertStock({ sku: payload.sku, batch: item.batch, location: item.targetLocation, status: item.status || getDefaultStockStatus(), qty: item.qty });
-      }
-      addLog({ type: payload.type, sku: payload.sku, name: payload.name, batch: item.batch, qty: item.qty, location: item.location, targetLocation: item.targetLocation, status: item.status || getDefaultStockStatus(), note: item.note || "" });
+    const remote = await postOperationBatch(payload);
+    if (remote) {
+      resetOperationForm(event.target);
+      selectedOperationVersion = null;
+      selectedOperationStock = null;
+      render();
+      showToast("Pekerjaan terkirim");
+      return;
     }
-    if (failed.length) return showToast("Batch gagal, silakan periksa baris yang ditandai");
-    removeZeroStock();
-    refreshLocationUsage();
-    saveState();
+    const localResult = applyBatchOperationLocally(payload);
+    if (localResult?.error) return showToast(localResult.error);
     resetOperationForm(event.target);
     selectedOperationVersion = null;
     selectedOperationStock = null;
