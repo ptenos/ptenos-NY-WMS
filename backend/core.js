@@ -164,10 +164,10 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     if (!sku || !body.name) return json(422, { error: "sku and name are required" });
     const previousSku = normalizeCode(body.previousSku);
     if (previousSku && previousSku !== sku && db.materials.some((item) => item.sku === sku)) {
-      return json(409, { error: "鐗╂枡缂栫爜宸插瓨鍦? });
+      return json(409, { error: "物料编码已存在" });
     }
     if (!previousSku && db.materials.some((item) => item.sku === sku)) {
-      return json(409, { error: "鐗╂枡缂栫爜宸插瓨鍦紝璇锋悳绱㈠悗淇敼" });
+      return json(409, { error: "物料编码已存在，请搜索后修改" });
     }
     const existing = db.materials.find((item) => item.sku === (previousSku || sku));
     const before = existing ? { ...existing } : null;
@@ -205,10 +205,10 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     if (!code) return json(422, { error: "code is required" });
     const previousCode = normalizeCode(body.previousCode);
     if (previousCode && previousCode !== code && db.locations.some((item) => item.code === code)) {
-      return json(409, { error: "搴撲綅缂栫爜宸插瓨鍦? });
+      return json(409, { error: "库位编码已存在" });
     }
     if (!previousCode && db.locations.some((item) => item.code === code)) {
-      return json(409, { error: "搴撲綅宸插瓨鍦紝璇锋悳绱㈠悗淇敼" });
+      return json(409, { error: "库位已存在，请搜索后修改" });
     }
     const existing = db.locations.find((item) => item.code === (previousCode || code));
     const before = existing ? { ...existing } : null;
@@ -259,7 +259,7 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     const userPassword = String(body.userPassword || "").trim();
     if (!id || !["employee", "keeper", "admin"].includes(role)) return json(422, { error: "账号和角色不能为空" });
     const existing = db.users.find((user) => user.id === id);
-    if (!existing && !userPassword) return json(422, { error: "鏂板璐﹀彿蹇呴』璁剧疆瀵嗙爜" });
+    if (!existing && !userPassword) return json(422, { error: "新增账号必须设置密码" });
     const user = { id, name, role };
     if (userPassword) user.passwordHash = await hashPassword(userPassword);
     const before = existing ? sanitizeUser(existing) : null;
