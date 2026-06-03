@@ -31,7 +31,7 @@ const wmsLocalStorage = safeStorage("localStorage");
 const wmsSessionStorage = safeStorage("sessionStorage");
 
 const state = loadState();
-const frontendBuildVersion = "runtime-userflow-20260603b";
+const frontendBuildVersion = "runtime-userflow-20260603c";
 const labels = {
   operation: {
     save: "Simpan",
@@ -3039,4 +3039,5 @@ setupInstallPrompt();
 registerServiceWorker();
 render();
 initApiSync();
+
 

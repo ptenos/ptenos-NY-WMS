@@ -1,4 +1,4 @@
-const CACHE_NAME = "wms-lite-shell-v23";
+﻿const CACHE_NAME = "wms-lite-shell-v24";
 const SHELL_FILES = [
   "./",
   "./index.html",
@@ -40,3 +40,4 @@ self.addEventListener("fetch", (event) => {
       .catch(() => caches.match(event.request).then((cached) => cached || caches.match("./index.html")))
   );
 });
+
