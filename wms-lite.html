@@ -311,7 +311,7 @@
         <section class="panel">
           <div class="panel-title">
             <h2>账号与权限</h2>
-            <p>管理员可维护账号角色。普通用户只能看到作业和库存。</p>
+            <p>管理员可以新增账号、设置角色、重置密码，并维护模块权限。</p>
           </div>
           <form id="userForm" class="compact-form user-form">
             <input id="newUserId" required placeholder="账号，如 WH-001" />
@@ -321,6 +321,7 @@
               <option value="keeper">仓管</option>
               <option value="admin">管理员</option>
             </select>
+            <input id="newUserModules" type="hidden" />
             <button class="primary-button server-write" type="submit">保存</button>
           </form>
           <div class="cards-list" id="userList"></div>

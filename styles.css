@@ -620,6 +620,19 @@ textarea:focus {
   margin-top: 12px;
 }
 
+.button-row-tight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
 .import-report {
   margin-top: 12px;
   padding: 12px;
