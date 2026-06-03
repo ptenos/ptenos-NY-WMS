@@ -1668,8 +1668,8 @@ function renderStockRows(rows) {
                 <div>
                   <strong>${escapeHtml(item.sku)}</strong>
                   <span>${escapeHtml(item.name || material?.name || "未知物料")}</span>
-                  <span>鎵瑰彿锛?{escapeHtml(item.batch)}</span>
-                  <span>搴撲綅锛?{escapeHtml(item.location)}</span>
+                  <span>批号：${escapeHtml(item.batch)}</span>
+                  <span>库位：${escapeHtml(item.location)}</span>
                 </div>
                 <div class="card-meta">
                   <b>${item.qty}</b>
@@ -1724,11 +1724,11 @@ function renderPager(selector, pageState, prefix) {
   const from = (pageState.page - 1) * pageState.pageSize + 1;
   const to = Math.min(pageState.page * pageState.pageSize, pageState.total);
   target.innerHTML = `
-    <span>鏄剧ず ${from}-${to} / ${pageState.total}</span>
+    <span>显示 ${from}-${to} / ${pageState.total}</span>
     <div class="pager-actions">
-      <button class="ghost-button" type="button" data-${prefix}-page="prev" ${pageState.page <= 1 ? "disabled" : ""}>涓婁竴椤?/button>
+      <button class="ghost-button" type="button" data-${prefix}-page="prev" ${pageState.page <= 1 ? "disabled" : ""}>上一页</button>
       <span>${pageState.page} / ${pageState.pages}</span>
-      <button class="ghost-button" type="button" data-${prefix}-page="next" ${pageState.page >= pageState.pages ? "disabled" : ""}>涓嬩竴椤?/button>
+      <button class="ghost-button" type="button" data-${prefix}-page="next" ${pageState.page >= pageState.pages ? "disabled" : ""}>下一页</button>
     </div>`;
 }
 
@@ -2136,7 +2136,7 @@ function downloadLocationTemplate() {
 }
 
 function downloadCsv(rows, filename) {
-  const headers = Object.keys(rows[0] || { 绌? "" });
+  const headers = Object.keys(rows[0] || { Empty: "" });
   const csv = `\uFEFF${headers.join(",")}\n${rows.map((row) => headers.map((header) => csvCell(row[header])).join(",")).join("\n")}`;
   downloadBlob(new Blob([csv], { type: "text/csv;charset=utf-8" }), filename);
 }
@@ -2175,9 +2175,9 @@ async function importInventory() {
   const groupedRows = new Map();
   let rejected = 0;
   rows.forEach((row) => {
-    const sku = normalize(pickField(row, ["鐗╂枡缂栫爜", "瀛樿揣缂栫爜", "sku", "SKU"]));
-    const name = String(pickField(row, ["鐗╂枡鍚嶇О", "瀛樿揣鍚嶇О", "name"]) || "").trim();
-    const batch = normalize(pickField(row, ["鎵瑰彿", "batch"]));
+    const sku = normalize(pickField(row, ["物料编码", "存货编码", "Material Code", "sku", "SKU"]));
+    const name = String(pickField(row, ["物料名称", "存货名称", "Material Name", "name"]) || "").trim();
+    const batch = normalize(pickField(row, ["批号", "Batch No.", "batch"]));
     const rawQty = pickField(row, ["数量", "可用数量", "现存量", "qty"]);
     const qty = parseSystemQty(rawQty);
     const location = normalize(pickField(row, ["Location", "Location Code", "Warehouse Location", "Storage Location", "location"]));
@@ -2233,8 +2233,8 @@ async function importMaterials() {
   }
   let imported = 0;
   rows.forEach((row) => {
-    const sku = normalize(pickField(row, ["鐗╂枡缂栫爜", "瀛樿揣缂栫爜", "sku", "SKU"]));
-    const name = String(pickField(row, ["鐗╂枡鍚嶇О", "瀛樿揣鍚嶇О", "name"]) || "").trim();
+    const sku = normalize(pickField(row, ["物料编码", "存货编码", "Material Code", "sku", "SKU"]));
+    const name = String(pickField(row, ["物料名称", "存货名称", "Material Name", "name"]) || "").trim();
     if (!sku || !name) return;
     upsertMaterial({ sku, name });
     imported += 1;
@@ -2264,7 +2264,7 @@ async function importLocations() {
   }
   let imported = 0;
   rows.forEach((row) => {
-    const code = normalize(row["搴撲綅"] || row["搴撲綅缂栫爜"] || row.location || row.code);
+    const code = normalize(row["Location"] || row["Location Code"] || row.location || row.code);
     const status = String(row["状态"] || row.status || "空闲").trim();
     if (!code) return;
     const existing = findLocation(code);
