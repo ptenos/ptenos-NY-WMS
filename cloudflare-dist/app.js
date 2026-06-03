@@ -72,14 +72,14 @@ const labels = {
     operateCountStock: "Operation, Stock Opname, Stock"
   },
   errors: {
-    INVALID_LOGIN: { operation: "Masuk gagal", admin: "账号或密码错误 / Invalid login" },
+    INVALID_LOGIN: { operation: "Masuk gagal", admin: "Invalid login / Invalid login" },
     STOCK_NOT_ENOUGH: { operation: "Stok tidak cukup", admin: "库存不足 / Stock not enough" },
     MATERIAL_EXISTS: { operation: "Kode material sudah ada", admin: "鐗╂枡缂栫爜宸插瓨鍦?/ Material code exists" },
-    LOCATION_EXISTS: { operation: "Kode lokasi sudah ada", admin: "库位编码已存在 / Location code exists" },
-    INVALID_LOCATION: { operation: "Lokasi tidak valid", admin: "库位无效 / Invalid location" },
+    LOCATION_EXISTS: { operation: "Kode lokasi sudah ada", admin: "Location code already exists / Location code exists" },
+    INVALID_LOCATION: { operation: "Lokasi tidak valid", admin: "Location无效 / Invalid location" },
     INVALID_QTY: { operation: "Jumlah tidak valid", admin: "鏁伴噺鏃犳晥 / Invalid quantity" },
     USER_NOT_FOUND: { operation: "Akun tidak ditemukan", admin: "账号不存在 / User not found" },
-    ADMIN_CANNOT_BE_DELETED: { operation: "Akun admin tidak bisa dihapus", admin: "不能删除管理员账号 / Admin cannot be deleted" },
+    ADMIN_CANNOT_BE_DELETED: { operation: "Akun admin tidak bisa dihapus", admin: "Cannot delete admin account / Admin cannot be deleted" },
     PASSWORD_TOO_SHORT: { operation: "Password minimal 6 karakter", admin: "密码至少 6 位 / Password too short" },
     PASSWORD_REQUIRED: { operation: "Password wajib diisi", admin: "必须设置密码 / Password required" },
     UNAUTHORIZED: { operation: "Tidak punya izin", admin: "未授权 / Unauthorized" },
@@ -215,7 +215,7 @@ function migrateState(data) {
 
 function ensureAdminAccount() {
   if (serverRequired) {
-    showToast("正式服务不能在手机端重置管理员密码，请在账号权限里修改密码");
+    showToast("正式服务不能在手机端重置管理员密码，请在Account Permissions里修改密码");
     return;
   }
   let admin = state.users.find((user) => String(user.id).toLowerCase() === "admin");
@@ -299,9 +299,9 @@ function permissionScope(role) {
 function locationStatusLabel(status) {
   const value = String(status || '').trim();
   const map = {
-    '空闲': 'Empty',
-    '占用': 'Occupied',
-    '冻结': 'Frozen',
+    'Empty': 'Empty',
+    'Occupied': 'Occupied',
+    'Frozen': 'Frozen',
     'kosong': 'Empty',
     'terisi': 'Occupied',
     'dibekukan': 'Frozen',
@@ -675,7 +675,7 @@ async function postUserData(path, payload) {
     body: JSON.stringify({ ...payload, operatorId: auth.operatorId })
   });
   const data = await response.json();
-  if (!response.ok) throw new Error(apiErrorText(data, "账号保存失败", "admin"));
+  if (!response.ok) throw new Error(apiErrorText(data, "账号Save失败", "admin"));
   const currentUserId = state.currentUserId;
   Object.assign(state, migrateState({ ...defaultState(), ...data }));
   state.currentUserId = currentUserId;
@@ -763,7 +763,7 @@ async function submitOperation(event, overridePayload = null) {
   }
   if (operationType === "move") {
     if (!targetLocation || !findLocation(targetLocation)) return showToast("Pilih lokasi tujuan yang valid");
-    if (findLocation(targetLocation)?.status === "冻结") return showToast("Lokasi tujuan dibekukan");
+    if (findLocation(targetLocation)?.status === "Frozen") return showToast("Lokasi tujuan dibekukan");
     if (targetLocation === (selectedRow?.location || location)) return showToast("Lokasi tujuan tidak boleh sama dengan lokasi awal");
   }
 
@@ -1049,7 +1049,7 @@ function updateOperationHelper() {
     if (operationType === "move") {
       const target = findLocation(targetLocation);
       ready = ready && !!target && targetLocation !== location && target.status !== "鍐荤粨";
-      if (target?.status === "冻结") nextText = "Lokasi tujuan dibekukan, pilih lokasi lain.";
+      if (target?.status === "Frozen") nextText = "Lokasi tujuan dibekukan, pilih lokasi lain.";
     }
   }
 
@@ -1124,7 +1124,7 @@ async function submitCount(event) {
     return showToast("Pilih detail stok untuk opname terlebih dahulu");
   }
   const targetLocation = findLocation(location);
-  if (selectedCountStock.location !== location && targetLocation?.status === "冻结") return showToast("Lokasi opname dibekukan, pilih lokasi lain.");
+  if (selectedCountStock.location !== location && targetLocation?.status === "Frozen") return showToast("Lokasi opname dibekukan, pilih lokasi lain.");
 
   setFormSubmitting(event.target, true);
   try {
@@ -1392,10 +1392,10 @@ function seedDemo() {
     { sku: "FG-8801", name: "防晒霜成品" }
   ];
   state.locations = [
-    { code: "A-01-01", status: "占用" },
-    { code: "A-01-02", status: "空闲" },
-    { code: "B-02-01", status: "占用" },
-    { code: "QC-HOLD", status: "冻结" }
+    { code: "A-01-01", status: "Occupied" },
+    { code: "A-01-02", status: "Empty" },
+    { code: "B-02-01", status: "Occupied" },
+    { code: "QC-HOLD", status: "Frozen" }
   ];
   state.stock = [
     { id: uid(), sku: "RM-1001", batch: "B20260501", location: "A-01-01", status: "可用", qty: 120, version: 1, updatedAt: new Date().toISOString() },
@@ -1403,7 +1403,7 @@ function seedDemo() {
     { id: uid(), sku: "FG-8801", batch: "F260527", location: "QC-HOLD", status: "待检", qty: 48, version: 1, updatedAt: new Date().toISOString() }
   ];
   addLog({ type: "initial", sku: "IMPORT", batch: "", qty: 3, location: "", targetLocation: "", status: "", note: "演示数据初始化" });
-  addAuditLog({ action: "载入演示数据", entity: "系统数据", key: "DEMO", before: null, after: { materials: state.materials.length, locations: state.locations.length, stock: state.stock.length }, note: "演示数据初始化" });
+  addAuditLog({ action: "载入演示数据", entity: "System data", key: "DEMO", before: null, after: { materials: state.materials.length, locations: state.locations.length, stock: state.stock.length }, note: "演示数据初始化" });
   refreshLocationUsage();
   saveState();
   render();
@@ -1476,7 +1476,7 @@ function openOperationConfirm(payload) {
     ["物料", `${payload.sku}${payload.name || findMaterial(payload.sku)?.name ? ` / ${payload.name || findMaterial(payload.sku)?.name || ""}` : ""}`],
     ["Batch", payload.batch],
     ["Lokasi", payload.type === "move" ? `${payload.location} -> ${payload.targetLocation || "-"}` : payload.location],
-    ["数量", payload.qty]
+    ["Qty", payload.qty]
   ];
   $("#operationConfirmText").textContent = "Periksa kembali lalu kirim.";
   $("#operationConfirmGrid").innerHTML = rows.map(([label, value]) => `<div class="confirm-row"><span>${escapeHtml(label)}</span><span>${escapeHtml(value)}</span></div>`).join("");
@@ -1944,13 +1944,13 @@ function renderLogRows(rows) {
               <th>操作日期</th>
               <th>账号</th>
               <th>类型</th>
-              <th>物料编码</th>
-              <th>批号</th>
-              <th>库位</th>
-              <th>目标库位</th>
-              <th>状态</th>
+              <th>Material Code</th>
+              <th>Batch No.</th>
+              <th>Location</th>
+              <th>目标Location</th>
+              <th>Status</th>
               <th class="num-cell">Jumlah</th>
-              <th>备注</th>
+              <th>Remark</th>
             </tr>
           </thead>
           <tbody>
@@ -1993,7 +1993,7 @@ function renderAuditLogs() {
               <th>主键</th>
               <th>修改前</th>
               <th>修改后</th>
-              <th>备注</th>
+              <th>Remark</th>
             </tr>
           </thead>
           <tbody>
@@ -2141,7 +2141,7 @@ async function exportStock() {
 }
 
 function downloadTemplate() {
-  downloadCsv([{ "物料编码": "RM-1001", "物料名称": "甘油", "批号": "B20260501", "数量": "120", "库位": "A-01-01", "状态": "可用" }], "库存导入模板.csv");
+  downloadCsv([{ "Material Code": "RM-1001", "Material Name": "甘油", "Batch No.": "B20260501", "Qty": "120", "Location": "A-01-01", "Status": "可用" }], "库存导入模板.csv");
 }
 
 function downloadMaterialTemplate() {
@@ -2149,7 +2149,7 @@ function downloadMaterialTemplate() {
 }
 
 function downloadLocationTemplate() {
-  downloadCsv([{ "Location Code": "A-01-01", Status: "空闲" }], "location-master-template.csv");
+  downloadCsv([{ "Location Code": "A-01-01", Status: "Empty" }], "location-master-template.csv");
 }
 
 function downloadCsv(rows, filename) {
@@ -2192,13 +2192,13 @@ async function importInventory() {
   const groupedRows = new Map();
   let rejected = 0;
   rows.forEach((row) => {
-    const sku = normalize(pickField(row, ["物料编码", "存货编码", "Material Code", "sku", "SKU"]));
-    const name = String(pickField(row, ["物料名称", "存货名称", "Material Name", "name"]) || "").trim();
-    const batch = normalize(pickField(row, ["批号", "Batch No.", "batch"]));
-    const rawQty = pickField(row, ["数量", "可用数量", "现存量", "qty"]);
+    const sku = normalize(pickField(row, ["Material Code", "存货编码", "Material Code", "sku", "SKU"]));
+    const name = String(pickField(row, ["Material Name", "存货名称", "Material Name", "name"]) || "").trim();
+    const batch = normalize(pickField(row, ["Batch No.", "Batch No.", "batch"]));
+    const rawQty = pickField(row, ["Qty", "可用Qty", "现存量", "qty"]);
     const qty = parseSystemQty(rawQty);
     const location = normalize(pickField(row, ["Location", "Location Code", "Warehouse Location", "Storage Location", "location"]));
-    const status = String(pickField(row, ["状态", "库存状态", "status"]) || "可用").trim();
+    const status = String(pickField(row, ["Status", "库存Status", "status"]) || "可用").trim();
     if (!sku || !name || !batch || !location || qty === null) {
       rejected += 1;
       return;
@@ -2250,13 +2250,13 @@ async function importMaterials() {
   }
   let imported = 0;
   rows.forEach((row) => {
-    const sku = normalize(pickField(row, ["物料编码", "存货编码", "Material Code", "sku", "SKU"]));
-    const name = String(pickField(row, ["物料名称", "存货名称", "Material Name", "name"]) || "").trim();
+    const sku = normalize(pickField(row, ["Material Code", "存货编码", "Material Code", "sku", "SKU"]));
+    const name = String(pickField(row, ["Material Name", "存货名称", "Material Name", "name"]) || "").trim();
     if (!sku || !name) return;
     upsertMaterial({ sku, name });
     imported += 1;
   });
-  addAuditLog({ action: "Impor master material", entity: "物料主数据", key: "IMPORT", before: null, after: { imported }, note: `Impor material ${imported} baris` });
+  addAuditLog({ action: "Impor master material", entity: "Material Master Data", key: "IMPORT", before: null, after: { imported }, note: `Impor material ${imported} baris` });
   saveState();
   render();
   showToast(`Berhasil impor material ${imported} baris`);
@@ -2282,7 +2282,7 @@ async function importLocations() {
   let imported = 0;
   rows.forEach((row) => {
     const code = normalize(row["Location"] || row["Location Code"] || row.location || row.code);
-    const status = String(row["状态"] || row.status || "空闲").trim();
+    const status = String(row["Status"] || row.status || "Empty").trim();
     if (!code) return;
     const existing = findLocation(code);
     if (existing) existing.status = status;
@@ -2290,7 +2290,7 @@ async function importLocations() {
     imported += 1;
   });
   refreshLocationUsage();
-  addAuditLog({ action: "Impor master lokasi", entity: "库位主数据", key: "IMPORT", before: null, after: { imported }, note: `Impor lokasi ${imported} baris` });
+  addAuditLog({ action: "Impor master lokasi", entity: "Location Master Data", key: "IMPORT", before: null, after: { imported }, note: `Impor lokasi ${imported} baris` });
   saveState();
   render();
   showToast(`Berhasil impor lokasi ${imported} baris`);
@@ -2378,12 +2378,12 @@ function validateInventoryRows(rows) {
   const grouped = new Map();
   rows.forEach((row, index) => {
     const sku = normalize(pickField(row, ["鐗╂枡缂栫爜", "瀛樿揣缂栫爜", "sku", "SKU"]));
-    const name = String(pickField(row, ["物料名称", "存货名称", "name"]) || "").trim();
-    const batch = normalize(pickField(row, ["批号", "batch"]));
-    const rawQty = pickField(row, ["数量", "可用数量", "现存量", "qty"]);
+    const name = String(pickField(row, ["Material Name", "存货名称", "name"]) || "").trim();
+    const batch = normalize(pickField(row, ["Batch No.", "batch"]));
+    const rawQty = pickField(row, ["Qty", "可用Qty", "现存量", "qty"]);
     const qty = parseSystemQty(rawQty);
     const location = normalize(pickField(row, ["Location", "Location Code", "Warehouse Location", "Storage Location", "location"]));
-    const status = String(pickField(row, ["状态", "库存状态", "status"]) || "可用").trim();
+    const status = String(pickField(row, ["Status", "库存Status", "status"]) || "可用").trim();
     const reasons = [];
     if (!sku) reasons.push("缂哄皯鐗╂枡缂栫爜");
     if (!name) reasons.push("Nama material kosong");
@@ -2406,7 +2406,7 @@ function validateMaterialRows(rows) {
   const seen = new Set();
   rows.forEach((row, index) => {
     const sku = normalize(pickField(row, ["鐗╂枡缂栫爜", "瀛樿揣缂栫爜", "sku", "SKU"]));
-    const name = String(pickField(row, ["物料名称", "存货名称", "name"]) || "").trim();
+    const name = String(pickField(row, ["Material Name", "存货名称", "name"]) || "").trim();
     const reasons = [];
     if (!sku) reasons.push("缂哄皯鐗╂枡缂栫爜");
     if (!name) reasons.push("Nama material kosong");
@@ -2450,7 +2450,7 @@ function renderImportReport(title, report) {
   target.innerHTML = `
     <strong>${escapeHtml(title)}</strong>
     原始 ${report.sourceRows} 行；有效 ${report.validRows} 行；无效 ${report.invalidRows} 行；重复合并 ${report.duplicateRows} 行；最终导入 ${report.mergedRows} 行。
-    ${report.totalQty ? `<br>有效数量合计：${report.totalQty}` : ""}
+    ${report.totalQty ? `<br>有效Qty合计：${report.totalQty}` : ""}
     ${invalid}`;
 }
 
@@ -2581,7 +2581,7 @@ async function addMaterial(event) {
           touchStock(row);
         }
       });
-      addAuditLog({ action: existing ? (previousSku && previousSku !== sku ? "修改物料编码" : "修改物料") : "新增物料", entity: "物料主数据", key: sku, before, after: { sku, name } });
+      addAuditLog({ action: existing ? (previousSku && previousSku !== sku ? "Edit material code" : "Edit material") : "Add material", entity: "Material Master Data", key: sku, before, after: { sku, name } });
       saveState();
     }
   } catch (error) {
@@ -2618,7 +2618,7 @@ async function addLocation(event) {
         if (row.targetLocation === previousCode) row.targetLocation = code;
       });
       refreshLocationUsage();
-      addAuditLog({ action: existing ? (previousCode && previousCode !== code ? "修改库位编码" : "修改库位") : "新增库位", entity: "库位主数据", key: code, before, after: findLocation(code) || { code, status } });
+      addAuditLog({ action: existing ? (previousCode && previousCode !== code ? "Edit location code" : "Edit location") : "Add location", entity: "Location Master Data", key: code, before, after: findLocation(code) || { code, status } });
       saveState();
     }
   } catch (error) {
@@ -2684,7 +2684,7 @@ async function addUser(event) {
       if (existing) Object.assign(existing, user);
       else state.users.push(user);
       const afterUser = state.users.find((item) => item.id === id);
-      addAuditLog({ action: existing ? "修改账号" : "新增账号", entity: "账号权限", key: id, before, after: { id: afterUser.id, role: afterUser.role, modules: afterUser.modules || [] } });
+      addAuditLog({ action: existing ? "Edit account" : "Add account", entity: "Account Permissions", key: id, before, after: { id: afterUser.id, role: afterUser.role, modules: afterUser.modules || [] } });
       saveState();
     }
   } catch (error) {
@@ -2727,7 +2727,7 @@ async function submitPasswordChange() {
   if (newPassword.length < 6) return showToast("Password minimal 6 karakter");
   if (newPassword !== confirmPassword) return showToast("Dua password tidak sama");
   const account = pendingPasswordUserId;
-  if (!confirm(`确认修改账号 ${account} 的密码？`)) return;
+  if (!confirm(`确认Edit account ${account} 的密码？`)) return;
   try {
     await postUserData("/api/users/password", {
       targetId: account,
@@ -2807,14 +2807,14 @@ async function deleteUser(userId) {
   if (!isAdmin()) return showToast("没有权限");
   const target = state.users.find((user) => user.id === userId);
   if (target?.role === "admin") return showToast("Akun admin tidak bisa dihapus");
-  if (!confirm(`确认删除账号 ${userId}？\n删除后该账号将无法登录。`)) return;
+  if (!confirm(`确认Delete account ${userId}？\n删除后该账号将无法登录。`)) return;
   try {
     const remote = await postUserData("/api/users/delete", { targetId: userId });
     if (!remote) {
       const before = state.users.find((user) => user.id === userId);
       state.users = state.users.filter((user) => user.id !== userId);
       if (state.currentUserId === userId) state.currentUserId = "";
-      if (before) addAuditLog({ action: "删除账号", entity: "账号权限", key: userId, before: { id: before.id, role: before.role, modules: before.modules || [] }, after: null });
+      if (before) addAuditLog({ action: "Delete account", entity: "Account Permissions", key: userId, before: { id: before.id, role: before.role, modules: before.modules || [] }, after: null });
       saveState();
     }
   } catch (error) {
