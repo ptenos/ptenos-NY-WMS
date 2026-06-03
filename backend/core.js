@@ -1,7 +1,7 @@
 ﻿const appTimeZone = "Asia/Jakarta";
 
 const defaultUsers = [
-  { id: "admin", name: "绠＄悊鍛?, role: "admin", password: "admin123" },
+  { id: "admin", name: "管理员", role: "admin", password: "admin123" },
   { id: "WH-001", name: "浠撳簱鍛樺伐", role: "employee", password: "123456" },
   { id: "WH-MGR", name: "浠撶", role: "keeper", password: "123456" }
 ];
