@@ -986,7 +986,7 @@ function updateOperationHelper() {
     in: ["选择物料", "选择库位", "输入数量", "确认提交"],
     out: ["选择库存明细", "输入数量", "确认提交"],
     move: ["选择库存明细", "输入数量", "选择目标库位", "确认提交"]
-  }[operationType] || ["濉啓淇℃伅", "纭鎻愪氦"];
+  }[operationType] || ["填写信息", "确认提交"];
 
   const inputSku = normalize($("#skuInput").value);
   const batch = normalize($("#batchInput").value);
@@ -1004,7 +1004,7 @@ function updateOperationHelper() {
     if (findLocation(location)) activeStep = 2;
     if (qty !== null && qty > 0) activeStep = 3;
     delete qtyInput.dataset.maxQty;
-    qtyInput.placeholder = "濡?1000 鎴?1000.123456";
+    qtyInput.placeholder = "如 1000 或 1000.123456";
     ready = !!findMaterial($("#skuInput").value) && !!findLocation(location) && !!batch && qty !== null && qty > 0;
     nextText = ready ? "可以先确认，再提交入库。" : "请先选择物料、库位，再输入数量。";
   } else {
@@ -1038,7 +1038,7 @@ function updateOperationHelper() {
 
   guide.innerHTML = steps.map((step, index) => `<span class="step-pill ${index <= activeStep ? "active" : ""}">${index + 1}. ${escapeHtml(step)}</span>`).join("");
   qtyHint.textContent = nextText;
-  submitButton.textContent = `${labels[operationType] || "浣滀笟"}鎻愪氦`;
+  submitButton.textContent = `${labels[operationType] || "作业"}提交`;
   submitButton.dataset.logicDisabled = ready ? "" : "1";
   submitButton.disabled = (serverRequired && !apiAvailable) || !ready || submitButton.dataset.busy === "1";
 }
