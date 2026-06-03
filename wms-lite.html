@@ -133,19 +133,30 @@
               <datalist id="targetLocationOptions"></datalist>
             </label>
 
-            <label class="operation-field">
+            <label class="operation-field hidden" id="operationStatusWrap">
               Status
               <select id="statusInput">
-                <option>Aktif</option>
-                <option>QC</option>
-                <option>Frozen</option>
-                <option>Reserved</option>
+                <option value="可用">Available</option>
+                <option value="待检">QC Hold</option>
+                <option value="冻结">Frozen</option>
+                <option value="保留">Reserved</option>
               </select>
             </label>
 
             <label class="wide">
               Catatan
               <textarea id="noteInput" placeholder="Nomor dokumen, pelanggan, alasan, catatan opname"></textarea>
+            </label>
+
+            <label class="wide batch-toggle">
+              <input id="batchModeInput" type="checkbox" />
+              Batch mode / Mode batch
+            </label>
+
+            <label class="wide hidden" id="batchRowsWrap">
+              Batch rows / Baris batch
+              <textarea id="batchRowsInput" placeholder="Batch|Location|Qty|TargetLocation|Note"></textarea>
+              <small class="field-hint">One row per line. Use standard numbers only. For out/move, each row must match an existing stock row.</small>
             </label>
 
             <button class="primary-button wide server-write" id="operationSubmitButton" type="submit">Kirim Pekerjaan</button>
@@ -181,14 +192,14 @@
               <input id="countBatchInput" autocomplete="off" required placeholder="Contoh B20260528" />
             </label>
 
-            <label class="count-field">
+            <label class="count-field hidden" id="countStatusWrap">
               Status
               <select id="countStatusInput">
-                <option value="">Semua status</option>
-                <option>Aktif</option>
-                <option>QC</option>
-                <option>Frozen</option>
-                <option>Reserved</option>
+                <option value="">All statuses</option>
+                <option value="可用">Available</option>
+                <option value="待检">QC Hold</option>
+                <option value="冻结">Frozen</option>
+                <option value="保留">Reserved</option>
               </select>
             </label>
 

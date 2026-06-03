@@ -312,6 +312,41 @@ function locationStatusLabel(status) {
   return map[value] || value || '-';
 }
 
+function getDefaultStockStatus() {
+  return "可用";
+}
+
+function batchModeEnabled() {
+  const checkbox = $("#batchModeInput");
+  return !!checkbox && checkbox.checked && ["in", "out", "move"].includes(operationType);
+}
+
+function parseBatchOperationRows(text) {
+  const lines = String(text || "")
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  return lines.map((line, index) => ({
+    lineNo: index + 1,
+    raw: line,
+    parts: line.split("|").map((part) => part.trim())
+  }));
+}
+
+function findUniqueStockRow(sku, batch, location) {
+  const matches = state.stock.filter((item) => item.sku === sku && item.batch === batch && item.location === location);
+  if (matches.length === 1) return matches[0];
+  return null;
+}
+
+function batchOperationLabel(type) {
+  return {
+    in: "Batch Barang Masuk",
+    out: "Batch Barang Keluar",
+    move: "Batch Pindah Lokasi"
+  }[type] || "Batch Operation";
+}
+
 
 
 
@@ -738,9 +773,15 @@ function addAuditLog(payload) {
 async function submitOperation(event, overridePayload = null) {
   event.preventDefault();
   if (event.target.dataset.submitting === "1") return;
+  if (!overridePayload && batchModeEnabled()) {
+    const batchPayload = buildBatchOperationPayload();
+    if (batchPayload.error) return showToast(batchPayload.error);
+    openOperationConfirm(batchPayload);
+    return;
+  }
   const inputSku = normalize($("#skuInput").value);
   const material = findMaterial($("#skuInput").value) ||
-    (selectedOperationSourceMatches(inputSku, normalize($("#batchInput").value), $("#statusInput").value)
+    (selectedOperationSourceMatches(inputSku, normalize($("#batchInput").value), $("#statusInput").value || getDefaultStockStatus())
       ? { sku: selectedOperationStock.sku, name: selectedOperationStock.name }
       : null);
   const sku = material?.sku || "";
@@ -749,7 +790,7 @@ async function submitOperation(event, overridePayload = null) {
   const qty = parseSystemQty(rawQty);
   const location = normalize($("#locationInput").value);
   const targetLocation = normalize($("#targetLocationInput").value);
-  const status = $("#statusInput").value;
+  const status = $("#statusInput").value || getDefaultStockStatus();
   const note = $("#noteInput").value.trim();
 
   if (!material) return showToast("Material harus dipilih dari master data");
@@ -829,6 +870,129 @@ async function submitOperation(event, overridePayload = null) {
   }
 }
 
+function buildBatchOperationPayload() {
+  const sku = normalize($("#skuInput").value);
+  const material = findMaterial($("#skuInput").value);
+  const batchRows = parseBatchOperationRows($("#batchRowsInput").value);
+  const note = $("#noteInput").value.trim();
+  if (!material) return { error: "Material harus dipilih dari master data" };
+  if (!sku) return { error: "SKU harus diisi" };
+  if (!batchRows.length) return { error: "Tambahkan minimal satu baris batch" };
+
+  const batchItems = [];
+  const seenKeys = new Set();
+  for (const row of batchRows) {
+    if (operationType === "move") {
+      if (row.parts.length < 4) return { error: `Baris ${row.lineNo} tidak valid` };
+    } else {
+      if (row.parts.length < 3) return { error: `Baris ${row.lineNo} tidak valid` };
+    }
+    const [batch, location, qtyText, targetLocation = "", rowNote = "", rowStatus = ""] = row.parts;
+    const normalizedBatch = normalize(batch);
+    const normalizedLocation = normalize(location);
+    const normalizedTarget = normalize(targetLocation);
+    const qty = parseSystemQty(qtyText);
+    const status = rowStatus ? String(rowStatus).trim() : getDefaultStockStatus();
+    if (!normalizedBatch) return { error: `Baris ${row.lineNo}: batch wajib diisi` };
+    if (!normalizedLocation) return { error: `Baris ${row.lineNo}: lokasi wajib diisi` };
+    if (qty === null) return { error: `Baris ${row.lineNo}: ${qtyErrorText(qtyText)}` };
+    if (operationType !== "count" && qty <= 0) return { error: `Baris ${row.lineNo}: jumlah harus lebih dari 0` };
+    if (operationType === "in" && !findLocation(normalizedLocation)) return { error: `Baris ${row.lineNo}: lokasi tidak valid` };
+    if (operationType === "move") {
+      if (!normalizedTarget) return { error: `Baris ${row.lineNo}: lokasi tujuan wajib diisi` };
+      if (!findLocation(normalizedTarget)) return { error: `Baris ${row.lineNo}: lokasi tujuan tidak valid` };
+      if (findLocation(normalizedTarget)?.status === "Frozen") return { error: `Baris ${row.lineNo}: lokasi tujuan dibekukan` };
+      if (normalizedTarget === normalizedLocation) return { error: `Baris ${row.lineNo}: lokasi tujuan tidak boleh sama dengan lokasi awal` };
+    }
+
+    const key = `${sku}__${normalizedBatch}__${normalizedLocation}__${status}`;
+    if (seenKeys.has(key)) return { error: `Baris ${row.lineNo}: detail stok duplikat` };
+    seenKeys.add(key);
+
+    const sourceRow = operationType === "in"
+      ? null
+      : findStock(sku, normalizedBatch, normalizedLocation, status) || findUniqueStockRow(sku, normalizedBatch, normalizedLocation);
+    if (["out", "move"].includes(operationType) && !sourceRow) {
+      return { error: `Baris ${row.lineNo}: detail stok tidak ditemukan` };
+    }
+    if (["out", "move"].includes(operationType) && qty > Number(sourceRow.qty || 0)) {
+      return { error: `Baris ${row.lineNo}: stok tidak cukup` };
+    }
+
+    batchItems.push({
+      lineNo: row.lineNo,
+      sku,
+      name: material.name || "",
+      batch: normalizedBatch,
+      location: normalizedLocation,
+      targetLocation: normalizedTarget,
+      qty,
+      note: rowNote || note,
+      status,
+      expectedVersion: sourceRow?.version || 1
+    });
+  }
+
+  return {
+    type: operationType,
+    sku,
+    name: material.name || "",
+    batchItems
+  };
+}
+
+async function submitBatchOperation(event, payload) {
+  setFormSubmitting(event.target, true);
+  try {
+    const failed = [];
+    for (const item of payload.batchItems) {
+      const operationPayload = {
+        type: payload.type,
+        sku: payload.sku,
+        batch: item.batch,
+        qty: String(item.qty),
+        location: item.location,
+        targetLocation: item.targetLocation,
+        status: item.status || getDefaultStockStatus(),
+        note: item.note || "",
+        expectedVersion: item.expectedVersion
+      };
+      const remote = await postOperation(operationPayload);
+      if (remote === false) {
+        failed.push(item.lineNo);
+        break;
+      }
+      if (remote) continue;
+      if (payload.type === "in") {
+        upsertStock({ sku: payload.sku, batch: item.batch, location: item.location, status: item.status || getDefaultStockStatus(), qty: item.qty });
+      } else if (payload.type === "out") {
+        const row = findStock(payload.sku, item.batch, item.location, item.status || getDefaultStockStatus()) || findUniqueStockRow(payload.sku, item.batch, item.location);
+        if (!row || row.qty < item.qty) return showToast(`Baris ${item.lineNo}: stok tidak cukup`);
+        row.qty = roundQty(row.qty - item.qty);
+        touchStock(row);
+      } else if (payload.type === "move") {
+        const row = findStock(payload.sku, item.batch, item.location, item.status || getDefaultStockStatus()) || findUniqueStockRow(payload.sku, item.batch, item.location);
+        if (!row || row.qty < item.qty) return showToast(`Baris ${item.lineNo}: stok tidak cukup`);
+        row.qty = roundQty(row.qty - item.qty);
+        touchStock(row);
+        upsertStock({ sku: payload.sku, batch: item.batch, location: item.targetLocation, status: item.status || getDefaultStockStatus(), qty: item.qty });
+      }
+      addLog({ type: payload.type, sku: payload.sku, name: payload.name, batch: item.batch, qty: item.qty, location: item.location, targetLocation: item.targetLocation, status: item.status || getDefaultStockStatus(), note: item.note || "" });
+    }
+    if (failed.length) return showToast("Batch gagal, silakan periksa baris yang ditandai");
+    removeZeroStock();
+    refreshLocationUsage();
+    saveState();
+    resetOperationForm(event.target);
+    selectedOperationVersion = null;
+    selectedOperationStock = null;
+    render();
+    showToast("Pekerjaan terkirim");
+  } finally {
+    setFormSubmitting(event.target, false);
+  }
+}
+
 function getOperationStockRows() {
   if (!["out", "move"].includes(operationType)) return [];
   const material = findMaterial($("#skuInput").value);
@@ -850,9 +1014,11 @@ function getOperationStockRows() {
 }
 
 function updateOperationStockList() {
-  const useStockPicker = ["out", "move"].includes(operationType);
+  const useStockPicker = ["out", "move"].includes(operationType) && !batchModeEnabled();
   $("#operationStockWrap").classList.toggle("hidden", !useStockPicker);
+  $("#batchRowsWrap")?.classList.toggle("hidden", !batchModeEnabled());
   $$(".operation-field").forEach((item) => item.classList.toggle("hidden", useStockPicker));
+  $("#operationStatusWrap")?.classList.add("hidden");
   $("#targetLocationWrap").classList.toggle("hidden", operationType !== "move");
   $("#operationStockHint").textContent = operationType === "move" ? "Cari dan pilih stok untuk dipindah." : "Cari dan pilih stok untuk dikeluarkan.";
   updateOperationHelper();
@@ -907,10 +1073,10 @@ function renderOperationStockRows(rows) {
           selectedOperationStock.location === item.location &&
           selectedOperationStock.status === item.status;
         return `
-          <button class="data-card compact-stock ${selected ? "selected" : ""}" type="button" data-op-stock="1" aria-pressed="${selected ? "true" : "false"}" data-sku="${escapeHtml(item.sku)}" data-name="${escapeHtml(item.name || material?.name || "")}" data-batch="${escapeHtml(item.batch)}" data-location="${escapeHtml(item.location)}" data-status="${escapeHtml(locationStatusLabel(item.status))}" data-qty="${item.qty}" data-version="${item.version || 1}">
+          <button class="data-card compact-stock ${selected ? "selected" : ""}" type="button" data-op-stock="1" aria-pressed="${selected ? "true" : "false"}" data-sku="${escapeHtml(item.sku)}" data-name="${escapeHtml(item.name || material?.name || "")}" data-batch="${escapeHtml(item.batch)}" data-location="${escapeHtml(item.location)}" data-status="${escapeHtml(item.status)}" data-qty="${item.qty}" data-version="${item.version || 1}">
             <div>
               <strong>${escapeHtml(item.location)}</strong>
-              <span>${escapeHtml(item.sku)} / ${escapeHtml(item.name || material?.name || "")} / ${escapeHtml(item.batch)} / ${escapeHtml(locationStatusLabel(item.status))}</span>
+              <span>${escapeHtml(item.sku)} / ${escapeHtml(item.name || material?.name || "")} / ${escapeHtml(item.batch)}</span>
             </div>
             <div class="card-meta">
               <b>${item.qty}</b>
@@ -979,7 +1145,7 @@ function renderSelectedStockInfo() {
   $("#selectedStockInfo").innerHTML = row
     ? `<strong>Detail stok dipilih</strong>
       <span>Material: ${escapeHtml(sku)} / ${escapeHtml(row.name || material?.name || "")}</span>
-      <span>Batch: ${escapeHtml(batch)} / Lokasi: ${escapeHtml(location)} / Status: ${escapeHtml(status)}</span>
+      <span>Batch: ${escapeHtml(batch)} / Lokasi: ${escapeHtml(location)}</span>
       <span>Stok tersedia: ${row.qty}, masukkan jumlah di bawah.</span>`
     : "";
   updateOperationHelper();
@@ -999,16 +1165,17 @@ function updateOperationHelper() {
   if (!guide || !qtyHint || !qtyInput || !submitButton) return;
 
   const labels = { in: "Barang Masuk", out: "Barang Keluar", move: "Pindah Lokasi" };
+  const batchMode = batchModeEnabled();
   const steps = {
-    in: ["Pilih material", "Pilih lokasi", "Masukkan jumlah", "Konfirmasi kirim"],
-    out: ["Pilih detail stok", "Masukkan jumlah", "Konfirmasi kirim"],
-    move: ["Pilih detail stok", "Masukkan jumlah", "Pilih lokasi tujuan", "Konfirmasi kirim"]
+    in: batchMode ? ["Pilih SKU", "Isi batch rows", "Konfirmasi kirim"] : ["Pilih material", "Pilih lokasi", "Masukkan jumlah", "Konfirmasi kirim"],
+    out: batchMode ? ["Pilih SKU", "Isi batch rows", "Konfirmasi kirim"] : ["Pilih detail stok", "Masukkan jumlah", "Konfirmasi kirim"],
+    move: batchMode ? ["Pilih SKU", "Isi batch rows", "Konfirmasi kirim"] : ["Pilih detail stok", "Masukkan jumlah", "Pilih lokasi tujuan", "Konfirmasi kirim"]
   }[operationType] || ["Isi data", "Konfirmasi kirim"];
 
   const inputSku = normalize($("#skuInput").value);
   const batch = normalize($("#batchInput").value);
   const location = normalize($("#locationInput").value);
-  const status = $("#statusInput").value;
+  const status = $("#statusInput").value || getDefaultStockStatus();
   const qty = parseSystemQty(qtyInput.value);
   const targetLocation = normalize($("#targetLocationInput").value);
   const selectedRow = selectedOperationSourceMatches(inputSku, batch, status) ? selectedOperationStock : null;
@@ -1016,7 +1183,16 @@ function updateOperationHelper() {
   let activeStep = 0;
   let ready = false;
   let nextText = "";
-  if (operationType === "in") {
+  if (batchMode) {
+    const batchText = $("#batchRowsInput")?.value || "";
+    const rows = parseBatchOperationRows(batchText);
+    const skuReady = !!findMaterial($("#skuInput").value);
+    activeStep = skuReady ? 1 : 0;
+    if (skuReady && rows.length) activeStep = 2;
+    ready = skuReady && rows.length > 0;
+    nextText = ready ? "Periksa batch rows lalu kirim." : "Pilih SKU lalu isi batch rows.";
+    qtyInput.placeholder = "Batch mode uses rows below";
+  } else if (operationType === "in") {
     if (findMaterial($("#skuInput").value)) activeStep = 1;
     if (findLocation(location)) activeStep = 2;
     if (qty !== null && qty > 0) activeStep = 3;
@@ -1110,7 +1286,7 @@ async function submitCount(event) {
   const material = selected ? { sku: selected.sku, name: selected.name } : findMaterial($("#countSkuInput").value);
   const sku = material?.sku || "";
   const batch = normalize($("#countBatchInput").value);
-  const status = $("#countStatusInput").value;
+  const status = $("#countStatusInput").value || getDefaultStockStatus();
   const rawQty = $("#countQtyInput").value;
   const qty = parseSystemQty(rawQty);
   const location = normalize($("#countLocationInput").value);
@@ -1268,11 +1444,11 @@ function renderCountStockList(rows = []) {
           selectedCountStock.location === item.location &&
           selectedCountStock.status === item.status;
         return `
-        <button class="data-card compact-stock ${selected ? "selected" : ""}" type="button" aria-pressed="${selected ? "true" : "false"}" data-sku="${escapeHtml(item.sku)}" data-name="${escapeHtml(item.name || material?.name || "")}" data-batch="${escapeHtml(item.batch)}" data-location="${escapeHtml(item.location)}" data-status="${escapeHtml(locationStatusLabel(item.status))}" data-qty="${item.qty}" data-version="${item.version || 1}">
+        <button class="data-card compact-stock ${selected ? "selected" : ""}" type="button" aria-pressed="${selected ? "true" : "false"}" data-sku="${escapeHtml(item.sku)}" data-name="${escapeHtml(item.name || material?.name || "")}" data-batch="${escapeHtml(item.batch)}" data-location="${escapeHtml(item.location)}" data-status="${escapeHtml(item.status)}" data-qty="${item.qty}" data-version="${item.version || 1}">
           <div>
             <strong>${escapeHtml(item.location)}</strong>
             <span>${escapeHtml(item.sku)} / ${escapeHtml(item.name || material?.name || "")}</span>
-            <small>${escapeHtml(item.batch)} / ${escapeHtml(locationStatusLabel(item.status))}</small>
+            <small>${escapeHtml(item.batch)}</small>
           </div>
           <div class="card-meta">
             <b>${item.qty}</b>
@@ -1376,11 +1552,15 @@ function syncCountSelection() {
 
 function resetOperationForm(form) {
   form.reset();
-  $("#statusInput").value = "可用";
+  $("#statusInput").value = getDefaultStockStatus();
+  $("#countStatusInput").value = getDefaultStockStatus();
+  $("#batchModeInput").checked = false;
+  $("#batchRowsInput").value = "";
   $("#materialNameInput").value = "";
   delete $("#qtyInput").dataset.maxQty;
   updateMaterialPicker();
   updateOperationHelper();
+  updateOperationStockList();
 }
 
 function seedDemo() {
@@ -1471,15 +1651,31 @@ function selectHomeAction(action) {
 
 function openOperationConfirm(payload) {
   pendingOperationPayload = payload;
-  const rows = [
-    ["操作", typeLabel(payload.type)],
-    ["物料", `${payload.sku}${payload.name || findMaterial(payload.sku)?.name ? ` / ${payload.name || findMaterial(payload.sku)?.name || ""}` : ""}`],
-    ["Batch", payload.batch],
-    ["Lokasi", payload.type === "move" ? `${payload.location} -> ${payload.targetLocation || "-"}` : payload.location],
-    ["Qty", payload.qty]
-  ];
-  $("#operationConfirmText").textContent = "Periksa kembali lalu kirim.";
-  $("#operationConfirmGrid").innerHTML = rows.map(([label, value]) => `<div class="confirm-row"><span>${escapeHtml(label)}</span><span>${escapeHtml(value)}</span></div>`).join("");
+  const batchItems = Array.isArray(payload.batchItems) ? payload.batchItems : null;
+  const rows = batchItems
+    ? [
+        ["Action", batchOperationLabel(payload.type)],
+        ["SKU", payload.sku],
+        ["Rows", String(batchItems.length)],
+        ["Qty total", String(roundQty(batchItems.reduce((sum, item) => sum + Number(item.qty || 0), 0)))],
+        ["Batch", "Batch operation"]
+      ]
+    : [
+        ["Action", typeLabel(payload.type)],
+        ["Material", `${payload.sku}${payload.name || findMaterial(payload.sku)?.name ? ` / ${payload.name || findMaterial(payload.sku)?.name || ""}` : ""}`],
+        ["Batch", payload.batch],
+        ["Location", payload.type === "move" ? `${payload.location} -> ${payload.targetLocation || "-"}` : payload.location],
+        ["Qty", payload.qty]
+      ];
+  $("#operationConfirmText").textContent = batchItems ? "Review batch rows before submit." : "Review before submit.";
+  $("#operationConfirmGrid").innerHTML = batchItems
+    ? `
+      <div class="confirm-row"><span>Batch mode</span><span>${escapeHtml(batchOperationLabel(payload.type))}</span></div>
+      <div class="confirm-row"><span>SKU</span><span>${escapeHtml(payload.sku)}</span></div>
+      <div class="confirm-row"><span>Rows</span><span>${escapeHtml(String(batchItems.length))}</span></div>
+      <div class="confirm-row"><span>Total qty</span><span>${escapeHtml(String(roundQty(batchItems.reduce((sum, item) => sum + Number(item.qty || 0), 0))))}</span></div>
+      <div class="confirm-row wide"><span>Details</span><span>${batchItems.map((item) => `${escapeHtml(item.batch)} / ${escapeHtml(item.location)} / ${escapeHtml(String(item.qty))}${item.targetLocation ? ` -> ${escapeHtml(item.targetLocation)}` : ""}`).join("<br>")}</span></div>`
+    : rows.map(([label, value]) => `<div class="confirm-row"><span>${escapeHtml(label)}</span><span>${escapeHtml(value)}</span></div>`).join("");
   $("#operationConfirmSheet").classList.remove("hidden");
 }
 
@@ -1493,7 +1689,8 @@ async function commitPendingOperation() {
   const event = { target: $("#operationForm") };
   const payload = pendingOperationPayload;
   closeOperationConfirm();
-  await submitOperation(event, payload);
+  if (Array.isArray(payload.batchItems)) await submitBatchOperation(event, payload);
+  else await submitOperation(event, payload);
 }
 
 function renderOptions() {
@@ -1690,7 +1887,6 @@ function renderStockRows(rows) {
                 </div>
                 <div class="card-meta">
                   <b>${item.qty}</b>
-                  <span>${escapeHtml(locationStatusLabel(item.status))}</span>
                 </div>
               </article>`;
           }).join("")}
@@ -1704,7 +1900,6 @@ function renderStockRows(rows) {
               <th class="sortable-th ${stockSortClass("name")}" data-stock-sort="name">名称</th>
               <th class="sortable-th ${stockSortClass("batch")}" data-stock-sort="batch">Batch</th>
               <th class="sortable-th ${stockSortClass("location")}" data-stock-sort="location">Lokasi</th>
-              <th class="sortable-th ${stockSortClass("status")}" data-stock-sort="status">Status</th>
               <th class="num-cell sortable-th ${stockSortClass("qty")}" data-stock-sort="qty">Jumlah</th>
             </tr>
           </thead>
@@ -1717,7 +1912,6 @@ function renderStockRows(rows) {
                   <td>${escapeHtml(item.name || material?.name || "Unknown material")}</td>
                   <td>${escapeHtml(item.batch)}</td>
                   <td>${escapeHtml(item.location)}</td>
-                  <td>${escapeHtml(locationStatusLabel(item.status))}</td>
                   <td class="num-cell">${item.qty}</td>
                 </tr>`;
             }).join("")}
@@ -1810,7 +2004,7 @@ function renderMaterialRows(rows) {
             <span>${escapeHtml(item.name)}</span>
           </div>
           <div class="card-meta">
-            <button class="secondary-button mini-action" type="button" data-edit-material="${escapeHtml(item.sku)}">淇敼</button>
+            <button class="secondary-button mini-action" type="button" data-edit-material="${escapeHtml(item.sku)}">Edit</button>
           </div>
         </article>`).join("")
     : emptyHtml();
@@ -1859,7 +2053,7 @@ function renderLocationRows(rows) {
         <article class="data-card">
           <div>
             <strong>${escapeHtml(item.code)}</strong>
-            <span>${Number(item.stockRows ?? state.stock.filter((stock) => stock.location === item.code).length)} 鏉″簱瀛?/span>
+            <span>${Number(item.stockRows ?? state.stock.filter((stock) => stock.location === item.code).length)} rows</span>
           </div>
           <div class="card-meta">
             <span>${escapeHtml(locationStatusLabel(item.status))}</span>
@@ -2922,6 +3116,11 @@ $("#targetLocationInput").addEventListener("input", () => {
   updateOperationHelper();
 });
 $("#statusInput").addEventListener("change", updateOperationStockList);
+$("#batchModeInput")?.addEventListener("change", () => {
+  updateOperationStockList();
+  updateOperationHelper();
+});
+$("#batchRowsInput")?.addEventListener("input", updateOperationHelper);
 $("#operationStockSearch").addEventListener("input", updateOperationStockList);
 $("#operationStockList").addEventListener("click", selectOperationStock);
 $("#qtyInput").addEventListener("blur", (event) => {
