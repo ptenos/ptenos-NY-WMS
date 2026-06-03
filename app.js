@@ -61,7 +61,7 @@ const labels = {
     masterData: "主数据 / Master Data",
     import: "导入 / Import",
     transactionLog: "流水账 / Transaction Log",
-    changeLog: "淇敼璁板綍 / Change Log",
+    changeLog: "修改记录 / Change Log",
     changePassword: "修改密码 / Change Password",
     addAccount: "新增账号 / Add Account",
     deleteAccount: "删除账号 / Delete Account",
