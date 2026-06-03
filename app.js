@@ -2112,7 +2112,7 @@ async function exportStock() {
   const rows = sourceRows.map((item) => {
     const material = findMaterial(item.sku);
     return {
-      鐗╂枡缂栫爜: item.sku,
+      "Material Code": item.sku,
       "Material Name": item.name || material?.name || "",
       "Batch No.": item.batch,
       Qty: item.qty,
@@ -2128,7 +2128,7 @@ function downloadTemplate() {
 }
 
 function downloadMaterialTemplate() {
-  downloadCsv([{ 鐗╂枡缂栫爜: "RM-1001", 鐗╂枡鍚嶇О: "鐢樻补" }], "鐗╂枡涓绘暟鎹ā鏉?csv");
+  downloadCsv([{ "Material Code": "RM-1001", "Material Name": "甘油" }], "material-master-template.csv");
 }
 
 function downloadLocationTemplate() {
