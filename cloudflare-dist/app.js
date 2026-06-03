@@ -289,12 +289,29 @@ function roleLabel(role) {
 
 function permissionScope(role) {
   return {
-    admin: "全部功能",
-    keeper: "作业、盘点、库存",
-    employee: "作业、库存",
-    operator: "作业、库存"
-  }[role] || "-";
+    admin: '全部功能',
+    keeper: '作业、盘点、库存',
+    employee: '作业、库存',
+    operator: '作业、库存'
+  }[role] || role;
 }
+
+function locationStatusLabel(status) {
+  const value = String(status || '').trim();
+  const map = {
+    '空闲': 'Empty',
+    '占用': 'Occupied',
+    '冻结': 'Frozen',
+    'kosong': 'Empty',
+    'terisi': 'Occupied',
+    'dibekukan': 'Frozen',
+    'Empty': 'Empty',
+    'Occupied': 'Occupied',
+    'Frozen': 'Frozen'
+  };
+  return map[value] || value || '-';
+}
+
 
 
 
@@ -890,10 +907,10 @@ function renderOperationStockRows(rows) {
           selectedOperationStock.location === item.location &&
           selectedOperationStock.status === item.status;
         return `
-          <button class="data-card compact-stock ${selected ? "selected" : ""}" type="button" data-op-stock="1" aria-pressed="${selected ? "true" : "false"}" data-sku="${escapeHtml(item.sku)}" data-name="${escapeHtml(item.name || material?.name || "")}" data-batch="${escapeHtml(item.batch)}" data-location="${escapeHtml(item.location)}" data-status="${escapeHtml(item.status)}" data-qty="${item.qty}" data-version="${item.version || 1}">
+          <button class="data-card compact-stock ${selected ? "selected" : ""}" type="button" data-op-stock="1" aria-pressed="${selected ? "true" : "false"}" data-sku="${escapeHtml(item.sku)}" data-name="${escapeHtml(item.name || material?.name || "")}" data-batch="${escapeHtml(item.batch)}" data-location="${escapeHtml(item.location)}" data-status="${escapeHtml(locationStatusLabel(item.status))}" data-qty="${item.qty}" data-version="${item.version || 1}">
             <div>
               <strong>${escapeHtml(item.location)}</strong>
-              <span>${escapeHtml(item.sku)} / ${escapeHtml(item.name || material?.name || "")} / ${escapeHtml(item.batch)} / ${escapeHtml(item.status)}</span>
+              <span>${escapeHtml(item.sku)} / ${escapeHtml(item.name || material?.name || "")} / ${escapeHtml(item.batch)} / ${escapeHtml(locationStatusLabel(item.status))}</span>
             </div>
             <div class="card-meta">
               <b>${item.qty}</b>
@@ -1251,11 +1268,11 @@ function renderCountStockList(rows = []) {
           selectedCountStock.location === item.location &&
           selectedCountStock.status === item.status;
         return `
-        <button class="data-card compact-stock ${selected ? "selected" : ""}" type="button" aria-pressed="${selected ? "true" : "false"}" data-sku="${escapeHtml(item.sku)}" data-name="${escapeHtml(item.name || material?.name || "")}" data-batch="${escapeHtml(item.batch)}" data-location="${escapeHtml(item.location)}" data-status="${escapeHtml(item.status)}" data-qty="${item.qty}" data-version="${item.version || 1}">
+        <button class="data-card compact-stock ${selected ? "selected" : ""}" type="button" aria-pressed="${selected ? "true" : "false"}" data-sku="${escapeHtml(item.sku)}" data-name="${escapeHtml(item.name || material?.name || "")}" data-batch="${escapeHtml(item.batch)}" data-location="${escapeHtml(item.location)}" data-status="${escapeHtml(locationStatusLabel(item.status))}" data-qty="${item.qty}" data-version="${item.version || 1}">
           <div>
             <strong>${escapeHtml(item.location)}</strong>
             <span>${escapeHtml(item.sku)} / ${escapeHtml(item.name || material?.name || "")}</span>
-            <small>${escapeHtml(item.batch)} / ${escapeHtml(item.status)}</small>
+            <small>${escapeHtml(item.batch)} / ${escapeHtml(locationStatusLabel(item.status))}</small>
           </div>
           <div class="card-meta">
             <b>${item.qty}</b>
@@ -1673,7 +1690,7 @@ function renderStockRows(rows) {
                 </div>
                 <div class="card-meta">
                   <b>${item.qty}</b>
-                  <span>${escapeHtml(item.status)}</span>
+                  <span>${escapeHtml(locationStatusLabel(item.status))}</span>
                 </div>
               </article>`;
           }).join("")}
@@ -1700,7 +1717,7 @@ function renderStockRows(rows) {
                   <td>${escapeHtml(item.name || material?.name || "Unknown material")}</td>
                   <td>${escapeHtml(item.batch)}</td>
                   <td>${escapeHtml(item.location)}</td>
-                  <td>${escapeHtml(item.status)}</td>
+                  <td>${escapeHtml(locationStatusLabel(item.status))}</td>
                   <td class="num-cell">${item.qty}</td>
                 </tr>`;
             }).join("")}
@@ -1845,8 +1862,8 @@ function renderLocationRows(rows) {
             <span>${Number(item.stockRows ?? state.stock.filter((stock) => stock.location === item.code).length)} 鏉″簱瀛?/span>
           </div>
           <div class="card-meta">
-            <span>${escapeHtml(item.status)}</span>
-            <button class="secondary-button mini-action" type="button" data-edit-location="${escapeHtml(item.code)}">淇敼</button>
+            <span>${escapeHtml(locationStatusLabel(item.status))}</span>
+            <button class="secondary-button mini-action" type="button" data-edit-location="${escapeHtml(item.code)}">Edit</button>
           </div>
         </article>`).join("")
     : emptyHtml();
@@ -3039,5 +3056,6 @@ setupInstallPrompt();
 registerServiceWorker();
 render();
 initApiSync();
+
 
 
