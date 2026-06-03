@@ -1,9 +1,9 @@
 const appTimeZone = "Asia/Jakarta";
 
 const defaultUsers = [
-  { id: "admin", name: "管理员", role: "admin", password: "admin123" },
-  { id: "WH-001", name: "仓库员工", role: "employee", password: "123456" },
-  { id: "WH-MGR", name: "仓管", role: "keeper", password: "123456" }
+  { id: "admin", role: "admin", password: "admin123" },
+  { id: "WH-001", role: "employee", password: "123456" },
+  { id: "WH-MGR", role: "keeper", password: "123456" }
 ];
 
 const emptyState = {
@@ -38,6 +38,7 @@ async function migrateDb(data = {}) {
   });
   for (const user of merged.users) {
     if (user.role === "operator") user.role = "employee";
+    delete user.name;
     if (!user.passwordHash) {
       user.passwordHash = await hashPassword(user.password || (user.role === "admin" ? "admin123" : "123456"));
     }
@@ -55,7 +56,7 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
   if (method === "POST" && pathname === "/api/login") {
     const db = await storage.readDb();
     const user = findUserById(db, body.userId);
-    if (!user || !(await verifyPassword(user, body.password))) return json(401, { error: "账号或密码错误" });
+    if (!user || !(await verifyPassword(user, body.password))) return json(401, { errorCode: "INVALID_LOGIN", error: "账号或密码错误" });
     cleanupSessions(db);
     const token = globalThis.crypto.randomUUID();
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
@@ -97,7 +98,7 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     const denied = await requireAdmin(db, "", "", authToken(body, headers));
     if (denied) return json(403, { error: denied });
     const backup = await storage.readBackup?.("latest");
-    if (!backup) return json(404, { error: "暂无自动备份" });
+    if (!backup) return json(404, { errorCode: "USER_NOT_FOUND", error: "暂无自动备份" });
     return json(200, backup);
   }
 
@@ -107,7 +108,7 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     if (denied) return json(403, { error: denied });
     const actor = await getActor(db, body.operatorId, body.password, authToken(body, headers));
     const restored = await restorePayload(body);
-    if (restored.error) return json(422, { error: restored.error });
+    if (restored.error) return json(422, { errorCode: "INVALID_FILE", error: restored.error });
     const nextDb = restored.db;
     nextDb.sessions = db.sessions;
     nextDb.auditLogs.unshift(makeAuditLog({
@@ -152,7 +153,7 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
   }
 
   if (method === "PUT" && pathname === "/api/state") {
-    return json(405, { error: "state cannot be overwritten; use operation APIs" });
+    return json(405, { errorCode: "FORBIDDEN", error: "state cannot be overwritten; use operation APIs" });
   }
 
   if (method === "POST" && pathname === "/api/materials") {
@@ -161,13 +162,13 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     if (denied) return json(403, { error: denied });
     const actor = await getActor(db, body.operatorId, body.password, authToken(body, headers));
     const sku = normalizeCode(body.sku);
-    if (!sku || !body.name) return json(422, { error: "sku and name are required" });
+    if (!sku || !body.name) return json(422, { errorCode: "INVALID_QTY", error: "sku and name are required" });
     const previousSku = normalizeCode(body.previousSku);
     if (previousSku && previousSku !== sku && db.materials.some((item) => item.sku === sku)) {
-      return json(409, { error: "物料编码已存在" });
+      return json(409, { errorCode: "MATERIAL_EXISTS", error: "物料编码已存在" });
     }
     if (!previousSku && db.materials.some((item) => item.sku === sku)) {
-      return json(409, { error: "物料编码已存在，请搜索后修改" });
+      return json(409, { errorCode: "MATERIAL_EXISTS", error: "物料编码已存在，请搜索后修改" });
     }
     const existing = db.materials.find((item) => item.sku === (previousSku || sku));
     const before = existing ? { ...existing } : null;
@@ -202,13 +203,13 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     if (denied) return json(403, { error: denied });
     const actor = await getActor(db, body.operatorId, body.password, authToken(body, headers));
     const code = normalizeCode(body.code);
-    if (!code) return json(422, { error: "code is required" });
+    if (!code) return json(422, { errorCode: "INVALID_LOCATION", error: "code is required" });
     const previousCode = normalizeCode(body.previousCode);
     if (previousCode && previousCode !== code && db.locations.some((item) => item.code === code)) {
-      return json(409, { error: "库位编码已存在" });
+      return json(409, { errorCode: "LOCATION_EXISTS", error: "库位编码已存在" });
     }
     if (!previousCode && db.locations.some((item) => item.code === code)) {
-      return json(409, { error: "库位已存在，请搜索后修改" });
+      return json(409, { errorCode: "LOCATION_EXISTS", error: "库位已存在，请搜索后修改" });
     }
     const existing = db.locations.find((item) => item.code === (previousCode || code));
     const before = existing ? { ...existing } : null;
@@ -257,9 +258,9 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     const role = String(body.role || "").trim();
     const userPassword = String(body.userPassword || "").trim();
     const name = String(body.name || id).trim() || id;
-    if (!id || !["employee", "keeper", "admin"].includes(role)) return json(422, { error: "账号和角色不能为空" });
+    if (!id || !["employee", "keeper", "admin"].includes(role)) return json(422, { errorCode: "INVALID_LOGIN", error: "账号和角色不能为空" });
     const existing = db.users.find((user) => user.id === id);
-    if (!existing && !userPassword) return json(422, { error: "新增账号必须设置密码" });
+    if (!existing && !userPassword) return json(422, { errorCode: "PASSWORD_REQUIRED", error: "新增账号必须设置密码" });
     const user = { id, name, role };
     if (userPassword) user.passwordHash = await hashPassword(userPassword);
     const before = existing ? sanitizeUser(existing) : null;
@@ -284,10 +285,10 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     const actor = await getActor(db, body.operatorId, body.password, authToken(body, headers));
     const targetId = normalizeCode(body.targetId);
     const userPassword = String(body.userPassword || "").trim();
-    if (!targetId) return json(422, { error: "账号不能为空" });
-    if (userPassword.length < 6) return json(422, { error: "密码至少 6 位" });
+    if (!targetId) return json(422, { errorCode: "USER_NOT_FOUND", error: "账号不能为空" });
+    if (userPassword.length < 6) return json(422, { errorCode: "PASSWORD_TOO_SHORT", error: "密码至少 6 位" });
     const target = db.users.find((user) => user.id === targetId);
-    if (!target) return json(404, { error: "账号不存在" });
+    if (!target) return json(404, { errorCode: "USER_NOT_FOUND", error: "账号不存在" });
     const before = sanitizeUser(target);
     target.passwordHash = await hashPassword(userPassword);
     delete target.password;
@@ -311,7 +312,7 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     const actor = await getActor(db, body.operatorId, body.password, authToken(body, headers));
     const targetId = normalizeCode(body.targetId);
     const target = db.users.find((user) => user.id === targetId);
-    if (target?.role === "admin") return json(422, { error: "不能删除管理员账号" });
+    if (target?.role === "admin") return json(422, { errorCode: "ADMIN_CANNOT_BE_DELETED", error: "不能删除管理员账号" });
     const before = sanitizeUser(target);
     db.users = db.users.filter((user) => user.id !== targetId);
     if (before) {
@@ -435,10 +436,10 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
   }
 
   if (method === "POST" && pathname === "/api/clear-master-data") {
-    return json(403, { error: "清空基础数据接口已关闭" });
+    return json(403, { errorCode: "FORBIDDEN", error: "清空基础数据接口已关闭" });
   }
 
-  return json(404, { error: "Not found" });
+  return json(404, { errorCode: "USER_NOT_FOUND", error: "Not found" });
 }
 
 function json(status, data) {
@@ -769,31 +770,31 @@ async function applyOperation(db, operation, token = "") {
   const status = operation.status || "可用";
   const qty = parseSystemQty(operation.qty);
 
-  if (!db.materials.some((item) => item.sku === sku)) return { error: "物料必须从主数据选择" };
-  if (!db.locations.some((item) => item.code === location)) return { error: "库位必须从主数据选择" };
-  if (!batch || qty === null || qty < 0) return { error: "数量只能使用系统数字格式，最多 6 位小数，例如 1000 或 1000.123456" };
+  if (!db.materials.some((item) => item.sku === sku)) return { errorCode: "INVALID_LOCATION", error: "物料必须从主数据选择" };
+  if (!db.locations.some((item) => item.code === location)) return { errorCode: "INVALID_LOCATION", error: "库位必须从主数据选择" };
+  if (!batch || qty === null || qty < 0) return { errorCode: "INVALID_QTY", error: "数量只能使用系统数字格式，最多 6 位小数，例如 1000 或 1000.123456" };
 
   if (type === "in") {
-    if (qty <= 0) return { error: "入库数量必须大于 0" };
+    if (qty <= 0) return { errorCode: "INVALID_QTY", error: "入库数量必须大于 0" };
     addStock(db, { sku, batch, location, status, qty });
   } else if (type === "out") {
-    if (qty <= 0) return { error: "出库数量必须大于 0" };
+    if (qty <= 0) return { errorCode: "INVALID_QTY", error: "出库数量必须大于 0" };
     const row = findStock(db, { sku, batch, location, status });
-    if (!row) return { error: "库存不足或状态不匹配" };
-    if (Number(row.qty || 0) < qty) return { error: "库存不足，不能出库" };
+    if (!row) return { errorCode: "STOCK_NOT_ENOUGH", error: "库存不足或状态不匹配" };
+    if (Number(row.qty || 0) < qty) return { errorCode: "STOCK_NOT_ENOUGH", error: "库存不足，不能出库" };
     const versionError = assertVersion(row, operation.expectedVersion);
     if (versionError) return { error: versionError };
     row.qty = roundQty(row.qty - qty);
     touchStock(row);
   } else if (type === "move") {
-    if (qty <= 0) return { error: "移库数量必须大于 0" };
+    if (qty <= 0) return { errorCode: "INVALID_QTY", error: "移库数量必须大于 0" };
     const target = db.locations.find((item) => item.code === targetLocation);
-    if (!target) return { error: "目标库位必须从主数据选择" };
-    if (target.status === "冻结") return { error: "目标库位已冻结" };
-    if (targetLocation === location) return { error: "目标库位不能和原库位相同" };
+    if (!target) return { errorCode: "INVALID_LOCATION", error: "目标库位必须从主数据选择" };
+    if (target.status === "冻结") return { errorCode: "INVALID_LOCATION", error: "目标库位已冻结" };
+    if (targetLocation === location) return { errorCode: "INVALID_LOCATION", error: "目标库位不能和原库位相同" };
     const row = findStock(db, { sku, batch, location, status });
-    if (!row) return { error: "原库位库存不足" };
-    if (Number(row.qty || 0) < qty) return { error: "原库位库存不足，不能移出" };
+    if (!row) return { errorCode: "STOCK_NOT_ENOUGH", error: "原库位库存不足" };
+    if (Number(row.qty || 0) < qty) return { errorCode: "STOCK_NOT_ENOUGH", error: "原库位库存不足，不能移出" };
     const versionError = assertVersion(row, operation.expectedVersion);
     if (versionError) return { error: versionError };
     row.qty = roundQty(row.qty - qty);
@@ -804,12 +805,12 @@ async function applyOperation(db, operation, token = "") {
     const sourceBatch = normalizeCode(operation.sourceBatch || operation.batch);
     const sourceLocation = normalizeCode(operation.sourceLocation || operation.location);
     const sourceStatus = operation.sourceStatus || status;
-    if (sourceSku !== sku || sourceBatch !== batch || sourceStatus !== status) return { error: "盘点只能调整选中的库存明细" };
+    if (sourceSku !== sku || sourceBatch !== batch || sourceStatus !== status) return { errorCode: "INVALID_QTY", error: "盘点只能调整选中的库存明细" };
     const target = db.locations.find((item) => item.code === location);
-    if (!target) return { error: "盘点库位必须从主数据选择" };
-    if (sourceLocation !== location && target.status === "冻结") return { error: "盘点库位已冻结，请换一个库位" };
+    if (!target) return { errorCode: "INVALID_LOCATION", error: "盘点库位必须从主数据选择" };
+    if (sourceLocation !== location && target.status === "冻结") return { errorCode: "INVALID_LOCATION", error: "盘点库位已冻结，请换一个库位" };
     const row = findStock(db, { sku: sourceSku, batch: sourceBatch, location: sourceLocation, status: sourceStatus });
-    if (!row) return { error: "请先选择要盘点的库存明细" };
+    if (!row) return { errorCode: "INVALID_QTY", error: "请先选择要盘点的库存明细" };
     const beforeQty = row.qty;
     const versionError = assertVersion(row, operation.expectedVersion);
     if (versionError) return { error: versionError };
@@ -826,7 +827,7 @@ async function applyOperation(db, operation, token = "") {
     refreshLocationUsage(db);
     return { ok: true };
   } else {
-    return { error: "Unknown operation type" };
+    return { errorCode: "FORBIDDEN", error: "Unknown operation type" };
   }
 
   cleanup(db);
