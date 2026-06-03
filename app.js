@@ -57,19 +57,19 @@ const labels = {
     delete: "Hapus"
   },
   admin: {
-    accountPermissions: "账号权限 / Account Permissions",
-    masterData: "主数据 / Master Data",
-    import: "导入 / Import",
-    transactionLog: "流水账 / Transaction Log",
-    changeLog: "修改记录 / Change Log",
-    changePassword: "修改密码 / Change Password",
-    addAccount: "新增账号 / Add Account",
-    deleteAccount: "删除账号 / Delete Account",
-    accessScope: "鏉冮檺鑼冨洿 / Access Scope",
-    systemAdminLocked: "系统管理员，不可删除 / System admin, cannot be deleted",
-    allFeatures: "全部功能 / All Features",
-    operateStock: "浣滀笟銆佸簱瀛?/ Operation, Stock",
-    operateCountStock: "浣滀笟銆佺洏鐐广€佸簱瀛?/ Operation, Stock Opname, Stock"
+    accountPermissions: "Account Permissions",
+    masterData: "Master Data",
+    import: "Import",
+    transactionLog: "Transaction Log",
+    changeLog: "Change Log",
+    changePassword: "Change Password",
+    addAccount: "Add Account",
+    deleteAccount: "Delete Account",
+    accessScope: "Access Scope",
+    systemAdminLocked: "System admin, cannot be deleted",
+    allFeatures: "All Features",
+    operateStock: "Operation, Stock",
+    operateCountStock: "Operation, Stock Opname, Stock"
   },
   errors: {
     INVALID_LOGIN: { operation: "Masuk gagal", admin: "账号或密码错误 / Invalid login" },
@@ -368,11 +368,11 @@ function applyLanguageLabels() {
   setText("#restoreBackup", "Restore / 鎭㈠");
 
   const tabMap = {
-    operate: "浣滀笟 / Operation",
-    count: "盘点 / Stock Opname",
-    stock: "库存 / Stock",
-    import: "导入 / Import",
-    master: "主数据 / Master Data",
+    operate: "Operation",
+    count: "Stock Opname",
+    stock: "Stock",
+    import: "Import",
+    master: "Master Data",
     users: labels.admin.accountPermissions,
     logs: labels.admin.transactionLog,
     audit: labels.admin.changeLog
@@ -2021,7 +2021,7 @@ function ledgerQty(item) {
 }
 
 function typeLabel(type) {
-  return { in: "入库", out: "出库", move: "移库", count: "盘点", adjust: "盘点调整", initial: "期初" }[type] || type;
+  return { in: "Barang Masuk", out: "Barang Keluar", move: "Pindah Lokasi", count: "Stock Opname", adjust: "Penyesuaian Opname", initial: "Saldo Awal" }[type] || type;
 }
 
 function emptyHtml() {
