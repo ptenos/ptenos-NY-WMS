@@ -458,12 +458,12 @@ function syncStatusText() {
   if (apiConnectionState === "connecting" && !apiSyncAttempted) return "连接中";
   if (apiAvailable || apiConnectionState === "connected") return "服务器已连接";
   if (apiConnectionState === "failed") return serverRequired ? "服务器连接失败" : "本机演示";
-  return serverRequired ? "服务器未连接" : "本机演示";
+  return serverRequired ? "Server belum tersambung" : "Demo lokal";
 }
 
 function requireLiveServer(action = "操作") {
   if (!serverRequired || apiAvailable) return true;
-  showToast(`服务器未连接，${action}暂不能执行`);
+  showToast(`Server belum tersambung, ${action} belum bisa dijalankan`);
   return false;
 }
 
@@ -513,8 +513,8 @@ function fuzzySequence(text, token) {
 
 function formatMinute(value = new Date()) {
   const date = value instanceof Date ? value : new Date(value);
-  if (text.includes(",")) return "数量不能使用逗号，请不要输入印尼小数格式，例如 1.000,5";
-  if (/^\d{1,3}(\.\d{3})+$/.test(text)) return "数量不能使用印尼千分位格式，例如 1.000";
+  if (text.includes(",")) return "Jumlah tidak boleh memakai koma, gunakan format standar contoh 1000.5";
+  if (/^\d{1,3}(\.\d{3})+$/.test(text)) return "Jumlah tidak boleh memakai format ribuan seperti 1.000";
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
@@ -527,9 +527,9 @@ function parseSystemQty(value) {
 
 function qtyErrorText(value) {
   const text = String(value ?? "").trim();
-  if (text.includes(",")) return "数量不能使用逗号，请不要输入印尼小数格式，例如 1.000,5";
-  if (/^\d{1,3}(\.\d{3})+$/.test(text)) return "数量不能使用印尼千分位格式，例如 1.000";
-  return "数量只能输入标准数字，最多 6 位小数，例如 1000 或 1000.123456";
+  if (text.includes(",")) return "Jumlah tidak boleh memakai koma, gunakan format standar contoh 1000.5";
+  if (/^\d{1,3}(\.\d{3})+$/.test(text)) return "Jumlah tidak boleh memakai format ribuan seperti 1.000";
+  return "Masukkan angka standar, maksimal 6 desimal, contoh 1000 atau 1000.123456";
 }
 
 function roundQty(value) {
@@ -602,7 +602,7 @@ function touchStock(row) {
 
 async function postOperation(payload) {
   if (!apiAvailable) {
-    if (serverRequired) throw new Error("服务器未连接，请恢复网络后重试");
+    if (serverRequired) throw new Error("Server belum tersambung, silakan coba lagi setelah jaringan kembali");
     return null;
   }
   const auth = currentAuthPayload();
@@ -622,7 +622,7 @@ async function postOperation(payload) {
 
 async function postMasterData(path, payload) {
   if (!apiAvailable) {
-    if (serverRequired) throw new Error("服务器未连接，请恢复网络后重试");
+    if (serverRequired) throw new Error("Server belum tersambung, silakan coba lagi setelah jaringan kembali");
     return null;
   }
   const auth = currentAuthPayload();
@@ -648,7 +648,7 @@ async function postMasterData(path, payload) {
 
 async function postUserData(path, payload) {
   if (!apiAvailable) {
-    if (serverRequired) throw new Error("服务器未连接，请恢复网络后重试");
+    if (serverRequired) throw new Error("Server belum tersambung, silakan coba lagi setelah jaringan kembali");
     return null;
   }
   const auth = currentAuthPayload();
@@ -701,7 +701,7 @@ function addLog(payload) {
     id: uid(),
     operatorId: user?.id || "",
     operatorName: user?.name || "",
-    operator: user ? `${user.id} ${user.name || user.id}` : "未选择",
+    operator: user ? `${user.id} ${user.name || user.id}` : "Not selected",
     time: formatMinute(),
     ...payload
   });
@@ -735,19 +735,19 @@ async function submitOperation(event, overridePayload = null) {
   const status = $("#statusInput").value;
   const note = $("#noteInput").value.trim();
 
-  if (!material) return showToast("物料必须从主数据搜索选择");
-  if (!findLocation(location)) return showToast("库位必须从主数据搜索选择");
+  if (!material) return showToast("Material harus dipilih dari master data");
+  if (!findLocation(location)) return showToast("Lokasi harus dipilih dari master data");
   if (!batch || qty === null) return showToast(qtyErrorText(rawQty));
-  if (qty <= 0) return showToast(operationType === "in" ? "入库数量必须大于 0" : "本次数量必须大于 0");
+  if (qty <= 0) return showToast(operationType === "in" ? "Jumlah barang masuk harus lebih dari 0" : "Jumlah harus lebih dari 0");
   const selectedRow = selectedOperationSourceMatches(sku, batch, status) ? selectedOperationStock : null;
   if (["out", "move"].includes(operationType)) {
-    if (!selectedRow) return showToast("请先选择要操作的库存明细");
-    if (qty > Number(selectedRow.qty || 0)) return showToast("本次数量不能超过现有库存");
+    if (!selectedRow) return showToast("Pilih detail stok terlebih dahulu");
+    if (qty > Number(selectedRow.qty || 0)) return showToast("Jumlah tidak boleh melebihi stok tersedia");
   }
   if (operationType === "move") {
-    if (!targetLocation || !findLocation(targetLocation)) return showToast("请选择有效目标库位");
-    if (findLocation(targetLocation)?.status === "冻结") return showToast("目标库位已冻结");
-    if (targetLocation === (selectedRow?.location || location)) return showToast("目标库位不能和原库位相同");
+    if (!targetLocation || !findLocation(targetLocation)) return showToast("Pilih lokasi tujuan yang valid");
+    if (findLocation(targetLocation)?.status === "冻结") return showToast("Lokasi tujuan dibekukan");
+    if (targetLocation === (selectedRow?.location || location)) return showToast("Lokasi tujuan tidak boleh sama dengan lokasi awal");
   }
 
   const sourceLocation = selectedRow?.location || location;
@@ -770,29 +770,29 @@ async function submitOperation(event, overridePayload = null) {
         selectedOperationVersion = null;
         selectedOperationStock = null;
         render();
-        return showToast("作业已提交");
+        return showToast("Pekerjaan terkirim");
       }
     } catch (error) {
       return showToast(error.message);
     }
 
     if (operationType === "in") {
-      if (qty <= 0) return showToast("入库数量必须大于 0");
+      if (qty <= 0) return showToast("Jumlah barang masuk harus lebih dari 0");
       upsertStock({ sku, batch, location, status, qty });
     }
 
     if (operationType === "out") {
-      if (qty <= 0) return showToast("出库数量必须大于 0");
+      if (qty <= 0) return showToast("Jumlah barang keluar harus lebih dari 0");
       const row = findStock(sku, batch, selectedRow?.location || location, status);
-      if (!row || row.qty < qty) return showToast("库存不足或状态不匹配");
+      if (!row || row.qty < qty) return showToast("Stok tidak cukup atau status tidak cocok");
       row.qty = roundQty(row.qty - qty);
       touchStock(row);
     }
 
     if (operationType === "move") {
-      if (qty <= 0) return showToast("移库数量必须大于 0");
+      if (qty <= 0) return showToast("Jumlah pindah lokasi harus lebih dari 0");
       const row = findStock(sku, batch, selectedRow?.location || location, status);
-      if (!row || row.qty < qty) return showToast("原库位库存不足");
+      if (!row || row.qty < qty) return showToast("Stok lokasi awal tidak cukup");
       row.qty = roundQty(row.qty - qty);
       touchStock(row);
       upsertStock({ sku, batch, location: targetLocation, status, qty });
@@ -806,7 +806,7 @@ async function submitOperation(event, overridePayload = null) {
     selectedOperationVersion = null;
     selectedOperationStock = null;
     render();
-    showToast("作业已提交");
+    showToast("Pekerjaan terkirim");
   } finally {
     setFormSubmitting(event.target, false);
   }
@@ -858,7 +858,7 @@ function scheduleOperationStockLoad() {
 async function loadOperationStockRows() {
   if (!["out", "move"].includes(operationType)) return;
   const requestId = ++operationStockRequestId;
-  $("#operationStockList").innerHTML = `<div class="empty-state">库存加载中...</div>`;
+  $("#operationStockList").innerHTML = `<div class="empty-state">Memuat stok...</div>`;
   try {
     const material = findMaterial($("#skuInput").value);
     const data = await fetchApiPage("/api/stock", {
@@ -960,10 +960,10 @@ function renderSelectedStockInfo() {
   const row = selectedOperationMatches(sku, batch, location, status) ? selectedOperationStock : findStock(sku, batch, location, status);
   $("#selectedStockInfo").classList.toggle("hidden", !row);
   $("#selectedStockInfo").innerHTML = row
-    ? `<strong>已选择库存明细</strong>
-      <span>物料：${escapeHtml(sku)} / ${escapeHtml(row.name || material?.name || "")}</span>
-      <span>批号：${escapeHtml(batch)} / 库位：${escapeHtml(location)} / 状态：${escapeHtml(status)}</span>
-      <span>现有库存：${row.qty}，请在下方输入本次数量。</span>`
+    ? `<strong>Detail stok dipilih</strong>
+      <span>Material: ${escapeHtml(sku)} / ${escapeHtml(row.name || material?.name || "")}</span>
+      <span>Batch: ${escapeHtml(batch)} / Lokasi: ${escapeHtml(location)} / Status: ${escapeHtml(status)}</span>
+      <span>Stok tersedia: ${row.qty}, masukkan jumlah di bawah.</span>`
     : "";
   updateOperationHelper();
 }
@@ -1004,7 +1004,7 @@ function updateOperationHelper() {
     if (findLocation(location)) activeStep = 2;
     if (qty !== null && qty > 0) activeStep = 3;
     delete qtyInput.dataset.maxQty;
-    qtyInput.placeholder = "如 1000 或 1000.123456";
+    qtyInput.placeholder = "Contoh 1000 atau 1000.123456";
     ready = !!findMaterial($("#skuInput").value) && !!findLocation(location) && !!batch && qty !== null && qty > 0;
     nextText = ready ? "Bisa konfirmasi lalu kirim barang masuk." : "Pilih material, lokasi, lalu masukkan jumlah.";
   } else {
@@ -1013,7 +1013,7 @@ function updateOperationHelper() {
     if (operationType === "move" && findLocation(targetLocation) && targetLocation !== location) activeStep = 3;
     if (selectedRow) {
       qtyInput.dataset.maxQty = selectedRow.qty;
-      qtyInput.placeholder = `最大 ${selectedRow.qty}`;
+      qtyInput.placeholder = `Maks ${selectedRow.qty}`;
       if (selectedRow.location !== location) {
         nextText = `Stok ${selectedRow.location} sudah dipilih, lanjut masukkan jumlah.`;
       } else if (qty !== null && qty > Number(selectedRow.qty || 0)) {
@@ -1038,7 +1038,7 @@ function updateOperationHelper() {
 
   guide.innerHTML = steps.map((step, index) => `<span class="step-pill ${index <= activeStep ? "active" : ""}">${index + 1}. ${escapeHtml(step)}</span>`).join("");
   qtyHint.textContent = nextText;
-  submitButton.textContent = `${labels[operationType] || "作业"}提交`;
+  submitButton.textContent = `${labels[operationType] || "Operation"} / Kirim`;
   submitButton.dataset.logicDisabled = ready ? "" : "1";
   submitButton.disabled = (serverRequired && !apiAvailable) || !ready || submitButton.dataset.busy === "1";
 }
@@ -1099,15 +1099,15 @@ async function submitCount(event) {
   const location = normalize($("#countLocationInput").value);
   const note = $("#countNoteInput").value.trim();
 
-  if (!material) return showToast("物料必须从主数据搜索选择");
+  if (!material) return showToast("Material harus dipilih dari master data");
   if (!batch || qty === null) return showToast(qtyErrorText(rawQty));
-  if (!status) return showToast("请选择盘点状态");
-  if (!findLocation(location)) return showToast("盘点库位必须从主数据搜索选择");
+  if (!status) return showToast("Pilih status opname");
+  if (!findLocation(location)) return showToast("Lokasi opname harus dipilih dari master data");
   if (!selectedCountStock || selectedCountStock.sku !== sku || selectedCountStock.batch !== batch || selectedCountStock.status !== status) {
-    return showToast("请先选择要盘点的库存明细");
+    return showToast("Pilih detail stok untuk opname terlebih dahulu");
   }
   const targetLocation = findLocation(location);
-  if (selectedCountStock.location !== location && targetLocation?.status === "冻结") return showToast("盘点库位已冻结，请换一个库位。");
+  if (selectedCountStock.location !== location && targetLocation?.status === "冻结") return showToast("Lokasi opname dibekukan, pilih lokasi lain.");
 
   setFormSubmitting(event.target, true);
   try {
@@ -1134,7 +1134,7 @@ async function submitCount(event) {
       $("#selectedCountInfo").classList.add("hidden");
       $("#selectedCountInfo").innerHTML = "";
       render();
-      return showToast("盘点已调整");
+      return showToast("Opname diperbarui");
     }
 
     const row = findStock(sku, batch, location, status);
@@ -1158,7 +1158,7 @@ async function submitCount(event) {
     $("#selectedCountInfo").innerHTML = "";
     render();
     updateCountPreview();
-    showToast("盘点已调整");
+    showToast("Opname diperbarui");
   } catch (error) {
     return showToast(error.message);
   } finally {
@@ -1200,8 +1200,8 @@ function updateCountPreview() {
 
 function countEmptyText() {
   const keyword = $("#countStockSearch")?.value.trim();
-  if (!keyword) return "请先扫码或输入物料编码、批号、库位，查询盘点库存。";
-  return "未找到可盘点库存，请确认物料编码、批号或库位是否正确。";
+  if (!keyword) return "Silakan scan atau masukkan kode material, batch, atau lokasi untuk mencari stok opname.";
+  return "Stok opname tidak ditemukan, periksa kode material, batch, atau lokasi.";
 }
 
 function scheduleCountStockLoad() {
@@ -1211,7 +1211,7 @@ function scheduleCountStockLoad() {
 
 async function loadCountStockRows() {
   const requestId = ++countStockRequestId;
-  $("#countStockList").innerHTML = `<div class="empty-state">库存加载中...</div>`;
+  $("#countStockList").innerHTML = `<div class="empty-state">Memuat stok...</div>`;
   try {
     const material = findMaterial($("#countSkuInput").value);
     const data = await fetchApiPage("/api/stock", {
@@ -1237,7 +1237,7 @@ async function loadCountStockRows() {
 function formatLocations(locations, total) {
   const text = locations.join(" / ");
   if (!total || total <= locations.length) return text;
-  return `${text} 等于 ${total} 个库位。`;
+  return `${text} = ${total} lokasi.`;
 }
 
 function renderCountStockList(rows = []) {
@@ -1290,10 +1290,10 @@ function renderSelectedCountInfo() {
   const selected = $("#selectedCountInfo");
   selected.classList.toggle("hidden", !row);
   selected.innerHTML = row
-    ? `<strong>已选择盘点明细</strong>
-      <span>物料：${escapeHtml(sku)} / ${escapeHtml(row.name || material?.name || "")}</span>
-      <span>批号：${escapeHtml(batch)} / 原库位：${escapeHtml(row.location)} / 状态：${escapeHtml(status)}</span>
-      <span>账面数量：${row.qty}，请在下方填写实际数量和实际库位。</span>`
+    ? `<strong>Detail opname dipilih</strong>
+      <span>Material: ${escapeHtml(sku)} / ${escapeHtml(row.name || material?.name || "")}</span>
+      <span>Batch: ${escapeHtml(batch)} / Lokasi awal: ${escapeHtml(row.location)} / Status: ${escapeHtml(status)}</span>
+      <span>Jumlah buku: ${row.qty}, masukkan jumlah aktual dan lokasi aktual di bawah.</span>`
     : "";
   updateCountHelper();
 }
@@ -1331,14 +1331,14 @@ function updateCountHelper() {
   const target = findLocation(location);
   let ready = !!selected && qty !== null && !!target;
   let text = "";
-  if (!selected) text = "先选择要盘点的库存明细。";
-  else if (qty === null) text = "输入实际数量，允许 0，最多 6 位小数。";
-  else if (!target) text = "盘点库位必须从主数据选择。";
+  if (!selected) text = "Pilih detail stok untuk opname terlebih dahulu.";
+  else if (qty === null) text = "Masukkan jumlah aktual, 0 boleh, maksimal 6 desimal.";
+  else if (!target) text = "Lokasi opname harus dipilih dari master data.";
   else if (selected.location !== location && target.status === "鍐荤粨") {
     ready = false;
-    text = "盘点库位已冻结，请换一个库位。";
+    text = "Lokasi opname dibekukan, pilih lokasi lain.";
   } else {
-    const locationText = selected.location === location ? "库位不变" : `库位将从 ${selected.location} 调整到 ${location}`;
+    const locationText = selected.location === location ? "Lokasi tetap" : `Lokasi akan berubah dari ${selected.location} ke ${location}`;
     text = `账面 ${selected.qty}，实际 ${qty}，${locationText}。`;
   }
   hint.textContent = text;
@@ -1404,7 +1404,7 @@ function renderPermissions() {
   $(".tabbar").classList.toggle("hidden", !loggedIn);
   $("#passwordWarning")?.classList.toggle("hidden", !passwordWarning);
   $$(".view").forEach((item) => item.classList.toggle("hidden", !loggedIn));
-  $("#accountBadge").textContent = loggedIn ? `${currentUser().id} / ${roleLabel(currentUser().role)}` : "未登录";
+  $("#accountBadge").textContent = loggedIn ? `${currentUser().id} / ${roleLabel(currentUser().role)}` : "Not logged in";
   if (!loggedIn) return;
   if (lockdown) {
     $$(".tab").forEach((item) => item.classList.toggle("hidden", item.dataset.view !== "users"));
@@ -1457,11 +1457,11 @@ function openOperationConfirm(payload) {
   const rows = [
     ["操作", typeLabel(payload.type)],
     ["物料", `${payload.sku}${payload.name || findMaterial(payload.sku)?.name ? ` / ${payload.name || findMaterial(payload.sku)?.name || ""}` : ""}`],
-    ["批号", payload.batch],
-    ["库位", payload.type === "move" ? `${payload.location} -> ${payload.targetLocation || "-"}` : payload.location],
+    ["Batch", payload.batch],
+    ["Lokasi", payload.type === "move" ? `${payload.location} -> ${payload.targetLocation || "-"}` : payload.location],
     ["数量", payload.qty]
   ];
-  $("#operationConfirmText").textContent = "请核对后提交。";
+  $("#operationConfirmText").textContent = "Periksa kembali lalu kirim.";
   $("#operationConfirmGrid").innerHTML = rows.map(([label, value]) => `<div class="confirm-row"><span>${escapeHtml(label)}</span><span>${escapeHtml(value)}</span></div>`).join("");
   $("#operationConfirmSheet").classList.remove("hidden");
 }
@@ -1640,7 +1640,7 @@ function renderStock() {
 
 async function loadStockPage() {
   const requestId = ++stockRequestId;
-  $("#stockList").innerHTML = `<div class="empty-state">库存加载中...</div>`;
+  $("#stockList").innerHTML = `<div class="empty-state">Memuat stok...</div>`;
   renderStockPager();
   try {
     const data = await fetchApiPage("/api/stock", stockQueryParams());
@@ -1667,9 +1667,9 @@ function renderStockRows(rows) {
               <article class="data-card stock-card">
                 <div>
                   <strong>${escapeHtml(item.sku)}</strong>
-                  <span>${escapeHtml(item.name || material?.name || "未知物料")}</span>
-                  <span>批号：${escapeHtml(item.batch)}</span>
-                  <span>库位：${escapeHtml(item.location)}</span>
+                  <span>${escapeHtml(item.name || material?.name || "Unknown material")}</span>
+                  <span>Batch: ${escapeHtml(item.batch)}</span>
+                  <span>Lokasi: ${escapeHtml(item.location)}</span>
                 </div>
                 <div class="card-meta">
                   <b>${item.qty}</b>
@@ -1685,10 +1685,10 @@ function renderStockRows(rows) {
             <tr>
               <th class="sortable-th ${stockSortClass("sku")}" data-stock-sort="sku">鐗╂枡缂栫爜</th>
               <th class="sortable-th ${stockSortClass("name")}" data-stock-sort="name">名称</th>
-              <th class="sortable-th ${stockSortClass("batch")}" data-stock-sort="batch">批号</th>
-              <th class="sortable-th ${stockSortClass("location")}" data-stock-sort="location">库位</th>
-              <th class="sortable-th ${stockSortClass("status")}" data-stock-sort="status">状态</th>
-              <th class="num-cell sortable-th ${stockSortClass("qty")}" data-stock-sort="qty">数量</th>
+              <th class="sortable-th ${stockSortClass("batch")}" data-stock-sort="batch">Batch</th>
+              <th class="sortable-th ${stockSortClass("location")}" data-stock-sort="location">Lokasi</th>
+              <th class="sortable-th ${stockSortClass("status")}" data-stock-sort="status">Status</th>
+              <th class="num-cell sortable-th ${stockSortClass("qty")}" data-stock-sort="qty">Jumlah</th>
             </tr>
           </thead>
           <tbody>
@@ -1697,7 +1697,7 @@ function renderStockRows(rows) {
               return `
                 <tr>
                   <td>${escapeHtml(item.sku)}</td>
-                  <td>${escapeHtml(item.name || material?.name || "未知物料")}</td>
+                  <td>${escapeHtml(item.name || material?.name || "Unknown material")}</td>
                   <td>${escapeHtml(item.batch)}</td>
                   <td>${escapeHtml(item.location)}</td>
                   <td>${escapeHtml(item.status)}</td>
@@ -1707,7 +1707,7 @@ function renderStockRows(rows) {
           </tbody>
         </table>
       </div>`
-    : `<div class="empty-state">当前没有库存数据。你可以先从库存页搜索物料、批号或库位。</div>`;
+    : `<div class="empty-state">Belum ada data stok. Silakan cari material, batch, atau lokasi di halaman stok.</div>`;
 }
 
 function renderStockPager() {
@@ -1766,7 +1766,7 @@ function renderMaterials() {
 
 async function loadMaterialPage() {
   const requestId = ++materialRequestId;
-  $("#materialList").innerHTML = `<div class="empty-state">加载中...</div>`;
+  $("#materialList").innerHTML = `<div class="empty-state">Memuat...</div>`;
   try {
     const data = await fetchApiPage("/api/materials", {
       query: $("#materialSearch")?.value.trim() || "",
@@ -1818,7 +1818,7 @@ function renderLocations() {
 
 async function loadLocationPage() {
   const requestId = ++locationRequestId;
-  $("#locationList").innerHTML = `<div class="empty-state">加载中...</div>`;
+  $("#locationList").innerHTML = `<div class="empty-state">Memuat...</div>`;
   try {
     const data = await fetchApiPage("/api/locations", {
       query: $("#locationSearch")?.value.trim() || "",
@@ -1900,7 +1900,7 @@ function renderLogs() {
 
 async function loadLogPage() {
   const requestId = ++logRequestId;
-  $("#logList").innerHTML = `<div class="empty-state">流水加载中...</div>`;
+  $("#logList").innerHTML = `<div class="empty-state">Memuat log...</div>`;
   renderLogPager();
   try {
     const data = await fetchApiPage("/api/logs", {
@@ -1932,7 +1932,7 @@ function renderLogRows(rows) {
               <th>库位</th>
               <th>目标库位</th>
               <th>状态</th>
-              <th class="num-cell">数量</th>
+              <th class="num-cell">Jumlah</th>
               <th>备注</th>
             </tr>
           </thead>
@@ -2081,7 +2081,7 @@ function setFormSubmitting(form, busy) {
     button.disabled = busy;
     if (busy) {
       button.dataset.label = button.textContent;
-      button.textContent = "提交中";
+      button.textContent = "Mengirim";
     } else if (button.dataset.label) {
       button.textContent = button.dataset.label;
     }
@@ -2158,16 +2158,16 @@ function downloadBlob(blob, filename) {
 async function importInventory() {
   if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
   const rows = await readSelectedRows("#inventoryFile");
-  if (!rows.length) return showToast("文件没有可导入数据");
+  if (!rows.length) return showToast("File tidak memiliki data impor");
   const report = validateInventoryRows(rows);
-  renderImportReport("期初库存校验报告", report);
-  if (!report.validRows) return showToast("没有有效库存行，请检查文件");
-  if (!confirm(importConfirmText("期初库存", report))) return;
+  renderImportReport("Laporan validasi saldo awal", report);
+  if (!report.validRows) return showToast("Tidak ada baris stok valid, periksa file");
+  if (!confirm(importConfirmText("Saldo Awal", report))) return;
   try {
     const remote = await postMasterData("/api/import-inventory", { rows });
     if (remote) {
       render();
-      return showToast("库存导入已提交");
+      return showToast("Impor stok terkirim");
     }
   } catch (error) {
     return showToast(error.message);
@@ -2207,26 +2207,26 @@ async function importInventory() {
   });
   const imported = groupedRows.size;
   refreshLocationUsage();
-  addLog({ type: "initial", sku: "IMPORT", batch: "", qty: imported, location: "", targetLocation: "", status: "", note: `导入期初库存 ${imported} 行，拒绝 ${rejected} 行` });
-  addAuditLog({ action: "导入期初库存", entity: "库存导入", key: "IMPORT", before: null, after: { imported, rejected, sourceRows: rows.length }, note: `导入期初库存 ${imported} 行，拒绝 ${rejected} 行` });
+  addLog({ type: "initial", sku: "IMPORT", batch: "", qty: imported, location: "", targetLocation: "", status: "", note: `Impor saldo awal ${imported} baris, ditolak ${rejected} baris` });
+  addAuditLog({ action: "Impor saldo awal", entity: "Impor stok", key: "IMPORT", before: null, after: { imported, rejected, sourceRows: rows.length }, note: `Impor saldo awal ${imported} baris, ditolak ${rejected} baris` });
   saveState();
   render();
-  showToast(`已导入 ${imported} 行，拒绝 ${rejected} 行`);
+  showToast(`Berhasil impor ${imported} baris, ditolak ${rejected} baris`);
 }
 
 async function importMaterials() {
   if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
   const rows = await readSelectedRows("#materialFile");
-  if (!rows.length) return showToast("文件没有可导入数据");
+  if (!rows.length) return showToast("File tidak memiliki data impor");
   const report = validateMaterialRows(rows);
-  renderImportReport("物料主数据校验报告", report);
+  renderImportReport("Laporan validasi master material", report);
   if (!report.validRows) return showToast("没有有效物料行，请检查文件");
-  if (!confirm(importConfirmText("物料主数据", report))) return;
+  if (!confirm(importConfirmText("Master Material", report))) return;
   try {
     const remote = await postMasterData("/api/import-materials", { rows });
     if (remote) {
       render();
-      return showToast("物料主数据导入已提交");
+      return showToast("Impor master material terkirim");
     }
   } catch (error) {
     return showToast(error.message);
@@ -2239,25 +2239,25 @@ async function importMaterials() {
     upsertMaterial({ sku, name });
     imported += 1;
   });
-  addAuditLog({ action: "导入物料主数据", entity: "物料主数据", key: "IMPORT", before: null, after: { imported }, note: `导入物料 ${imported} 行` });
+  addAuditLog({ action: "Impor master material", entity: "物料主数据", key: "IMPORT", before: null, after: { imported }, note: `Impor material ${imported} baris` });
   saveState();
   render();
-  showToast(`已导入物料 ${imported} 行`);
+  showToast(`Berhasil impor material ${imported} baris`);
 }
 
 async function importLocations() {
   if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
   const rows = await readSelectedRows("#locationFile");
-  if (!rows.length) return showToast("文件没有可导入数据");
+  if (!rows.length) return showToast("File tidak memiliki data impor");
   const report = validateLocationRows(rows);
-  renderImportReport("库位主数据校验报告", report);
-  if (!report.validRows) return showToast("没有有效库位行，请检查文件");
-  if (!confirm(importConfirmText("库位主数据", report))) return;
+  renderImportReport("Laporan validasi master lokasi", report);
+  if (!report.validRows) return showToast("Tidak ada baris lokasi valid, periksa file");
+  if (!confirm(importConfirmText("Master Lokasi", report))) return;
   try {
     const remote = await postMasterData("/api/import-locations", { rows });
     if (remote) {
       render();
-      return showToast("库位主数据导入已提交");
+      return showToast("Impor master lokasi terkirim");
     }
   } catch (error) {
     return showToast(error.message);
@@ -2273,10 +2273,10 @@ async function importLocations() {
     imported += 1;
   });
   refreshLocationUsage();
-  addAuditLog({ action: "导入库位主数据", entity: "库位主数据", key: "IMPORT", before: null, after: { imported }, note: `导入库位 ${imported} 行` });
+  addAuditLog({ action: "Impor master lokasi", entity: "库位主数据", key: "IMPORT", before: null, after: { imported }, note: `Impor lokasi ${imported} baris` });
   saveState();
   render();
-  showToast(`已导入库位 ${imported} 行`);
+  showToast(`Berhasil impor lokasi ${imported} baris`);
 }
 
 async function downloadBackup() {
@@ -2324,7 +2324,7 @@ async function restoreBackup() {
   if (!requireLiveServer("鎭㈠澶囦唤")) return;
   const file = $("#restoreFile").files[0];
   if (!file) return showToast("璇烽€夋嫨澶囦唤 JSON 鏂囦欢");
-  if (!confirm("恢复备份会覆盖当前库存、主数据、账号和流水，确定继续吗？")) return;
+  if (!confirm("Restore backup akan menimpa stok, master data, akun, dan log saat ini. Lanjutkan?")) return;
   try {
     const backup = JSON.parse(await readTextFile(file));
     const auth = currentAuthPayload();
@@ -2369,9 +2369,9 @@ function validateInventoryRows(rows) {
     const status = String(pickField(row, ["状态", "库存状态", "status"]) || "可用").trim();
     const reasons = [];
     if (!sku) reasons.push("缂哄皯鐗╂枡缂栫爜");
-    if (!name) reasons.push("缺少物料名称");
-    if (!batch) reasons.push("缺少批号");
-    if (!location) reasons.push("缺少库位");
+    if (!name) reasons.push("Nama material kosong");
+    if (!batch) reasons.push("Batch kosong");
+    if (!location) reasons.push("Lokasi kosong");
     if (qty === null) reasons.push(qtyErrorText(rawQty));
     if (reasons.length) return addInvalid(report, index, reasons);
     report.validRows += 1;
@@ -2392,7 +2392,7 @@ function validateMaterialRows(rows) {
     const name = String(pickField(row, ["物料名称", "存货名称", "name"]) || "").trim();
     const reasons = [];
     if (!sku) reasons.push("缂哄皯鐗╂枡缂栫爜");
-    if (!name) reasons.push("缺少物料名称");
+    if (!name) reasons.push("Nama material kosong");
     if (reasons.length) return addInvalid(report, index, reasons);
     report.validRows += 1;
     if (seen.has(sku)) report.duplicateRows += 1;
@@ -2407,7 +2407,7 @@ function validateLocationRows(rows) {
   const seen = new Set();
   rows.forEach((row, index) => {
     const code = normalize(pickField(row, ["Location", "Location Code", "Warehouse Location", "Storage Location", "location", "code"]));
-    if (!code) return addInvalid(report, index, ["缺少库位编码"]);
+    if (!code) return addInvalid(report, index, ["Kode lokasi kosong"]);
     report.validRows += 1;
     if (seen.has(code)) report.duplicateRows += 1;
     seen.add(code);
@@ -2548,9 +2548,9 @@ async function addMaterial(event) {
   const sku = normalize($("#newSku").value);
   const name = $("#newName").value.trim();
   const previousSku = editingMaterialSku;
-  if (!sku || !name) return showToast("物料编码和名称不能为空");
-  if (!previousSku && state.materials.some((item) => item.sku === sku)) return showToast("物料编码已存在，请搜索后点修改");
-  if (previousSku && previousSku !== sku && state.materials.some((item) => item.sku === sku)) return showToast("物料编码已存在");
+  if (!sku || !name) return showToast("Kode material dan nama tidak boleh kosong");
+  if (!previousSku && state.materials.some((item) => item.sku === sku)) return showToast("Kode material sudah ada, cari lalu klik ubah");
+  if (previousSku && previousSku !== sku && state.materials.some((item) => item.sku === sku)) return showToast("Kode material sudah ada");
   try {
     const remote = await postMasterData("/api/materials", { previousSku, sku, name });
     if (!remote) {
@@ -2574,7 +2574,7 @@ async function addMaterial(event) {
   materialPage.page = 1;
   resetMaterialEdit();
   render();
-  showToast("物料主数据已保存");
+  showToast("Master material tersimpan");
 }
 
 async function addLocation(event) {
@@ -2583,9 +2583,9 @@ async function addLocation(event) {
   const code = normalize($("#newLocation").value);
   const previousCode = editingLocationCode;
   const status = $("#newLocationStatus").value;
-  if (!code) return showToast("库位编码不能为空");
-  if (!previousCode && state.locations.some((item) => item.code === code)) return showToast("库位已存在，请搜索后点修改");
-  if (previousCode && previousCode !== code && state.locations.some((item) => item.code === code)) return showToast("库位编码已存在");
+  if (!code) return showToast("Kode lokasi tidak boleh kosong");
+  if (!previousCode && state.locations.some((item) => item.code === code)) return showToast("Kode lokasi sudah ada, cari lalu klik ubah");
+  if (previousCode && previousCode !== code && state.locations.some((item) => item.code === code)) return showToast("Kode lokasi sudah ada");
   try {
     const remote = await postMasterData("/api/locations", { previousCode, code, status });
     if (!remote) {
@@ -2611,7 +2611,7 @@ async function addLocation(event) {
   locationPage.page = 1;
   resetLocationEdit();
   render();
-  showToast("库位主数据已保存");
+  showToast("Master lokasi tersimpan");
 }
 
 function editMaterial(sku) {
@@ -2659,7 +2659,7 @@ async function addUser(event) {
   const role = $("#newUserRole").value;
   const modules = normalizeModules($("#newUserModules").value);
   const user = { id, role, modules: modules.length ? modules : defaultModulesForRole(role) };
-  if (!existing && !password) return showToast("新增账号必须设置密码");
+  if (!existing && !password) return showToast("Akun baru wajib punya password");
   try {
     const remote = await postUserData("/api/users", { id, role: user.role, modules: user.modules, userPassword: password });
     if (!remote) {
@@ -2703,12 +2703,12 @@ function closePasswordDialog() {
 
 async function submitPasswordChange() {
   if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
-  if (!pendingPasswordUserId) return showToast("请选择账号");
+  if (!pendingPasswordUserId) return showToast("Pilih akun terlebih dahulu");
   const newPassword = $("#passwordDialogNew").value.trim();
   const confirmPassword = $("#passwordDialogConfirm").value.trim();
-  if (!newPassword) return showToast("请输入新密码");
-  if (newPassword.length < 6) return showToast("密码至少 6 位");
-  if (newPassword !== confirmPassword) return showToast("两次输入的密码不一致");
+  if (!newPassword) return showToast("Masukkan password baru");
+  if (newPassword.length < 6) return showToast("Password minimal 6 karakter");
+  if (newPassword !== confirmPassword) return showToast("Dua password tidak sama");
   const account = pendingPasswordUserId;
   if (!confirm(`确认修改账号 ${account} 的密码？`)) return;
   try {
@@ -2716,11 +2716,11 @@ async function submitPasswordChange() {
       targetId: account,
       userPassword: newPassword
     });
-    showToast("密码修改成功");
+    showToast("Password berhasil diubah");
     closePasswordDialog();
     render();
   } catch (error) {
-    showToast(error.message || "密码修改失败");
+    showToast(error.message || "Gagal ubah password");
   }
 }
 
@@ -2734,7 +2734,7 @@ async function loginAsync() {
   const password = $("#loginPasswordInput").value;
   const button = $("#loginButton");
   if (button.dataset.busy === "1") return;
-  setButtonBusy(button, true, "登录中");
+  setButtonBusy(button, true, "Sedang masuk");
   try {
     debugLogin("sending /api/login");
     const response = await fetch("/api/login", {
@@ -2744,7 +2744,7 @@ async function loginAsync() {
     });
     const data = await response.json();
     debugLogin(`/api/login status ${response.status}`);
-    if (!response.ok) throw new Error(apiErrorText(data, "账号或密码错误", "admin"));
+    if (!response.ok) throw new Error(apiErrorText(data, "Akun atau password salah", "admin"));
     Object.assign(state, migrateState({ ...defaultState(), ...(data.state || {}) }));
 
     state.currentUserId = data.user.id;
@@ -2760,7 +2760,7 @@ async function loginAsync() {
     debugLogin("render called after login");
     if (data.mustChangePassword) {
       activateView("users");
-      showToast("管理员仍在使用默认密码，请先修改密码");
+      showToast("Administrator masih memakai password default, silakan ubah dulu");
     }
   } catch (error) {
     debugLogin(`login error ${error?.message || "unknown"}`);
@@ -2789,7 +2789,7 @@ function logout() {
 async function deleteUser(userId) {
   if (!isAdmin()) return showToast("没有权限");
   const target = state.users.find((user) => user.id === userId);
-  if (target?.role === "admin") return showToast("不能删除管理员账号");
+  if (target?.role === "admin") return showToast("Akun admin tidak bisa dihapus");
   if (!confirm(`确认删除账号 ${userId}？\n删除后该账号将无法登录。`)) return;
   try {
     const remote = await postUserData("/api/users/delete", { targetId: userId });
@@ -2911,7 +2911,7 @@ $("#qtyInput").addEventListener("blur", (event) => {
   if (event.target.value && parseSystemQty(event.target.value) === null) showToast(qtyErrorText(event.target.value));
   const qty = parseSystemQty(event.target.value);
   const maxQty = Number(event.target.dataset.maxQty || 0);
-  if (qty !== null && maxQty && qty > maxQty) showToast("本次数量不能超过现有库存");
+  if (qty !== null && maxQty && qty > maxQty) showToast("Jumlah tidak boleh melebihi stok tersedia");
 });
 $("#qtyInput").addEventListener("input", updateOperationHelper);
 $("#operationForm").addEventListener("submit", submitOperation);
