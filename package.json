@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check:js": "node --check app.js",
+    "check:js": "node --check app.js && node --check backend/core.js && node --check functions/api/health.js && node --check functions/api/[[path]].js && node --check functions/_shared/pages-api.js",
     "check": "npm run check:js",
     "prebuild:cloudflare": "npm run check:js",
     "build": "node scripts/build-netlify.mjs",
