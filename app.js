@@ -57,26 +57,26 @@ const labels = {
     delete: "Hapus"
   },
   admin: {
-    accountPermissions: "璐﹀彿鏉冮檺 / Account Permissions",
-    masterData: "涓绘暟鎹?/ Master Data",
-    import: "瀵煎叆 / Import",
-    transactionLog: "娴佹按璐?/ Transaction Log",
+    accountPermissions: "账号权限 / Account Permissions",
+    masterData: "主数据 / Master Data",
+    import: "导入 / Import",
+    transactionLog: "流水账 / Transaction Log",
     changeLog: "淇敼璁板綍 / Change Log",
-    changePassword: "淇敼瀵嗙爜 / Change Password",
-    addAccount: "鏂板璐﹀彿 / Add Account",
-    deleteAccount: "鍒犻櫎璐﹀彿 / Delete Account",
+    changePassword: "修改密码 / Change Password",
+    addAccount: "新增账号 / Add Account",
+    deleteAccount: "删除账号 / Delete Account",
     accessScope: "鏉冮檺鑼冨洿 / Access Scope",
     systemAdminLocked: "系统管理员，不可删除 / System admin, cannot be deleted",
-    allFeatures: "鍏ㄩ儴鍔熻兘 / All Features",
+    allFeatures: "全部功能 / All Features",
     operateStock: "浣滀笟銆佸簱瀛?/ Operation, Stock",
     operateCountStock: "浣滀笟銆佺洏鐐广€佸簱瀛?/ Operation, Stock Opname, Stock"
   },
   errors: {
-    INVALID_LOGIN: { operation: "Masuk gagal", admin: "璐﹀彿鎴栧瘑鐮侀敊璇?/ Invalid login" },
-    STOCK_NOT_ENOUGH: { operation: "Stok tidak cukup", admin: "搴撳瓨涓嶈冻 / Stock not enough" },
+    INVALID_LOGIN: { operation: "Masuk gagal", admin: "账号或密码错误 / Invalid login" },
+    STOCK_NOT_ENOUGH: { operation: "Stok tidak cukup", admin: "库存不足 / Stock not enough" },
     MATERIAL_EXISTS: { operation: "Kode material sudah ada", admin: "鐗╂枡缂栫爜宸插瓨鍦?/ Material code exists" },
-    LOCATION_EXISTS: { operation: "Kode lokasi sudah ada", admin: "搴撲綅缂栫爜宸插瓨鍦?/ Location code exists" },
-    INVALID_LOCATION: { operation: "Lokasi tidak valid", admin: "搴撲綅鏃犳晥 / Invalid location" },
+    LOCATION_EXISTS: { operation: "Kode lokasi sudah ada", admin: "库位编码已存在 / Location code exists" },
+    INVALID_LOCATION: { operation: "Lokasi tidak valid", admin: "库位无效 / Invalid location" },
     INVALID_QTY: { operation: "Jumlah tidak valid", admin: "鏁伴噺鏃犳晥 / Invalid quantity" },
     USER_NOT_FOUND: { operation: "Akun tidak ditemukan", admin: "账号不存在 / User not found" },
     ADMIN_CANNOT_BE_DELETED: { operation: "Akun admin tidak bisa dihapus", admin: "不能删除管理员账号 / Admin cannot be deleted" },
@@ -360,19 +360,19 @@ function applyLanguageLabels() {
   }
   setText("#materialSaveButton", "Simpan / Save");
   setText("#locationSaveButton", "Simpan / Save");
-  setText("#importMaterials", "Import / 瀵煎叆");
-  setText("#importLocations", "Import / 瀵煎叆");
-  setText("#importInventory", "Import / 瀵煎叆");
+  setText("#importMaterials", "Import / 导入");
+  setText("#importLocations", "Import / 导入");
+  setText("#importInventory", "Import / 导入");
   setText("#downloadBackup", "Backup / 澶囦唤");
   setText("#downloadAutoBackup", "Auto Backup / 鑷姩澶囦唤");
   setText("#restoreBackup", "Restore / 鎭㈠");
 
   const tabMap = {
     operate: "浣滀笟 / Operation",
-    count: "鐩樼偣 / Stock Opname",
-    stock: "搴撳瓨 / Stock",
-    import: "瀵煎叆 / Import",
-    master: "涓绘暟鎹?/ Master Data",
+    count: "盘点 / Stock Opname",
+    stock: "库存 / Stock",
+    import: "导入 / Import",
+    master: "主数据 / Master Data",
     users: labels.admin.accountPermissions,
     logs: labels.admin.transactionLog,
     audit: labels.admin.changeLog
@@ -513,8 +513,8 @@ function fuzzySequence(text, token) {
 
 function formatMinute(value = new Date()) {
   const date = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(date.getTime())) return String(value || "");
-  const pad = (number) => String(number).padStart(2, "0");
+  if (text.includes(",")) return "数量不能使用逗号，请不要输入印尼小数格式，例如 1.000,5";
+  if (/^\d{1,3}(\.\d{3})+$/.test(text)) return "数量不能使用印尼千分位格式，例如 1.000";
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
@@ -527,8 +527,8 @@ function parseSystemQty(value) {
 
 function qtyErrorText(value) {
   const text = String(value ?? "").trim();
-  if (text.includes(",")) return "鏁伴噺涓嶈兘浣跨敤閫楀彿锛岃涓嶈杈撳叆鍗板凹灏忔暟鏍煎紡锛屼緥濡?1.000,5";
-  if (/^\d{1,3}(\.\d{3})+$/.test(text)) return "鏁伴噺涓嶈兘浣跨敤鍗板凹鍗冨垎浣嶆牸寮忥紝渚嬪 1.000";
+  if (text.includes(",")) return "数量不能使用逗号，请不要输入印尼小数格式，例如 1.000,5";
+  if (/^\d{1,3}(\.\d{3})+$/.test(text)) return "数量不能使用印尼千分位格式，例如 1.000";
   return "数量只能输入标准数字，最多 6 位小数，例如 1000 或 1000.123456";
 }
 
@@ -658,7 +658,7 @@ async function postUserData(path, payload) {
     body: JSON.stringify({ ...payload, operatorId: auth.operatorId })
   });
   const data = await response.json();
-  if (!response.ok) throw new Error(apiErrorText(data, "璐﹀彿淇濆瓨澶辫触", "admin"));
+  if (!response.ok) throw new Error(apiErrorText(data, "账号保存失败", "admin"));
   const currentUserId = state.currentUserId;
   Object.assign(state, migrateState({ ...defaultState(), ...data }));
   state.currentUserId = currentUserId;
@@ -741,13 +741,13 @@ async function submitOperation(event, overridePayload = null) {
   if (qty <= 0) return showToast(operationType === "in" ? "入库数量必须大于 0" : "本次数量必须大于 0");
   const selectedRow = selectedOperationSourceMatches(sku, batch, status) ? selectedOperationStock : null;
   if (["out", "move"].includes(operationType)) {
-    if (!selectedRow) return showToast("璇峰厛閫夋嫨瑕佹搷浣滅殑搴撳瓨鏄庣粏");
+    if (!selectedRow) return showToast("请先选择要操作的库存明细");
     if (qty > Number(selectedRow.qty || 0)) return showToast("本次数量不能超过现有库存");
   }
   if (operationType === "move") {
     if (!targetLocation || !findLocation(targetLocation)) return showToast("请选择有效目标库位");
     if (findLocation(targetLocation)?.status === "冻结") return showToast("目标库位已冻结");
-    if (targetLocation === (selectedRow?.location || location)) return showToast("鐩爣搴撲綅涓嶈兘鍜屽師搴撲綅鐩稿悓");
+    if (targetLocation === (selectedRow?.location || location)) return showToast("目标库位不能和原库位相同");
   }
 
   const sourceLocation = selectedRow?.location || location;
@@ -777,20 +777,20 @@ async function submitOperation(event, overridePayload = null) {
     }
 
     if (operationType === "in") {
-      if (qty <= 0) return showToast("鍏ュ簱鏁伴噺蹇呴』澶т簬 0");
+      if (qty <= 0) return showToast("入库数量必须大于 0");
       upsertStock({ sku, batch, location, status, qty });
     }
 
     if (operationType === "out") {
-      if (qty <= 0) return showToast("鍑哄簱鏁伴噺蹇呴』澶т簬 0");
+      if (qty <= 0) return showToast("出库数量必须大于 0");
       const row = findStock(sku, batch, selectedRow?.location || location, status);
-      if (!row || row.qty < qty) return showToast("搴撳瓨涓嶈冻鎴栫姸鎬佷笉鍖归厤");
+      if (!row || row.qty < qty) return showToast("库存不足或状态不匹配");
       row.qty = roundQty(row.qty - qty);
       touchStock(row);
     }
 
     if (operationType === "move") {
-      if (qty <= 0) return showToast("绉诲簱鏁伴噺蹇呴』澶т簬 0");
+      if (qty <= 0) return showToast("移库数量必须大于 0");
       const row = findStock(sku, batch, selectedRow?.location || location, status);
       if (!row || row.qty < qty) return showToast("原库位库存不足");
       row.qty = roundQty(row.qty - qty);
@@ -858,7 +858,7 @@ function scheduleOperationStockLoad() {
 async function loadOperationStockRows() {
   if (!["out", "move"].includes(operationType)) return;
   const requestId = ++operationStockRequestId;
-  $("#operationStockList").innerHTML = `<div class="empty-state">搴撳瓨鍔犺浇涓?..</div>`;
+  $("#operationStockList").innerHTML = `<div class="empty-state">库存加载中...</div>`;
   try {
     const material = findMaterial($("#skuInput").value);
     const data = await fetchApiPage("/api/stock", {
@@ -981,11 +981,11 @@ function updateOperationHelper() {
   const submitButton = $("#operationSubmitButton");
   if (!guide || !qtyHint || !qtyInput || !submitButton) return;
 
-  const labels = { in: "鍏ュ簱", out: "鍑哄簱", move: "绉诲簱" };
+  const labels = { in: "入库", out: "出库", move: "移库" };
   const steps = {
-    in: ["閫夋嫨鐗╂枡", "閫夋嫨搴撲綅", "杈撳叆鏁伴噺", "纭鎻愪氦"],
-    out: ["閫夋嫨搴撳瓨鏄庣粏", "杈撳叆鏁伴噺", "纭鎻愪氦"],
-    move: ["閫夋嫨搴撳瓨鏄庣粏", "杈撳叆鏁伴噺", "閫夋嫨鐩爣搴撲綅", "纭鎻愪氦"]
+    in: ["选择物料", "选择库位", "输入数量", "确认提交"],
+    out: ["选择库存明细", "输入数量", "确认提交"],
+    move: ["选择库存明细", "输入数量", "选择目标库位", "确认提交"]
   }[operationType] || ["濉啓淇℃伅", "纭鎻愪氦"];
 
   const inputSku = normalize($("#skuInput").value);
@@ -1104,7 +1104,7 @@ async function submitCount(event) {
   if (!status) return showToast("请选择盘点状态");
   if (!findLocation(location)) return showToast("盘点库位必须从主数据搜索选择");
   if (!selectedCountStock || selectedCountStock.sku !== sku || selectedCountStock.batch !== batch || selectedCountStock.status !== status) {
-    return showToast("璇峰厛閫夋嫨瑕佺洏鐐圭殑搴撳瓨鏄庣粏");
+    return showToast("请先选择要盘点的库存明细");
   }
   const targetLocation = findLocation(location);
   if (selectedCountStock.location !== location && targetLocation?.status === "冻结") return showToast("盘点库位已冻结，请换一个库位。");
@@ -1211,7 +1211,7 @@ function scheduleCountStockLoad() {
 
 async function loadCountStockRows() {
   const requestId = ++countStockRequestId;
-  $("#countStockList").innerHTML = `<div class="empty-state">搴撳瓨鍔犺浇涓?..</div>`;
+  $("#countStockList").innerHTML = `<div class="empty-state">库存加载中...</div>`;
   try {
     const material = findMaterial($("#countSkuInput").value);
     const data = await fetchApiPage("/api/stock", {
@@ -1338,7 +1338,7 @@ function updateCountHelper() {
     ready = false;
     text = "盘点库位已冻结，请换一个库位。";
   } else {
-    const locationText = selected.location === location ? "搴撲綅涓嶅彉" : `搴撲綅灏嗕粠 ${selected.location} 璋冩暣鍒?${location}`;
+    const locationText = selected.location === location ? "库位不变" : `库位将从 ${selected.location} 调整到 ${location}`;
     text = `账面 ${selected.qty}，实际 ${qty}，${locationText}。`;
   }
   hint.textContent = text;
@@ -1359,7 +1359,7 @@ function syncCountSelection() {
 
 function resetOperationForm(form) {
   form.reset();
-  $("#statusInput").value = "鍙敤";
+  $("#statusInput").value = "可用";
   $("#materialNameInput").value = "";
   delete $("#qtyInput").dataset.maxQty;
   updateMaterialPicker();
@@ -1624,7 +1624,7 @@ function renderMetrics() {
   const total = state.stock.reduce((sum, item) => sum + item.qty, 0);
   if ($("#totalQty")) $("#totalQty").textContent = roundQty(total);
   if ($("#skuCount")) $("#skuCount").textContent = new Set(state.stock.map((item) => item.sku)).size;
-  if ($("#holdCount")) $("#holdCount").textContent = state.stock.filter((item) => item.status !== "鍙敤").length;
+  if ($("#holdCount")) $("#holdCount").textContent = state.stock.filter((item) => item.status !== "可用").length;
 }
 
 function renderStock() {
@@ -1640,7 +1640,7 @@ function renderStock() {
 
 async function loadStockPage() {
   const requestId = ++stockRequestId;
-  $("#stockList").innerHTML = `<div class="empty-state">搴撳瓨鍔犺浇涓?..</div>`;
+  $("#stockList").innerHTML = `<div class="empty-state">库存加载中...</div>`;
   renderStockPager();
   try {
     const data = await fetchApiPage("/api/stock", stockQueryParams());
@@ -1766,7 +1766,7 @@ function renderMaterials() {
 
 async function loadMaterialPage() {
   const requestId = ++materialRequestId;
-  $("#materialList").innerHTML = `<div class="empty-state">鍔犺浇涓?..</div>`;
+  $("#materialList").innerHTML = `<div class="empty-state">加载中...</div>`;
   try {
     const data = await fetchApiPage("/api/materials", {
       query: $("#materialSearch")?.value.trim() || "",
@@ -1818,7 +1818,7 @@ function renderLocations() {
 
 async function loadLocationPage() {
   const requestId = ++locationRequestId;
-  $("#locationList").innerHTML = `<div class="empty-state">鍔犺浇涓?..</div>`;
+  $("#locationList").innerHTML = `<div class="empty-state">加载中...</div>`;
   try {
     const data = await fetchApiPage("/api/locations", {
       query: $("#locationSearch")?.value.trim() || "",
@@ -1900,7 +1900,7 @@ function renderLogs() {
 
 async function loadLogPage() {
   const requestId = ++logRequestId;
-  $("#logList").innerHTML = `<div class="empty-state">娴佹按鍔犺浇涓?..</div>`;
+  $("#logList").innerHTML = `<div class="empty-state">流水加载中...</div>`;
   renderLogPager();
   try {
     const data = await fetchApiPage("/api/logs", {
@@ -2120,7 +2120,7 @@ async function exportStock() {
       Status: item.status
     };
   });
-  downloadCsv(rows, `搴撳瓨瀵煎嚭-${new Date().toISOString().slice(0, 10)}.csv`);
+  downloadCsv(rows, `stock-export-${new Date().toISOString().slice(0, 10)}.csv`);
 }
 
 function downloadTemplate() {
@@ -2226,7 +2226,7 @@ async function importMaterials() {
     const remote = await postMasterData("/api/import-materials", { rows });
     if (remote) {
       render();
-      return showToast("鐗╂枡涓绘暟鎹鍏ュ凡鎻愪氦");
+      return showToast("物料主数据导入已提交");
     }
   } catch (error) {
     return showToast(error.message);
@@ -2257,7 +2257,7 @@ async function importLocations() {
     const remote = await postMasterData("/api/import-locations", { rows });
     if (remote) {
       render();
-      return showToast("搴撲綅涓绘暟鎹鍏ュ凡鎻愪氦");
+      return showToast("库位主数据导入已提交");
     }
   } catch (error) {
     return showToast(error.message);
@@ -2310,7 +2310,7 @@ async function downloadAutoBackup() {
       }
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(apiErrorText(data, "鑷姩澶囦唤涓嬭浇澶辫触", "admin"));
+    if (!response.ok) throw new Error(apiErrorText(data, "自动备份下载失败", "admin"));
     const filename = `wms-auto-backup-${new Date().toISOString().slice(0, 10)}.json`;
     downloadBlob(new Blob([JSON.stringify(data, null, 2)], { type: "application/json;charset=utf-8" }), filename);
     showToast("自动备份已下载");
@@ -2361,17 +2361,17 @@ function validateInventoryRows(rows) {
   const grouped = new Map();
   rows.forEach((row, index) => {
     const sku = normalize(pickField(row, ["鐗╂枡缂栫爜", "瀛樿揣缂栫爜", "sku", "SKU"]));
-    const name = String(pickField(row, ["鐗╂枡鍚嶇О", "瀛樿揣鍚嶇О", "name"]) || "").trim();
-    const batch = normalize(pickField(row, ["鎵瑰彿", "batch"]));
+    const name = String(pickField(row, ["物料名称", "存货名称", "name"]) || "").trim();
+    const batch = normalize(pickField(row, ["批号", "batch"]));
     const rawQty = pickField(row, ["数量", "可用数量", "现存量", "qty"]);
     const qty = parseSystemQty(rawQty);
     const location = normalize(pickField(row, ["Location", "Location Code", "Warehouse Location", "Storage Location", "location"]));
     const status = String(pickField(row, ["状态", "库存状态", "status"]) || "可用").trim();
     const reasons = [];
     if (!sku) reasons.push("缂哄皯鐗╂枡缂栫爜");
-    if (!name) reasons.push("缂哄皯鐗╂枡鍚嶇О");
-    if (!batch) reasons.push("缂哄皯鎵瑰彿");
-    if (!location) reasons.push("缂哄皯搴撲綅");
+    if (!name) reasons.push("缺少物料名称");
+    if (!batch) reasons.push("缺少批号");
+    if (!location) reasons.push("缺少库位");
     if (qty === null) reasons.push(qtyErrorText(rawQty));
     if (reasons.length) return addInvalid(report, index, reasons);
     report.validRows += 1;
@@ -2389,10 +2389,10 @@ function validateMaterialRows(rows) {
   const seen = new Set();
   rows.forEach((row, index) => {
     const sku = normalize(pickField(row, ["鐗╂枡缂栫爜", "瀛樿揣缂栫爜", "sku", "SKU"]));
-    const name = String(pickField(row, ["鐗╂枡鍚嶇О", "瀛樿揣鍚嶇О", "name"]) || "").trim();
+    const name = String(pickField(row, ["物料名称", "存货名称", "name"]) || "").trim();
     const reasons = [];
     if (!sku) reasons.push("缂哄皯鐗╂枡缂栫爜");
-    if (!name) reasons.push("缂哄皯鐗╂枡鍚嶇О");
+    if (!name) reasons.push("缺少物料名称");
     if (reasons.length) return addInvalid(report, index, reasons);
     report.validRows += 1;
     if (seen.has(sku)) report.duplicateRows += 1;
@@ -2407,7 +2407,7 @@ function validateLocationRows(rows) {
   const seen = new Set();
   rows.forEach((row, index) => {
     const code = normalize(pickField(row, ["Location", "Location Code", "Warehouse Location", "Storage Location", "location", "code"]));
-    if (!code) return addInvalid(report, index, ["缂哄皯搴撲綅缂栫爜"]);
+    if (!code) return addInvalid(report, index, ["缺少库位编码"]);
     report.validRows += 1;
     if (seen.has(code)) report.duplicateRows += 1;
     seen.add(code);
@@ -2574,7 +2574,7 @@ async function addMaterial(event) {
   materialPage.page = 1;
   resetMaterialEdit();
   render();
-  showToast("鐗╂枡涓绘暟鎹凡淇濆瓨");
+  showToast("物料主数据已保存");
 }
 
 async function addLocation(event) {
@@ -2583,7 +2583,7 @@ async function addLocation(event) {
   const code = normalize($("#newLocation").value);
   const previousCode = editingLocationCode;
   const status = $("#newLocationStatus").value;
-  if (!code) return showToast("搴撲綅缂栫爜涓嶈兘涓虹┖");
+  if (!code) return showToast("库位编码不能为空");
   if (!previousCode && state.locations.some((item) => item.code === code)) return showToast("库位已存在，请搜索后点修改");
   if (previousCode && previousCode !== code && state.locations.some((item) => item.code === code)) return showToast("库位编码已存在");
   try {
@@ -2611,7 +2611,7 @@ async function addLocation(event) {
   locationPage.page = 1;
   resetLocationEdit();
   render();
-  showToast("搴撲綅涓绘暟鎹凡淇濆瓨");
+  showToast("库位主数据已保存");
 }
 
 function editMaterial(sku) {
@@ -2659,7 +2659,7 @@ async function addUser(event) {
   const role = $("#newUserRole").value;
   const modules = normalizeModules($("#newUserModules").value);
   const user = { id, role, modules: modules.length ? modules : defaultModulesForRole(role) };
-  if (!existing && !password) return showToast("鏂板璐﹀彿蹇呴』璁剧疆瀵嗙爜");
+  if (!existing && !password) return showToast("新增账号必须设置密码");
   try {
     const remote = await postUserData("/api/users", { id, role: user.role, modules: user.modules, userPassword: password });
     if (!remote) {
@@ -2667,7 +2667,7 @@ async function addUser(event) {
       if (existing) Object.assign(existing, user);
       else state.users.push(user);
       const afterUser = state.users.find((item) => item.id === id);
-      addAuditLog({ action: existing ? "淇敼璐﹀彿" : "鏂板璐﹀彿", entity: "璐﹀彿鏉冮檺", key: id, before, after: { id: afterUser.id, role: afterUser.role, modules: afterUser.modules || [] } });
+      addAuditLog({ action: existing ? "修改账号" : "新增账号", entity: "账号权限", key: id, before, after: { id: afterUser.id, role: afterUser.role, modules: afterUser.modules || [] } });
       saveState();
     }
   } catch (error) {
@@ -2703,24 +2703,24 @@ function closePasswordDialog() {
 
 async function submitPasswordChange() {
   if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
-  if (!pendingPasswordUserId) return showToast("璇烽€夋嫨璐﹀彿");
+  if (!pendingPasswordUserId) return showToast("请选择账号");
   const newPassword = $("#passwordDialogNew").value.trim();
   const confirmPassword = $("#passwordDialogConfirm").value.trim();
-  if (!newPassword) return showToast("璇疯緭鍏ユ柊瀵嗙爜");
+  if (!newPassword) return showToast("请输入新密码");
   if (newPassword.length < 6) return showToast("密码至少 6 位");
   if (newPassword !== confirmPassword) return showToast("两次输入的密码不一致");
   const account = pendingPasswordUserId;
-  if (!confirm(`纭淇敼璐﹀彿 ${account} 鐨勫瘑鐮侊紵`)) return;
+  if (!confirm(`确认修改账号 ${account} 的密码？`)) return;
   try {
     await postUserData("/api/users/password", {
       targetId: account,
       userPassword: newPassword
     });
-    showToast("瀵嗙爜淇敼鎴愬姛");
+    showToast("密码修改成功");
     closePasswordDialog();
     render();
   } catch (error) {
-    showToast(error.message || "瀵嗙爜淇敼澶辫触");
+    showToast(error.message || "密码修改失败");
   }
 }
 
@@ -2797,7 +2797,7 @@ async function deleteUser(userId) {
       const before = state.users.find((user) => user.id === userId);
       state.users = state.users.filter((user) => user.id !== userId);
       if (state.currentUserId === userId) state.currentUserId = "";
-      if (before) addAuditLog({ action: "鍒犻櫎璐﹀彿", entity: "璐﹀彿鏉冮檺", key: userId, before: { id: before.id, role: before.role, modules: before.modules || [] }, after: null });
+      if (before) addAuditLog({ action: "删除账号", entity: "账号权限", key: userId, before: { id: before.id, role: before.role, modules: before.modules || [] }, after: null });
       saveState();
     }
   } catch (error) {
