@@ -73,12 +73,12 @@ const labels = {
   },
   errors: {
     INVALID_LOGIN: { operation: "Masuk gagal", admin: "Invalid login / Invalid login" },
-    STOCK_NOT_ENOUGH: { operation: "Stok tidak cukup", admin: "库存不足 / Stock not enough" },
-    MATERIAL_EXISTS: { operation: "Kode material sudah ada", admin: "鐗╂枡缂栫爜宸插瓨鍦?/ Material code exists" },
+    STOCK_NOT_ENOUGH: { operation: "Stok tidak cukup", admin: "Stock not enough" },
+    MATERIAL_EXISTS: { operation: "Kode material sudah ada", admin: "Material code exists" },
     LOCATION_EXISTS: { operation: "Kode lokasi sudah ada", admin: "Location code already exists / Location code exists" },
     INVALID_LOCATION: { operation: "Lokasi tidak valid", admin: "Location无效 / Invalid location" },
     INVALID_QTY: { operation: "Jumlah tidak valid", admin: "鏁伴噺鏃犳晥 / Invalid quantity" },
-    USER_NOT_FOUND: { operation: "Akun tidak ditemukan", admin: "账号不存在 / User not found" },
+    USER_NOT_FOUND: { operation: "Akun tidak ditemukan", admin: "User not found" },
     ADMIN_CANNOT_BE_DELETED: { operation: "Akun admin tidak bisa dihapus", admin: "Cannot delete admin account / Admin cannot be deleted" },
     PASSWORD_TOO_SHORT: { operation: "Password minimal 6 karakter", admin: "密码至少 6 位 / Password too short" },
     PASSWORD_REQUIRED: { operation: "Password wajib diisi", admin: "必须设置密码 / Password required" },
@@ -280,19 +280,19 @@ function canOpenView(viewId) {
 
 function roleLabel(role) {
   return {
-    employee: "员工",
-    keeper: "仓管",
-    admin: "管理员",
-    operator: "员工"
+    employee: "Employee",
+    keeper: "Warehouse Keeper",
+    admin: "Admin",
+    operator: "Employee"
   }[role] || role;
 }
 
 function permissionScope(role) {
   return {
-    admin: '全部功能',
-    keeper: '作业、盘点、库存',
-    employee: '作业、库存',
-    operator: '作业、库存'
+    admin: "All features",
+    keeper: "Operation, Stock Opname, Stock",
+    employee: "Operation, Stock",
+    operator: "Operation, Stock"
   }[role] || role;
 }
 
@@ -302,14 +302,22 @@ function locationStatusLabel(status) {
     'Empty': 'Empty',
     'Occupied': 'Occupied',
     'Frozen': 'Frozen',
+    '空闲': 'Empty',
+    '占用': 'Occupied',
+    '冻结': 'Frozen',
     'kosong': 'Empty',
     'terisi': 'Occupied',
-    'dibekukan': 'Frozen',
-    'Empty': 'Empty',
-    'Occupied': 'Occupied',
-    'Frozen': 'Frozen'
+    'dibekukan': 'Frozen'
   };
   return map[value] || value || '-';
+}
+
+function isFrozenLocationStatus(status) {
+  return locationStatusLabel(status) === "Frozen";
+}
+
+function locationUsageStatus(hasStock) {
+  return hasStock ? "Occupied" : "Empty";
 }
 
 function getDefaultStockStatus() {
@@ -415,9 +423,9 @@ function applyLanguageLabels() {
   setText("#importMaterials", "Import / 导入");
   setText("#importLocations", "Import / 导入");
   setText("#importInventory", "Import / 导入");
-  setText("#downloadBackup", "Backup / 澶囦唤");
-  setText("#downloadAutoBackup", "Auto Backup / 鑷姩澶囦唤");
-  setText("#restoreBackup", "Restore / 鎭㈠");
+  setText("#downloadBackup", "Download Backup");
+  setText("#downloadAutoBackup", "Download Auto Backup");
+  setText("#restoreBackup", "Restore Backup");
 
   const tabMap = {
     operate: "Operation",
@@ -494,10 +502,10 @@ async function pushRemoteState() {
       body: JSON.stringify(state)
     });
     if (!response.ok) throw new Error("Remote save failed");
-    setSyncStatus("服务器同步");
+    setSyncStatus("Server synced");
   } catch {
     apiAvailable = false;
-    setSyncStatus("本机演示");
+    setSyncStatus("Local demo");
   }
 }
 
@@ -507,9 +515,9 @@ function setSyncStatus(text) {
 }
 
 function syncStatusText() {
-  if (apiConnectionState === "connecting" && !apiSyncAttempted) return "连接中";
-  if (apiAvailable || apiConnectionState === "connected") return "服务器已连接";
-  if (apiConnectionState === "failed") return serverRequired ? "服务器连接失败" : "本机演示";
+  if (apiConnectionState === "connecting" && !apiSyncAttempted) return "Connecting";
+  if (apiAvailable || apiConnectionState === "connected") return "Server connected";
+  if (apiConnectionState === "failed") return serverRequired ? "Server connection failed" : "Local demo";
   return serverRequired ? "Server belum tersambung" : "Demo lokal";
 }
 
@@ -704,7 +712,7 @@ async function postMasterData(path, payload) {
     body: JSON.stringify({ ...payload, operatorId: auth.operatorId })
   });
   const data = await response.json();
-  if (!response.ok) throw new Error(apiErrorText(data, "淇濆瓨澶辫触", "admin"));
+  if (!response.ok) throw new Error(apiErrorText(data, "Save failed", "admin"));
   const currentUserId = state.currentUserId;
   if (data.materials || data.locations || data.stock) {
     Object.assign(state, migrateState({ ...defaultState(), ...data }));
@@ -730,7 +738,7 @@ async function postUserData(path, payload) {
     body: JSON.stringify({ ...payload, operatorId: auth.operatorId })
   });
   const data = await response.json();
-  if (!response.ok) throw new Error(apiErrorText(data, "账号Save失败", "admin"));
+  if (!response.ok) throw new Error(apiErrorText(data, "Account save failed", "admin"));
   const currentUserId = state.currentUserId;
   Object.assign(state, migrateState({ ...defaultState(), ...data }));
   state.currentUserId = currentUserId;
@@ -751,7 +759,7 @@ async function fetchApiPage(path, params = {}) {
   });
   const response = await fetch(`${url.pathname}${url.search}`, { headers: { Accept: "application/json" } });
   const data = await response.json();
-  if (!response.ok) throw new Error(apiErrorText(data, "鏁版嵁鍔犺浇澶辫触", "admin"));
+  if (!response.ok) throw new Error(apiErrorText(data, "Data load failed", "admin"));
   return data;
 }
 
@@ -804,8 +812,8 @@ function removeZeroStockFromData(data) {
 
 function refreshLocationUsageInData(data) {
   (data.locations || []).forEach((location) => {
-    if (location.status !== "Frozen") {
-      location.status = (data.stock || []).some((item) => item.location === location.code) ? "Occupied" : "Empty";
+    if (!isFrozenLocationStatus(location.status)) {
+      location.status = locationUsageStatus((data.stock || []).some((item) => item.location === location.code));
     }
   });
 }
@@ -836,7 +844,7 @@ function applyBatchOperationLocally(payload) {
     } else if (payload.type === "out") {
       if (!sourceRow || Number(sourceRow.qty || 0) < qty) return { error: `Baris ${item.lineNo}: stok tidak cukup` };
       const versionError = sourceRow && item.expectedVersion !== undefined && item.expectedVersion !== null && item.expectedVersion !== "" && Number(sourceRow.version || 1) !== Number(item.expectedVersion)
-        ? "Stok đã berubah, silakan refresh lalu coba lagi"
+        ? "Data stok sudah berubah, silakan refresh lalu coba lagi"
         : null;
       if (versionError) return { error: versionError };
       sourceRow.qty = roundQty(Number(sourceRow.qty || 0) - qty);
@@ -847,11 +855,11 @@ function applyBatchOperationLocally(payload) {
       const target = (draft.locations || []).find((location) => location.code === targetLocation);
       if (!sourceRow || Number(sourceRow.qty || 0) < qty) return { error: `Baris ${item.lineNo}: stok tidak cukup` };
       const versionError = sourceRow && item.expectedVersion !== undefined && item.expectedVersion !== null && item.expectedVersion !== "" && Number(sourceRow.version || 1) !== Number(item.expectedVersion)
-        ? "Stok đã berubah, silakan refresh lalu coba lagi"
+        ? "Data stok sudah berubah, silakan refresh lalu coba lagi"
         : null;
       if (versionError) return { error: versionError };
       if (!target) return { error: `Baris ${item.lineNo}: lokasi tujuan tidak valid` };
-      if (target.status === "Frozen") return { error: `Baris ${item.lineNo}: lokasi tujuan dibekukan` };
+      if (isFrozenLocationStatus(target.status)) return { error: `Baris ${item.lineNo}: lokasi tujuan dibekukan` };
       if (targetLocation === item.location) return { error: `Baris ${item.lineNo}: lokasi tujuan tidak boleh sama dengan lokasi awal` };
       sourceRow.qty = roundQty(Number(sourceRow.qty || 0) - qty);
       sourceRow.version = Number(sourceRow.version || 0) + 1;
@@ -879,8 +887,8 @@ function applyBatchOperationLocally(payload) {
 
 function refreshLocationUsage() {
   state.locations.forEach((location) => {
-    if (location.status !== "鍐荤粨") {
-      location.status = state.stock.some((item) => item.location === location.code) ? "鍗犵敤" : "绌洪棽";
+    if (!isFrozenLocationStatus(location.status)) {
+      location.status = locationUsageStatus(state.stock.some((item) => item.location === location.code));
     }
   });
 }
@@ -942,7 +950,7 @@ async function submitOperation(event, overridePayload = null) {
   }
   if (operationType === "move") {
     if (!targetLocation || !findLocation(targetLocation)) return showToast("Pilih lokasi tujuan yang valid");
-    if (findLocation(targetLocation)?.status === "Frozen") return showToast("Lokasi tujuan dibekukan");
+    if (isFrozenLocationStatus(findLocation(targetLocation)?.status)) return showToast("Lokasi tujuan dibekukan");
     if (targetLocation === (selectedRow?.location || location)) return showToast("Lokasi tujuan tidak boleh sama dengan lokasi awal");
   }
 
@@ -1039,7 +1047,7 @@ function buildBatchOperationPayload() {
     if (operationType === "move") {
       if (!normalizedTarget) return { error: `Baris ${row.lineNo}: lokasi tujuan wajib diisi` };
       if (!findLocation(normalizedTarget)) return { error: `Baris ${row.lineNo}: lokasi tujuan tidak valid` };
-      if (findLocation(normalizedTarget)?.status === "Frozen") return { error: `Baris ${row.lineNo}: lokasi tujuan dibekukan` };
+      if (isFrozenLocationStatus(findLocation(normalizedTarget)?.status)) return { error: `Baris ${row.lineNo}: lokasi tujuan dibekukan` };
       if (normalizedTarget === normalizedLocation) return { error: `Baris ${row.lineNo}: lokasi tujuan tidak boleh sama dengan lokasi awal` };
     }
 
@@ -1109,7 +1117,6 @@ function getOperationStockRows() {
   const sku = material?.sku || "";
   const batch = normalize($("#batchInput").value);
   const location = normalize($("#locationInput").value);
-  const status = $("#statusInput").value;
   const keyword = $("#operationStockSearch").value.trim().toLowerCase();
   return state.stock.filter((item) => {
     const itemMaterial = findMaterial(item.sku);
@@ -1118,7 +1125,6 @@ function getOperationStockRows() {
     if (sku && item.sku !== sku) return false;
     if (batch && item.batch !== batch) return false;
     if (location && item.location !== location) return false;
-    if (status && item.status !== status) return false;
     return true;
   });
 }
@@ -1159,7 +1165,7 @@ async function loadOperationStockRows() {
       sku: material?.sku || "",
       batch: normalize($("#batchInput").value),
       location: normalize($("#locationInput").value),
-      status: $("#statusInput").value,
+      status: "",
       sort: "sku",
       dir: "asc",
       page: 1,
@@ -1334,8 +1340,8 @@ function updateOperationHelper() {
     ready = !!selectedRow && qty !== null && qty > 0 && qty <= Number(selectedRow.qty || 0);
     if (operationType === "move") {
       const target = findLocation(targetLocation);
-      ready = ready && !!target && targetLocation !== location && target.status !== "鍐荤粨";
-      if (target?.status === "Frozen") nextText = "Lokasi tujuan dibekukan, pilih lokasi lain.";
+      ready = ready && !!target && targetLocation !== location && !isFrozenLocationStatus(target.status);
+      if (isFrozenLocationStatus(target?.status)) nextText = "Lokasi tujuan dibekukan, pilih lokasi lain.";
     }
   }
 
@@ -1473,7 +1479,6 @@ function updateCountPreview() {
   const material = findMaterial($("#countSkuInput").value);
   const sku = material?.sku || "";
   const batch = normalize($("#countBatchInput").value);
-  const status = $("#countStatusInput").value;
   const keyword = ($("#countStockSearch")?.value || "").trim().toLowerCase();
   $("#countMaterialNameInput").value = material?.name || "";
   syncCountSelection();
@@ -1490,7 +1495,6 @@ function updateCountPreview() {
     if (!fuzzyMatchText(haystack, keyword)) return false;
     if (sku && item.sku !== sku) return false;
     if (batch && item.batch !== batch) return false;
-    if (status && item.status !== status) return false;
     return true;
   });
   const total = rows.reduce((sum, item) => sum + item.qty, 0);
@@ -1521,7 +1525,7 @@ async function loadCountStockRows() {
       query: $("#countStockSearch").value.trim(),
       sku: material?.sku || "",
       batch: normalize($("#countBatchInput").value),
-      status: $("#countStatusInput").value,
+      status: "",
       sort: "sku",
       dir: "asc",
       page: 1,
@@ -1595,7 +1599,7 @@ function renderSelectedCountInfo() {
   selected.innerHTML = row
     ? `<strong>Detail opname dipilih</strong>
       <span>Material: ${escapeHtml(sku)} / ${escapeHtml(row.name || material?.name || "")}</span>
-      <span>Batch: ${escapeHtml(batch)} / Lokasi awal: ${escapeHtml(row.location)} / Status: ${escapeHtml(status)}</span>
+      <span>Batch: ${escapeHtml(batch)} / Lokasi awal: ${escapeHtml(row.location)}</span>
       <span>Jumlah buku: ${row.qty}, masukkan jumlah aktual dan lokasi aktual di bawah.</span>`
     : "";
   updateCountHelper();
@@ -1637,12 +1641,12 @@ function updateCountHelper() {
   if (!selected) text = "Pilih detail stok untuk opname terlebih dahulu.";
   else if (qty === null) text = "Masukkan jumlah aktual, 0 boleh, maksimal 6 desimal.";
   else if (!target) text = "Lokasi opname harus dipilih dari master data.";
-  else if (selected.location !== location && target.status === "鍐荤粨") {
+  else if (selected.location !== location && isFrozenLocationStatus(target.status)) {
     ready = false;
     text = "Lokasi opname dibekukan, pilih lokasi lain.";
   } else {
     const locationText = selected.location === location ? "Lokasi tetap" : `Lokasi akan berubah dari ${selected.location} ke ${location}`;
-    text = `账面 ${selected.qty}，实际 ${qty}，${locationText}。`;
+    text = `Qty buku ${selected.qty}, qty aktual ${qty}. ${locationText}.`;
   }
   hint.textContent = text;
   submitButton.dataset.logicDisabled = ready ? "" : "1";
@@ -1674,12 +1678,12 @@ function resetOperationForm(form) {
 }
 
 function seedDemo() {
-  if (serverRequired) return showToast("正式服务不允许载入演示数据");
-  if (!isAdmin()) return showToast("只有管理员可以载入演示数据");
+  if (serverRequired) return showToast("Demo data is not allowed on production service");
+  if (!isAdmin()) return showToast("Admin only");
   state.materials = [
-    { sku: "RM-1001", name: "甘油" },
-    { sku: "PK-2030", name: "外箱" },
-    { sku: "FG-8801", name: "防晒霜成品" }
+    { sku: "RM-1001", name: "Glycerin" },
+    { sku: "PK-2030", name: "Outer Carton" },
+    { sku: "FG-8801", name: "Sunscreen Finished Goods" }
   ];
   state.locations = [
     { code: "A-01-01", status: "Occupied" },
@@ -1692,12 +1696,12 @@ function seedDemo() {
     { id: uid(), sku: "PK-2030", batch: "P260528", location: "B-02-01", status: "可用", qty: 560, version: 1, updatedAt: new Date().toISOString() },
     { id: uid(), sku: "FG-8801", batch: "F260527", location: "QC-HOLD", status: "待检", qty: 48, version: 1, updatedAt: new Date().toISOString() }
   ];
-  addLog({ type: "initial", sku: "IMPORT", batch: "", qty: 3, location: "", targetLocation: "", status: "", note: "演示数据初始化" });
-  addAuditLog({ action: "载入演示数据", entity: "System data", key: "DEMO", before: null, after: { materials: state.materials.length, locations: state.locations.length, stock: state.stock.length }, note: "演示数据初始化" });
+  addLog({ type: "initial", sku: "IMPORT", batch: "", qty: 3, location: "", targetLocation: "", status: "", note: "Demo data initialized" });
+  addAuditLog({ action: "Load demo data", entity: "System data", key: "DEMO", before: null, after: { materials: state.materials.length, locations: state.locations.length, stock: state.stock.length }, note: "Demo data initialized" });
   refreshLocationUsage();
   saveState();
   render();
-  showToast("演示数据已载入");
+  showToast("Demo data loaded");
 }
 
 function renderPermissions() {
@@ -1819,7 +1823,7 @@ function renderLocationOptions(rows) {
     .map((item) => `<option value="${escapeHtml(item.code)}">${escapeHtml(item.status || "")}</option>`)
     .join("");
   $("#targetLocationOptions").innerHTML = rows
-    .filter((item) => item.status !== "鍐荤粨")
+    .filter((item) => !isFrozenLocationStatus(item.status))
     .map((item) => `<option value="${escapeHtml(item.code)}">${escapeHtml(item.status || "")}</option>`)
     .join("");
 }
@@ -2006,8 +2010,8 @@ function renderStockRows(rows) {
         <table class="data-table stock-table">
           <thead>
             <tr>
-              <th class="sortable-th ${stockSortClass("sku")}" data-stock-sort="sku">鐗╂枡缂栫爜</th>
-              <th class="sortable-th ${stockSortClass("name")}" data-stock-sort="name">名称</th>
+              <th class="sortable-th ${stockSortClass("sku")}" data-stock-sort="sku">Material Code</th>
+              <th class="sortable-th ${stockSortClass("name")}" data-stock-sort="name">Material Name</th>
               <th class="sortable-th ${stockSortClass("batch")}" data-stock-sort="batch">Batch</th>
               <th class="sortable-th ${stockSortClass("location")}" data-stock-sort="location">Lokasi</th>
               <th class="num-cell sortable-th ${stockSortClass("qty")}" data-stock-sort="qty">Jumlah</th>
@@ -2045,11 +2049,11 @@ function renderPager(selector, pageState, prefix) {
   const from = (pageState.page - 1) * pageState.pageSize + 1;
   const to = Math.min(pageState.page * pageState.pageSize, pageState.total);
   target.innerHTML = `
-    <span>显示 ${from}-${to} / ${pageState.total}</span>
+    <span>Showing ${from}-${to} / ${pageState.total}</span>
     <div class="pager-actions">
-      <button class="ghost-button" type="button" data-${prefix}-page="prev" ${pageState.page <= 1 ? "disabled" : ""}>上一页</button>
+      <button class="ghost-button" type="button" data-${prefix}-page="prev" ${pageState.page <= 1 ? "disabled" : ""}>Prev</button>
       <span>${pageState.page} / ${pageState.pages}</span>
-      <button class="ghost-button" type="button" data-${prefix}-page="next" ${pageState.page >= pageState.pages ? "disabled" : ""}>下一页</button>
+      <button class="ghost-button" type="button" data-${prefix}-page="next" ${pageState.page >= pageState.pages ? "disabled" : ""}>Next</button>
     </div>`;
 }
 
@@ -2180,7 +2184,7 @@ function renderUsers() {
         <table class="data-table">
           <thead>
             <tr>
-                <th>账号 / Account</th>
+              <th>Account</th>
                 <th>角色 / Role</th>
                 <th>${labels.admin.accessScope}</th>
                 <th>操作 / Action</th>
@@ -2245,13 +2249,13 @@ function renderLogRows(rows) {
         <table class="data-table ledger-table">
           <thead>
             <tr>
-              <th>操作日期</th>
-              <th>账号</th>
+              <th>Date</th>
+              <th>Account</th>
               <th>类型</th>
               <th>Material Code</th>
               <th>Batch No.</th>
               <th>Location</th>
-              <th>目标Location</th>
+              <th>Target Location</th>
               <th>Status</th>
               <th class="num-cell">Jumlah</th>
               <th>Remark</th>
@@ -2290,8 +2294,8 @@ function renderAuditLogs() {
         <table class="data-table audit-table">
           <thead>
             <tr>
-              <th>操作日期</th>
-              <th>账号</th>
+              <th>Date</th>
+              <th>Account</th>
               <th>对象</th>
               <th>操作</th>
               <th>主键</th>
@@ -2445,11 +2449,11 @@ async function exportStock() {
 }
 
 function downloadTemplate() {
-  downloadCsv([{ "Material Code": "RM-1001", "Material Name": "甘油", "Batch No.": "B20260501", "Qty": "120", "Location": "A-01-01", "Status": "可用" }], "库存导入模板.csv");
+  downloadCsv([{ "Material Code": "RM-1001", "Material Name": "Glycerin", "Batch No.": "B20260501", "Qty": "120", "Location": "A-01-01", "Status": "available" }], "stock-import-template.csv");
 }
 
 function downloadMaterialTemplate() {
-  downloadCsv([{ "Material Code": "RM-1001", "Material Name": "甘油" }], "material-master-template.csv");
+  downloadCsv([{ "Material Code": "RM-1001", "Material Name": "Glycerin" }], "material-master-template.csv");
 }
 
 function downloadLocationTemplate() {
@@ -2477,7 +2481,7 @@ function downloadBlob(blob, filename) {
 }
 
 async function importInventory() {
-  if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
+  if (!isAdmin()) return showToast("No permission");
   const rows = await readSelectedRows("#inventoryFile");
   if (!rows.length) return showToast("File tidak memiliki data impor");
   const report = validateInventoryRows(rows);
@@ -2496,13 +2500,13 @@ async function importInventory() {
   const groupedRows = new Map();
   let rejected = 0;
   rows.forEach((row) => {
-    const sku = normalize(pickField(row, ["Material Code", "存货编码", "Material Code", "sku", "SKU"]));
-    const name = String(pickField(row, ["Material Name", "存货名称", "Material Name", "name"]) || "").trim();
+    const sku = normalize(pickField(row, ["Material Code", "Item Code", "sku", "SKU"]));
+    const name = String(pickField(row, ["Material Name", "Item Name", "name"]) || "").trim();
     const batch = normalize(pickField(row, ["Batch No.", "Batch No.", "batch"]));
-    const rawQty = pickField(row, ["Qty", "可用Qty", "现存量", "qty"]);
+    const rawQty = pickField(row, ["Qty", "Quantity", "qty"]);
     const qty = parseSystemQty(rawQty);
     const location = normalize(pickField(row, ["Location", "Location Code", "Warehouse Location", "Storage Location", "location"]));
-    const status = String(pickField(row, ["Status", "库存Status", "status"]) || "可用").trim();
+    const status = String(pickField(row, ["Status", "stockStatus", "status"]) || getDefaultStockStatus()).trim();
     if (!sku || !name || !batch || !location || qty === null) {
       rejected += 1;
       return;
@@ -2517,7 +2521,7 @@ async function importInventory() {
   });
   groupedRows.forEach((item) => {
     upsertMaterial({ sku: item.sku, name: item.name });
-    if (!findLocation(item.location)) state.locations.push({ code: item.location, status: "绌洪棽" });
+    if (!findLocation(item.location)) state.locations.push({ code: item.location, status: "Empty" });
     const existing = findStock(item.sku, item.batch, item.location, item.status);
     if (existing) {
       existing.qty = item.qty;
@@ -2536,12 +2540,12 @@ async function importInventory() {
 }
 
 async function importMaterials() {
-  if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
+  if (!isAdmin()) return showToast("No permission");
   const rows = await readSelectedRows("#materialFile");
   if (!rows.length) return showToast("File tidak memiliki data impor");
   const report = validateMaterialRows(rows);
   renderImportReport("Laporan validasi master material", report);
-  if (!report.validRows) return showToast("没有有效物料行，请检查文件");
+  if (!report.validRows) return showToast("No valid material rows, please check the file");
   if (!confirm(importConfirmText("Master Material", report))) return;
   try {
     const remote = await postMasterData("/api/import-materials", { rows });
@@ -2554,8 +2558,8 @@ async function importMaterials() {
   }
   let imported = 0;
   rows.forEach((row) => {
-    const sku = normalize(pickField(row, ["Material Code", "存货编码", "Material Code", "sku", "SKU"]));
-    const name = String(pickField(row, ["Material Name", "存货名称", "Material Name", "name"]) || "").trim();
+    const sku = normalize(pickField(row, ["Material Code", "Item Code", "sku", "SKU"]));
+    const name = String(pickField(row, ["Material Name", "Item Name", "name"]) || "").trim();
     if (!sku || !name) return;
     upsertMaterial({ sku, name });
     imported += 1;
@@ -2567,7 +2571,7 @@ async function importMaterials() {
 }
 
 async function importLocations() {
-  if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
+  if (!isAdmin()) return showToast("No permission");
   const rows = await readSelectedRows("#locationFile");
   if (!rows.length) return showToast("File tidak memiliki data impor");
   const report = validateLocationRows(rows);
@@ -2601,7 +2605,7 @@ async function importLocations() {
 }
 
 async function downloadBackup() {
-  if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
+  if (!isAdmin()) return showToast("No permission");
   const auth = currentAuthPayload();
   try {
     const response = await fetch("/api/backup", {
@@ -2611,17 +2615,17 @@ async function downloadBackup() {
       }
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(apiErrorText(data, "澶囦唤澶辫触", "admin"));
+    if (!response.ok) throw new Error(apiErrorText(data, "Backup failed", "admin"));
     const filename = `wms-backup-${new Date().toISOString().slice(0, 10)}.json`;
     downloadBlob(new Blob([JSON.stringify(data.data, null, 2)], { type: "application/json;charset=utf-8" }), filename);
-    showToast("备份已下载");
+    showToast("Backup downloaded");
   } catch (error) {
     showToast(error.message);
   }
 }
 
 async function downloadAutoBackup() {
-  if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
+  if (!isAdmin()) return showToast("No permission");
   const auth = currentAuthPayload();
   try {
     const response = await fetch("/api/auto-backup", {
@@ -2631,20 +2635,20 @@ async function downloadAutoBackup() {
       }
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(apiErrorText(data, "自动备份下载失败", "admin"));
+    if (!response.ok) throw new Error(apiErrorText(data, "Auto backup download failed", "admin"));
     const filename = `wms-auto-backup-${new Date().toISOString().slice(0, 10)}.json`;
     downloadBlob(new Blob([JSON.stringify(data, null, 2)], { type: "application/json;charset=utf-8" }), filename);
-    showToast("自动备份已下载");
+    showToast("Auto backup downloaded");
   } catch (error) {
     showToast(error.message);
   }
 }
 
 async function restoreBackup() {
-  if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
-  if (!requireLiveServer("鎭㈠澶囦唤")) return;
+  if (!isAdmin()) return showToast("No permission");
+  if (!requireLiveServer("restore backup")) return;
   const file = $("#restoreFile").files[0];
-  if (!file) return showToast("璇烽€夋嫨澶囦唤 JSON 鏂囦欢");
+  if (!file) return showToast("Please select a backup JSON file");
   if (!confirm("Restore backup akan menimpa stok, master data, akun, dan log saat ini. Lanjutkan?")) return;
   try {
     const backup = JSON.parse(await readTextFile(file));
@@ -2655,16 +2659,16 @@ async function restoreBackup() {
       body: JSON.stringify({ backup, operatorId: auth.operatorId })
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(apiErrorText(data, "鎭㈠澶辫触", "admin"));
+    if (!response.ok) throw new Error(apiErrorText(data, "Restore failed", "admin"));
     const currentUserId = state.currentUserId;
     Object.assign(state, migrateState({ ...defaultState(), ...data }));
     state.currentUserId = currentUserId;
     wmsLocalStorage.setItem(storeKey, JSON.stringify(state));
     $("#restoreFile").value = "";
     render();
-    showToast("备份已恢复");
+    showToast("Backup restored");
   } catch (error) {
-    showToast(error.message || "澶囦唤鏂囦欢鏃犳硶璇诲彇");
+    showToast(error.message || "Backup file cannot be read");
   }
 }
 
@@ -2681,15 +2685,15 @@ function validateInventoryRows(rows) {
   const report = createReport(rows.length);
   const grouped = new Map();
   rows.forEach((row, index) => {
-    const sku = normalize(pickField(row, ["鐗╂枡缂栫爜", "瀛樿揣缂栫爜", "sku", "SKU"]));
-    const name = String(pickField(row, ["Material Name", "存货名称", "name"]) || "").trim();
+    const sku = normalize(pickField(row, ["Material Code", "Item Code", "sku", "SKU"]));
+    const name = String(pickField(row, ["Material Name", "Item Name", "name"]) || "").trim();
     const batch = normalize(pickField(row, ["Batch No.", "batch"]));
-    const rawQty = pickField(row, ["Qty", "可用Qty", "现存量", "qty"]);
+    const rawQty = pickField(row, ["Qty", "Quantity", "qty"]);
     const qty = parseSystemQty(rawQty);
     const location = normalize(pickField(row, ["Location", "Location Code", "Warehouse Location", "Storage Location", "location"]));
-    const status = String(pickField(row, ["Status", "库存Status", "status"]) || "可用").trim();
+    const status = String(pickField(row, ["Status", "stockStatus", "status"]) || getDefaultStockStatus()).trim();
     const reasons = [];
-    if (!sku) reasons.push("缂哄皯鐗╂枡缂栫爜");
+    if (!sku) reasons.push("Material code missing");
     if (!name) reasons.push("Nama material kosong");
     if (!batch) reasons.push("Batch kosong");
     if (!location) reasons.push("Lokasi kosong");
@@ -2709,10 +2713,10 @@ function validateMaterialRows(rows) {
   const report = createReport(rows.length);
   const seen = new Set();
   rows.forEach((row, index) => {
-    const sku = normalize(pickField(row, ["鐗╂枡缂栫爜", "瀛樿揣缂栫爜", "sku", "SKU"]));
-    const name = String(pickField(row, ["Material Name", "存货名称", "name"]) || "").trim();
+    const sku = normalize(pickField(row, ["Material Code", "Item Code", "sku", "SKU"]));
+    const name = String(pickField(row, ["Material Name", "Item Name", "name"]) || "").trim();
     const reasons = [];
-    if (!sku) reasons.push("缂哄皯鐗╂枡缂栫爜");
+    if (!sku) reasons.push("Material code missing");
     if (!name) reasons.push("Nama material kosong");
     if (reasons.length) return addInvalid(report, index, reasons);
     report.validRows += 1;
@@ -2743,7 +2747,7 @@ function createReport(sourceRows) {
 
 function addInvalid(report, index, reasons) {
   report.invalidRows += 1;
-    if (report.invalidSamples.length < 8) report.invalidSamples.push(`第 ${index + 2} 行：${reasons.join("；")}`);
+  if (report.invalidSamples.length < 8) report.invalidSamples.push(`Row ${index + 2}: ${reasons.join("; ")}`);
 }
 
 function renderImportReport(title, report) {
@@ -2753,19 +2757,19 @@ function renderImportReport(title, report) {
   const invalid = report.invalidSamples.length ? `<br>${report.invalidSamples.map(escapeHtml).join("<br>")}` : "";
   target.innerHTML = `
     <strong>${escapeHtml(title)}</strong>
-    原始 ${report.sourceRows} 行；有效 ${report.validRows} 行；无效 ${report.invalidRows} 行；重复合并 ${report.duplicateRows} 行；最终导入 ${report.mergedRows} 行。
-    ${report.totalQty ? `<br>有效Qty合计：${report.totalQty}` : ""}
+    Source rows: ${report.sourceRows}; valid: ${report.validRows}; invalid: ${report.invalidRows}; duplicate merged: ${report.duplicateRows}; final import: ${report.mergedRows}.
+    ${report.totalQty ? `<br>Valid qty total: ${report.totalQty}` : ""}
     ${invalid}`;
 }
 
 function importConfirmText(title, report) {
-  return `${title}导入校验：\n原始 ${report.sourceRows} 行\n有效 ${report.validRows} 行\n无效 ${report.invalidRows} 行\n重复合并 ${report.duplicateRows} 行\n最终导入 ${report.mergedRows} 行\n是否继续导入有效数据？`;
+  return `${title} import validation:\nSource rows: ${report.sourceRows}\nValid rows: ${report.validRows}\nInvalid rows: ${report.invalidRows}\nDuplicate merged: ${report.duplicateRows}\nFinal import: ${report.mergedRows}\nContinue importing valid rows?`;
 }
 
 async function readSelectedRows(selector) {
   const file = $(selector).files[0];
   if (!file) {
-    showToast("璇烽€夋嫨 Excel 鎴?CSV 鏂囦欢");
+    showToast("Please select an Excel or CSV file");
     return [];
   }
   return readRows(file);
@@ -2865,7 +2869,7 @@ function upsertMaterial(material) {
 
 async function addMaterial(event) {
   event.preventDefault();
-  if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
+  if (!isAdmin()) return showToast("No permission");
   const sku = normalize($("#newSku").value);
   const name = $("#newName").value.trim();
   const previousSku = editingMaterialSku;
@@ -2900,7 +2904,7 @@ async function addMaterial(event) {
 
 async function addLocation(event) {
   event.preventDefault();
-  if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
+  if (!isAdmin()) return showToast("No permission");
   const code = normalize($("#newLocation").value);
   const previousCode = editingLocationCode;
   const status = $("#newLocationStatus").value;
@@ -2941,7 +2945,7 @@ function editMaterial(sku) {
   editingMaterialSku = material.sku;
   $("#newSku").value = material.sku;
   $("#newName").value = material.name;
-  $("#materialSaveButton").textContent = "淇濆瓨淇敼";
+  $("#materialSaveButton").textContent = "Save Changes";
   $("#cancelMaterialEdit").classList.remove("hidden");
   $("#newName").focus();
 }
@@ -2949,7 +2953,7 @@ function editMaterial(sku) {
 function resetMaterialEdit() {
   editingMaterialSku = "";
   $("#materialForm").reset();
-  $("#materialSaveButton").textContent = "淇濆瓨";
+  $("#materialSaveButton").textContent = "Save";
   $("#cancelMaterialEdit").classList.add("hidden");
 }
 
@@ -2958,8 +2962,8 @@ function editLocation(code) {
   if (!location) return;
   editingLocationCode = location.code;
   $("#newLocation").value = location.code;
-  $("#newLocationStatus").value = location.status || "绌洪棽";
-  $("#locationSaveButton").textContent = "淇濆瓨淇敼";
+  $("#newLocationStatus").value = locationStatusLabel(location.status || "Empty");
+  $("#locationSaveButton").textContent = "Save Changes";
   $("#cancelLocationEdit").classList.remove("hidden");
   $("#newLocation").focus();
 }
@@ -2967,13 +2971,13 @@ function editLocation(code) {
 function resetLocationEdit() {
   editingLocationCode = "";
   $("#locationForm").reset();
-  $("#locationSaveButton").textContent = "淇濆瓨";
+  $("#locationSaveButton").textContent = "Save";
   $("#cancelLocationEdit").classList.add("hidden");
 }
 
 async function addUser(event) {
   event.preventDefault();
-  if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
+  if (!isAdmin()) return showToast("No permission");
   const id = normalize($("#newUserId").value);
   const existing = state.users.find((user) => user.id === id);
   const password = $("#newUserPassword").value.trim();
@@ -3023,7 +3027,7 @@ function closePasswordDialog() {
 }
 
 async function submitPasswordChange() {
-  if (!isAdmin()) return showToast("娌℃湁鏉冮檺");
+  if (!isAdmin()) return showToast("No permission");
   if (!pendingPasswordUserId) return showToast("Pilih akun terlebih dahulu");
   const newPassword = $("#passwordDialogNew").value.trim();
   const confirmPassword = $("#passwordDialogConfirm").value.trim();
@@ -3031,7 +3035,7 @@ async function submitPasswordChange() {
   if (newPassword.length < 6) return showToast("Password minimal 6 karakter");
   if (newPassword !== confirmPassword) return showToast("Dua password tidak sama");
   const account = pendingPasswordUserId;
-  if (!confirm(`确认Edit account ${account} 的密码？`)) return;
+  if (!confirm(`Change password for account ${account}?`)) return;
   try {
     await postUserData("/api/users/password", {
       targetId: account,
@@ -3108,10 +3112,10 @@ function logout() {
 }
 
 async function deleteUser(userId) {
-  if (!isAdmin()) return showToast("没有权限");
+  if (!isAdmin()) return showToast("No permission");
   const target = state.users.find((user) => user.id === userId);
   if (target?.role === "admin") return showToast("Akun admin tidak bisa dihapus");
-  if (!confirm(`确认Delete account ${userId}？\n删除后该账号将无法登录。`)) return;
+  if (!confirm(`Delete account ${userId}?\nThis account will not be able to log in after deletion.`)) return;
   try {
     const remote = await postUserData("/api/users/delete", { targetId: userId });
     if (!remote) {
@@ -3181,8 +3185,8 @@ function registerServiceWorker() {
 
 $$(".tab").forEach((button) => {
   button.addEventListener("click", () => {
-    if (!isAdmin() && !["operate", "count", "stock"].includes(button.dataset.view)) return showToast("娌℃湁鏉冮檺");
-    if (!canOpenView(button.dataset.view)) return showToast("娌℃湁鏉冮檺");
+    if (!isAdmin() && !["operate", "count", "stock"].includes(button.dataset.view)) return showToast("No permission");
+    if (!canOpenView(button.dataset.view)) return showToast("No permission");
     activateView(button.dataset.view);
   });
 });
@@ -3311,7 +3315,7 @@ $("#downloadLocationTemplate").addEventListener("click", downloadLocationTemplat
 $("#importInventory").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "导入中", importInventory));
 $("#importMaterials").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "导入中", importMaterials));
 $("#importLocations").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "导入中", importLocations));
-$("#downloadBackup").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "备份中", downloadBackup));
+$("#downloadBackup").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "Backing up", downloadBackup));
 $("#downloadAutoBackup").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "下载中", downloadAutoBackup));
 $("#restoreBackup").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "恢复中", restoreBackup));
 $("#materialForm").addEventListener("submit", addMaterial);
@@ -3341,7 +3345,7 @@ $("#passwordDialog").addEventListener("click", (event) => {
 window.addEventListener("storage", (event) => {
   if (event.key !== storeKey || !event.newValue) return;
   Object.assign(state, JSON.parse(event.newValue));
-  setSyncStatus("鏀跺埌鏇存柊");
+  setSyncStatus("Updated");
   render();
 });
 
@@ -3356,7 +3360,7 @@ if (channel) {
     if (event.data?.type !== "state-updated") return;
     Object.assign(state, event.data.state);
     saveState(false);
-    setSyncStatus("鏀跺埌鏇存柊");
+    setSyncStatus("Updated");
     render();
   });
 }
