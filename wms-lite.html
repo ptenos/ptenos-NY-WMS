@@ -75,11 +75,11 @@
         <section class="panel action-panel">
           <form id="operationForm" class="form-grid">
             <label class="wide">
-              作业类型
+              Jenis Pekerjaan
               <select id="operationTypeInput">
-                <option value="in">入库</option>
-                <option value="out">出库</option>
-                <option value="move">移库</option>
+                <option value="in">Barang Masuk</option>
+                <option value="out">Barang Keluar</option>
+                <option value="move">Pindah Lokasi</option>
               </select>
             </label>
 
@@ -87,17 +87,17 @@
 
             <div class="operation-stock-list wide hidden" id="operationStockWrap">
               <div class="panel-title compact-title">
-                <h2>现有库存明细</h2>
-                <p id="operationStockHint">搜索并选择要操作的库存。</p>
+                <h2>Detail Stok Tersedia</h2>
+                <p id="operationStockHint">Cari dan pilih stok yang akan diproses.</p>
               </div>
-              <input id="operationStockSearch" type="search" placeholder="搜索物料、名称、批号、库位" />
+              <input id="operationStockSearch" type="search" placeholder="Cari material, nama, batch, lokasi" />
               <div class="selected-stock hidden" id="selectedStockInfo"></div>
               <div class="cards-list" id="operationStockList"></div>
             </div>
 
             <label class="operation-field">
-              物料编码
-              <input id="skuInput" list="materialOptions" autocomplete="off" required placeholder="搜索物料编码或名称" />
+              Kode Material
+              <input id="skuInput" list="materialOptions" autocomplete="off" required placeholder="Cari kode material atau nama" />
               <datalist id="materialOptions"></datalist>
             </label>
 
@@ -106,49 +106,49 @@
             </div>
 
             <label class="operation-field">
-              物料名称
-              <input id="materialNameInput" disabled placeholder="选择主数据后自动带出" />
+              Nama Material
+              <input id="materialNameInput" disabled placeholder="Akan terisi otomatis setelah pilih master data" />
             </label>
 
             <label class="operation-field">
-              批号
-              <input id="batchInput" autocomplete="off" required placeholder="如 B20260528" />
+              Batch
+              <input id="batchInput" autocomplete="off" required placeholder="Contoh B20260528" />
             </label>
 
             <label>
-              数量
-              <input id="qtyInput" inputmode="decimal" required placeholder="如 1000 或 1000.123456" />
+              Jumlah
+              <input id="qtyInput" inputmode="decimal" required placeholder="Contoh 1000 atau 1000.123456" />
               <small class="field-hint" id="qtyHint"></small>
             </label>
 
             <label class="operation-field">
-              当前库位
-              <input id="locationInput" list="locationOptions" autocomplete="off" required placeholder="搜索库位" />
+              Lokasi Saat Ini
+              <input id="locationInput" list="locationOptions" autocomplete="off" required placeholder="Cari lokasi" />
               <datalist id="locationOptions"></datalist>
             </label>
 
             <label id="targetLocationWrap" class="hidden">
-              目标库位
-              <input id="targetLocationInput" list="targetLocationOptions" autocomplete="off" placeholder="搜索目标库位" />
+              Lokasi Tujuan
+              <input id="targetLocationInput" list="targetLocationOptions" autocomplete="off" placeholder="Cari lokasi tujuan" />
               <datalist id="targetLocationOptions"></datalist>
             </label>
 
             <label class="operation-field">
-              状态
+              Status
               <select id="statusInput">
-                <option>可用</option>
-                <option>待检</option>
-                <option>冻结</option>
-                <option>已预留</option>
+                <option>Aktif</option>
+                <option>QC</option>
+                <option>Frozen</option>
+                <option>Reserved</option>
               </select>
             </label>
 
             <label class="wide">
-              备注
-              <textarea id="noteInput" placeholder="单号、客户、异常原因、盘点说明"></textarea>
+              Catatan
+              <textarea id="noteInput" placeholder="Nomor dokumen, pelanggan, alasan, catatan opname"></textarea>
             </label>
 
-            <button class="primary-button wide server-write" id="operationSubmitButton" type="submit">提交作业</button>
+            <button class="primary-button wide server-write" id="operationSubmitButton" type="submit">Kirim Pekerjaan</button>
           </form>
         </section>
       </section>
@@ -158,68 +158,68 @@
           <form id="countForm" class="form-grid">
             <div class="count-stock-list wide">
               <div class="panel-title compact-title">
-                <h2>现有库存明细</h2>
-                <p>先搜索并选择要盘点的库存。</p>
+                <h2>Detail Stok Tersedia</h2>
+                <p>Cari dan pilih stok yang akan dihitung.</p>
               </div>
-              <input id="countStockSearch" type="search" placeholder="搜索物料、名称、批号、库位" />
+              <input id="countStockSearch" type="search" placeholder="Cari material, nama, batch, lokasi" />
               <div class="selected-stock hidden" id="selectedCountInfo"></div>
               <div class="cards-list" id="countStockList"></div>
             </div>
 
             <label class="count-field">
-              物料编码
-              <input id="countSkuInput" list="materialOptions" autocomplete="off" required placeholder="搜索物料编码或名称" />
+              Kode Material
+              <input id="countSkuInput" list="materialOptions" autocomplete="off" required placeholder="Cari kode material atau nama" />
             </label>
 
             <label class="count-field">
-              物料名称
-              <input id="countMaterialNameInput" disabled placeholder="选择主数据后自动带出" />
+              Nama Material
+              <input id="countMaterialNameInput" disabled placeholder="Akan terisi otomatis setelah pilih master data" />
             </label>
 
             <label class="count-field">
-              批号
-              <input id="countBatchInput" autocomplete="off" required placeholder="如 B20260528" />
+              Batch
+              <input id="countBatchInput" autocomplete="off" required placeholder="Contoh B20260528" />
             </label>
 
             <label class="count-field">
-              状态
+              Status
               <select id="countStatusInput">
-                <option value="">全部状态</option>
-                <option>可用</option>
-                <option>待检</option>
-                <option>冻结</option>
-                <option>已预留</option>
+                <option value="">Semua status</option>
+                <option>Aktif</option>
+                <option>QC</option>
+                <option>Frozen</option>
+                <option>Reserved</option>
               </select>
             </label>
 
             <div class="inventory-preview wide hidden">
               <div>
-                <span>现有库存数量</span>
+                <span>Jumlah Stok Saat Ini</span>
                 <strong id="currentCountQty">-</strong>
               </div>
               <div>
-                <span>现有库位</span>
+                <span>Lokasi Saat Ini</span>
                 <strong id="currentCountLocation">-</strong>
               </div>
             </div>
 
             <label>
-              盘点数量
-              <input id="countQtyInput" inputmode="decimal" required placeholder="如 1000 或 1000.123456" />
+              Jumlah Opname
+              <input id="countQtyInput" inputmode="decimal" required placeholder="Contoh 1000 atau 1000.123456" />
               <small class="field-hint" id="countQtyHint"></small>
             </label>
 
             <label>
-              盘点库位
-              <input id="countLocationInput" list="locationOptions" autocomplete="off" required placeholder="搜索盘点库位" />
+              Lokasi Opname
+              <input id="countLocationInput" list="locationOptions" autocomplete="off" required placeholder="Cari lokasi opname" />
             </label>
 
             <label class="wide">
-              备注
-              <textarea id="countNoteInput" placeholder="盘点说明"></textarea>
+              Catatan
+              <textarea id="countNoteInput" placeholder="Keterangan opname"></textarea>
             </label>
 
-            <button class="primary-button wide server-write" id="countSubmitButton" type="submit">提交盘点</button>
+            <button class="primary-button wide server-write" id="countSubmitButton" type="submit">Kirim Opname</button>
           </form>
         </section>
       </section>

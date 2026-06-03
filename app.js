@@ -837,7 +837,7 @@ function updateOperationStockList() {
   $("#operationStockWrap").classList.toggle("hidden", !useStockPicker);
   $$(".operation-field").forEach((item) => item.classList.toggle("hidden", useStockPicker));
   $("#targetLocationWrap").classList.toggle("hidden", operationType !== "move");
-  $("#operationStockHint").textContent = operationType === "move" ? "搜索并选择要移库的库存。" : "搜索并选择要出库的库存。";
+  $("#operationStockHint").textContent = operationType === "move" ? "Cari dan pilih stok untuk dipindah." : "Cari dan pilih stok untuk dikeluarkan.";
   updateOperationHelper();
   if (!useStockPicker) return;
   syncOperationSelection();
@@ -970,8 +970,8 @@ function renderSelectedStockInfo() {
 
 function operationEmptyText() {
   const keyword = $("#operationStockSearch")?.value.trim();
-  if (!keyword) return "请先扫码或输入物料编码、批号、库位，查询可操作库存。";
-  return "未找到可操作库存，请确认物料编码、批号或库位是否正确。";
+  if (!keyword) return "Silakan scan atau masukkan kode material, batch, atau lokasi untuk mencari stok.";
+  return "Stok yang bisa diproses tidak ditemukan, periksa kode material, batch, atau lokasi.";
 }
 
 function updateOperationHelper() {
@@ -981,12 +981,12 @@ function updateOperationHelper() {
   const submitButton = $("#operationSubmitButton");
   if (!guide || !qtyHint || !qtyInput || !submitButton) return;
 
-  const labels = { in: "入库", out: "出库", move: "移库" };
+  const labels = { in: "Barang Masuk", out: "Barang Keluar", move: "Pindah Lokasi" };
   const steps = {
-    in: ["选择物料", "选择库位", "输入数量", "确认提交"],
-    out: ["选择库存明细", "输入数量", "确认提交"],
-    move: ["选择库存明细", "输入数量", "选择目标库位", "确认提交"]
-  }[operationType] || ["填写信息", "确认提交"];
+    in: ["Pilih material", "Pilih lokasi", "Masukkan jumlah", "Konfirmasi kirim"],
+    out: ["Pilih detail stok", "Masukkan jumlah", "Konfirmasi kirim"],
+    move: ["Pilih detail stok", "Masukkan jumlah", "Pilih lokasi tujuan", "Konfirmasi kirim"]
+  }[operationType] || ["Isi data", "Konfirmasi kirim"];
 
   const inputSku = normalize($("#skuInput").value);
   const batch = normalize($("#batchInput").value);
@@ -1006,7 +1006,7 @@ function updateOperationHelper() {
     delete qtyInput.dataset.maxQty;
     qtyInput.placeholder = "如 1000 或 1000.123456";
     ready = !!findMaterial($("#skuInput").value) && !!findLocation(location) && !!batch && qty !== null && qty > 0;
-    nextText = ready ? "可以先确认，再提交入库。" : "请先选择物料、库位，再输入数量。";
+    nextText = ready ? "Bisa konfirmasi lalu kirim barang masuk." : "Pilih material, lokasi, lalu masukkan jumlah.";
   } else {
     if (selectedRow) activeStep = 1;
     if (qty !== null && qty > 0 && selectedRow && qty <= Number(selectedRow.qty || 0)) activeStep = 2;
@@ -1015,24 +1015,24 @@ function updateOperationHelper() {
       qtyInput.dataset.maxQty = selectedRow.qty;
       qtyInput.placeholder = `最大 ${selectedRow.qty}`;
       if (selectedRow.location !== location) {
-        nextText = `已选中 ${selectedRow.location} 的库存明细，请继续输入数量。`;
+        nextText = `Stok ${selectedRow.location} sudah dipilih, lanjut masukkan jumlah.`;
       } else if (qty !== null && qty > Number(selectedRow.qty || 0)) {
-        nextText = "数量超过现有库存，请改小。";
+        nextText = "Jumlah melebihi stok tersedia, kurangi jumlah.";
       } else if (operationType === "move" && targetLocation && targetLocation === location) {
-        nextText = "目标库位不能和原库位相同。";
+        nextText = "Lokasi tujuan tidak boleh sama dengan lokasi awal.";
       } else {
-        nextText = `现有库存 ${selectedRow.qty}，请继续输入数量。`;
+        nextText = `Stok tersedia ${selectedRow.qty}, lanjut masukkan jumlah.`;
       }
     } else {
       delete qtyInput.dataset.maxQty;
-      qtyInput.placeholder = "先选择库存明细";
-      nextText = operationType === "move" ? "请先选择要移库的库存明细。" : "请先选择要出库的库存明细。";
+      qtyInput.placeholder = "Pilih detail stok terlebih dahulu";
+      nextText = operationType === "move" ? "Pilih detail stok yang akan dipindah." : "Pilih detail stok yang akan dikeluarkan.";
     }
     ready = !!selectedRow && qty !== null && qty > 0 && qty <= Number(selectedRow.qty || 0);
     if (operationType === "move") {
       const target = findLocation(targetLocation);
       ready = ready && !!target && targetLocation !== location && target.status !== "鍐荤粨";
-      if (target?.status === "冻结") nextText = "目标库位已冻结，请换一个库位。";
+      if (target?.status === "冻结") nextText = "Lokasi tujuan dibekukan, pilih lokasi lain.";
     }
   }
 
