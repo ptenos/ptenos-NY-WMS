@@ -31,7 +31,7 @@ const wmsLocalStorage = safeStorage("localStorage");
 const wmsSessionStorage = safeStorage("sessionStorage");
 
 const state = loadState();
-const frontendBuildVersion = "runtime-userflow-20260603";
+const frontendBuildVersion = "runtime-userflow-20260603b";
 const labels = {
   operation: {
     save: "Simpan",
