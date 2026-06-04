@@ -3,6 +3,7 @@ import { emptyState, handleApiRequest, migrateDb } from "../../backend/core.js";
 const STATE_KEY = "state";
 const BACKUP_TABLE = "wms_backups";
 const STATE_TABLE = "wms_state";
+const SESSION_TABLE = "wms_sessions";
 
 export async function handlePagesApiRequest(context) {
   const { request, env } = context;
@@ -37,6 +38,8 @@ async function resolveStorage(env) {
   return {
     readDb: async () => readState(env),
     writeDb: async (db) => writeState(env, db),
+    createSession: async (session) => createSession(env, session),
+    deleteSession: async (token) => deleteSession(env, token),
     readBackup: async (key) => readBackup(env, key)
   };
 }
@@ -54,6 +57,7 @@ async function readState(env) {
     return seed;
   }
   const data = await migrateDb(JSON.parse(row.payload || "{}"));
+  data.sessions = await readSessions(env);
   data._etag = String(row.version || 1);
   return data;
 }
@@ -64,7 +68,8 @@ async function writeState(env, dbState) {
   await ensureSchema(db);
   const current = await db.prepare(`SELECT payload, version FROM ${STATE_TABLE} WHERE id = ?`).bind(STATE_KEY).first();
   const nextVersion = Number(current?.version || 0) + 1;
-  const payload = JSON.stringify(dbState);
+  const persistedState = { ...dbState, sessions: [] };
+  const payload = JSON.stringify(persistedState);
   await db.prepare(`INSERT INTO ${BACKUP_TABLE} (backup_key, payload, created_at) VALUES (?, ?, datetime('now')) ON CONFLICT(backup_key) DO UPDATE SET payload = excluded.payload, created_at = excluded.created_at`)
     .bind("latest", current?.payload || payload)
     .run();
@@ -92,6 +97,39 @@ async function readBackup(env, key) {
   return row ? JSON.parse(row.payload) : null;
 }
 
+async function readSessions(env) {
+  const db = env?.WMS_DB;
+  if (!db) throw new Error("Cloudflare D1 binding WMS_DB is missing");
+  await ensureSchema(db);
+  await db.prepare(`DELETE FROM ${SESSION_TABLE} WHERE expires_at <= ?`).bind(new Date().toISOString()).run();
+  const result = await db.prepare(`SELECT token, user_id, expires_at, created_at FROM ${SESSION_TABLE}`).all();
+  return (result.results || []).map((row) => ({
+    token: row.token,
+    userId: row.user_id,
+    expiresAt: row.expires_at,
+    createdAt: row.created_at
+  }));
+}
+
+async function createSession(env, session) {
+  const db = env?.WMS_DB;
+  if (!db) throw new Error("Cloudflare D1 binding WMS_DB is missing");
+  await ensureSchema(db);
+  await db.prepare(`DELETE FROM ${SESSION_TABLE} WHERE expires_at <= ?`).bind(new Date().toISOString()).run();
+  await db.prepare(
+    `INSERT INTO ${SESSION_TABLE} (token, user_id, expires_at, created_at)
+     VALUES (?, ?, ?, ?)
+     ON CONFLICT(token) DO UPDATE SET user_id = excluded.user_id, expires_at = excluded.expires_at, created_at = excluded.created_at`
+  ).bind(session.token, session.userId, session.expiresAt, session.createdAt).run();
+}
+
+async function deleteSession(env, token) {
+  const db = env?.WMS_DB;
+  if (!db || !token) return;
+  await ensureSchema(db);
+  await db.prepare(`DELETE FROM ${SESSION_TABLE} WHERE token = ?`).bind(token).run();
+}
+
 async function ensureSchema(db) {
   await runSql(db, `CREATE TABLE IF NOT EXISTS ${STATE_TABLE} (
     id TEXT PRIMARY KEY,
@@ -102,6 +140,12 @@ async function ensureSchema(db) {
   await runSql(db, `CREATE TABLE IF NOT EXISTS ${BACKUP_TABLE} (
     backup_key TEXT PRIMARY KEY,
     payload TEXT NOT NULL,
+    created_at TEXT NOT NULL
+  )`);
+  await runSql(db, `CREATE TABLE IF NOT EXISTS ${SESSION_TABLE} (
+    token TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
     created_at TEXT NOT NULL
   )`);
   await runSql(db, `CREATE TABLE IF NOT EXISTS wms_stock (

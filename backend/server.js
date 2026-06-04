@@ -3,6 +3,7 @@ import { readFile, writeFile, mkdir, stat } from "node:fs/promises";
 import { createReadStream } from "node:fs";
 import { dirname, extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { handleApiRequest, migrateDb } from "./core.js";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const projectRoot = resolve(__dirname, "..");
@@ -44,9 +45,7 @@ const server = createServer(async (req, res) => {
     if (req.method === "OPTIONS") return sendJson(res, 204, {});
 
     const url = new URL(req.url, `http://${req.headers.host}`);
-    if (url.pathname.startsWith("/api/")) {
-      return await handleApi(req, res, url);
-    }
+    if (url.pathname.startsWith("/api/")) return await handleCoreApi(req, res, url);
     return await serveStatic(res, url.pathname);
   } catch (error) {
     sendJson(res, 500, { error: error.message || "Server error" });
@@ -83,6 +82,23 @@ async function readDb() {
 
 async function writeDb(data) {
   await writeFile(dbPath, `${JSON.stringify(data, null, 2)}\n`, "utf-8");
+}
+
+async function handleCoreApi(req, res, url) {
+  const body = ["POST", "PUT", "PATCH"].includes(req.method) ? await readJson(req) : {};
+  const result = await handleApiRequest({
+    method: req.method,
+    pathname: url.pathname,
+    query: url.searchParams,
+    headers: req.headers,
+    body,
+    storage: {
+      readDb: async () => migrateDb(await readDb()),
+      writeDb: async (db) => writeDb(db),
+      readBackup: async () => null
+    }
+  });
+  return sendJson(res, result.status, result.data);
 }
 
 async function handleApi(req, res, url) {
@@ -616,7 +632,8 @@ function setCors(res) {
 }
 
 async function serveStatic(res, pathname) {
-  const requested = pathname === "/" ? "/index.html" : decodeURIComponent(pathname);
+  const requestedPath = pathname === "/" ? "/index.html" : decodeURIComponent(pathname);
+  const requested = requestedPath === "/runtime.js" ? "/app.js" : requestedPath;
   const fullPath = normalize(join(projectRoot, requested));
   if (!fullPath.startsWith(projectRoot)) return sendJson(res, 403, { error: "Forbidden" });
   try {

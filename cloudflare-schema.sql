@@ -11,6 +11,13 @@ CREATE TABLE IF NOT EXISTS wms_backups (
   created_at TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS wms_sessions (
+  token TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  expires_at TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS wms_stock (
   id TEXT PRIMARY KEY,
   sku TEXT NOT NULL,

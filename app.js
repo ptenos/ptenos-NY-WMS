@@ -169,7 +169,15 @@ function loadState() {
 
 function loadSessionAuth() {
   try {
-    return JSON.parse(wmsSessionStorage.getItem(authKey) || "{}");
+    const auth = JSON.parse(wmsSessionStorage.getItem(authKey) || "{}");
+    if (auth.expiresAt) {
+      const expiresAt = new Date(auth.expiresAt).getTime();
+      if (!Number.isFinite(expiresAt) || expiresAt <= Date.now()) {
+        wmsSessionStorage.removeItem(authKey);
+        return {};
+      }
+    }
+    return auth;
   } catch {
     return {};
   }
@@ -463,13 +471,16 @@ async function initApiSync() {
       if (response.ok) {
         const preservedUserId = state.currentUserId;
         const preservedAuth = { ...sessionAuth };
+        const restoredSession = await validateSessionAuth(preservedAuth);
         Object.assign(state, migrateState({ ...defaultState(), ...(await response.json()) }));
-        if (preservedUserId) {
+        if (restoredSession?.user?.id) {
+          state.currentUserId = restoredSession.user.id;
+          saveSessionAuth(restoredSession.user.id, preservedAuth.token, preservedAuth.expiresAt, restoredSession.mustChangePassword);
+        } else if (preservedUserId && !preservedAuth.token) {
           state.currentUserId = preservedUserId;
-        } else if (preservedAuth.token && preservedAuth.userId) {
-          state.currentUserId = preservedAuth.userId;
         } else {
           state.currentUserId = "";
+          if (preservedAuth.token) clearSessionAuth();
         }
         wmsLocalStorage.setItem(storeKey, JSON.stringify(state));
       }
@@ -519,6 +530,23 @@ function syncStatusText() {
   if (apiAvailable || apiConnectionState === "connected") return "Server connected";
   if (apiConnectionState === "failed") return serverRequired ? "Server connection failed" : "Local demo";
   return serverRequired ? "Server belum tersambung" : "Demo lokal";
+}
+
+async function validateSessionAuth(auth = {}) {
+  if (!auth.token || !auth.userId) return null;
+  if (auth.expiresAt) {
+    const expiresAt = new Date(auth.expiresAt).getTime();
+    if (!Number.isFinite(expiresAt) || expiresAt <= Date.now()) return null;
+  }
+  try {
+    const response = await fetch("/api/session", {
+      headers: authHeaders({ operatorId: auth.userId, sessionToken: auth.token })
+    });
+    if (!response.ok) return null;
+    return await response.json();
+  } catch {
+    return null;
+  }
 }
 
 function requireLiveServer(action = "操作") {
@@ -3041,6 +3069,9 @@ async function submitPasswordChange() {
       targetId: account,
       userPassword: newPassword
     });
+    if (account.toLowerCase() === "admin" && sessionAuth.userId?.toLowerCase() === "admin") {
+      saveSessionAuth(sessionAuth.userId, sessionAuth.token, sessionAuth.expiresAt, false);
+    }
     showToast("Password berhasil diubah");
     closePasswordDialog();
     render();

@@ -7,6 +7,7 @@ const outDir = join(rootDir, "netlify-dist");
 const files = [
   ["wms-lite.html", "index.html"],
   ["app.js", "app.js"],
+  ["app.js", "runtime.js"],
   ["styles.css", "styles.css"],
   ["manifest.webmanifest", "manifest.webmanifest"],
   ["sw.js", "sw.js"],

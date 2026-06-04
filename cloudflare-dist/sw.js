@@ -3,7 +3,7 @@ const SHELL_FILES = [
   "./",
   "./index.html",
   "./styles.css",
-  "./runtime.js?v=runtime-userflow-20260603b",
+  "./runtime.js?v=runtime-userflow-20260603c",
   "./manifest.webmanifest",
   "./assets/icon-192.png",
   "./assets/icon-512.png"

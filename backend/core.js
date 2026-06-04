@@ -60,8 +60,10 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     cleanupSessions(db);
     const token = globalThis.crypto.randomUUID();
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-    db.sessions.unshift({ token, userId: user.id, expiresAt, createdAt: new Date().toISOString() });
-    await storage.writeDb(db);
+    const session = { token, userId: user.id, expiresAt, createdAt: new Date().toISOString() };
+    db.sessions.unshift(session);
+    if (storage.createSession) await storage.createSession(session);
+    else await storage.writeDb(db);
     const mustChangePassword = await isDefaultAdminPassword(user);
     return json(200, {
       user: { ...sanitizeUser(user), mustChangePassword },
@@ -77,9 +79,22 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     const token = authToken(body, headers);
     if (token) {
       db.sessions = db.sessions.filter((session) => session.token !== token);
-      await storage.writeDb(db);
+      if (storage.deleteSession) await storage.deleteSession(token);
+      else await storage.writeDb(db);
     }
     return json(200, { ok: true });
+  }
+
+  if (method === "GET" && pathname === "/api/session") {
+    const db = await storage.readDb();
+    const actor = getActorByToken(db, authToken(body, headers));
+    if (!actor) return json(401, { errorCode: "UNAUTHORIZED", error: "Session expired" });
+    const mustChangePassword = await isDefaultAdminPassword(actor);
+    return json(200, {
+      user: { ...sanitizeUser(actor), mustChangePassword },
+      mustChangePassword,
+      state: liteState(db)
+    });
   }
 
   if (method === "GET" && pathname === "/api/state") {
