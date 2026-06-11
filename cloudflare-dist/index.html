@@ -13,7 +13,7 @@
     <link rel="apple-touch-icon" href="./assets/icon-192.png" />
     <link rel="stylesheet" href="./styles.css" />
     <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script defer src="./runtime.js?v=runtime-userflow-20260603c"></script>
+    <script defer src="./app.js?v=runtime-userflow-20260603c"></script>
   </head>
   <body>
     <main class="app-shell">
@@ -25,6 +25,13 @@
         <div class="header-actions">
           <span class="sync-chip" id="syncStatus">Connecting</span>
           <div class="account-badge" id="accountBadge">Not logged in</div>
+          <label class="language-switch" id="languageSwitchWrap">
+            <span id="languageLabel">Language</span>
+            <select id="displayLanguageSelect" aria-label="Display language">
+              <option value="en">English</option>
+              <option value="zh">中文</option>
+            </select>
+          </label>
           <button class="ghost-button hidden" id="installAppButton" type="button">Install</button>
           <button class="ghost-button" id="logoutButton" type="button">Keluar</button>
           <button class="ghost-button admin-only local-demo-only hidden" id="seedDemo" type="button">Load Demo</button>
@@ -90,14 +97,14 @@
                 <h2>Detail Stok Tersedia</h2>
                 <p id="operationStockHint">Cari dan pilih stok yang akan diproses.</p>
               </div>
-              <input id="operationStockSearch" type="search" placeholder="Cari material, nama, batch, lokasi" />
+              <input id="operationStockSearch" type="search" placeholder="Scan barcode stok, material, batch, atau lokasi" />
               <div class="selected-stock hidden" id="selectedStockInfo"></div>
               <div class="cards-list" id="operationStockList"></div>
             </div>
 
             <label class="operation-field">
               Kode Material
-              <input id="skuInput" list="materialOptions" autocomplete="off" required placeholder="Cari kode material atau nama" />
+              <input id="skuInput" list="materialOptions" autocomplete="off" required placeholder="Scan kode material atau cari nama material" />
               <datalist id="materialOptions"></datalist>
             </label>
 
@@ -123,23 +130,23 @@
 
             <label class="operation-field">
               Lokasi Saat Ini
-              <input id="locationInput" list="locationOptions" autocomplete="off" required placeholder="Cari lokasi" />
+              <input id="locationInput" list="locationOptions" autocomplete="off" required placeholder="Scan label lokasi asal" />
               <datalist id="locationOptions"></datalist>
             </label>
 
             <label id="targetLocationWrap" class="hidden">
               Lokasi Tujuan
-              <input id="targetLocationInput" list="targetLocationOptions" autocomplete="off" placeholder="Cari lokasi tujuan" />
+              <input id="targetLocationInput" list="targetLocationOptions" autocomplete="off" placeholder="Scan label lokasi tujuan" />
               <datalist id="targetLocationOptions"></datalist>
             </label>
 
             <label class="operation-field hidden" id="operationStatusWrap">
               Status
               <select id="statusInput">
-                <option value="可用">Available</option>
-                <option value="待检">QC Hold</option>
-                <option value="冻结">Frozen</option>
-                <option value="保留">Reserved</option>
+                <option value="available">Available</option>
+                <option value="pending">Pending</option>
+                <option value="hold">Hold</option>
+                <option value="quarantine">Quarantine</option>
               </select>
             </label>
 
@@ -155,8 +162,8 @@
 
             <label class="wide hidden" id="batchRowsWrap">
               Batch rows / Baris batch
-              <textarea id="batchRowsInput" placeholder="Batch|Location|Qty|TargetLocation|Note"></textarea>
-              <small class="field-hint">One row per line. Use standard numbers only. For out/move, each row must match an existing stock row.</small>
+              <textarea id="batchRowsInput" placeholder="Batch|Source Location|Qty|Target Location|Note|Status"></textarea>
+              <small class="field-hint">Satu baris per detail. Contoh masuk/keluar: `B20260528|A-01-01|120`. Contoh pindah: `B20260528|A-01-01|120|B-02-01`. Tambahkan catatan dan status bila perlu.</small>
             </label>
 
             <button class="primary-button wide server-write" id="operationSubmitButton" type="submit">Kirim Pekerjaan</button>
@@ -172,14 +179,14 @@
                 <h2>Detail Stok Tersedia</h2>
                 <p>Cari dan pilih stok yang akan dihitung.</p>
               </div>
-              <input id="countStockSearch" type="search" placeholder="Cari material, nama, batch, lokasi" />
+              <input id="countStockSearch" type="search" placeholder="Scan barcode stok, material, batch, atau lokasi" />
               <div class="selected-stock hidden" id="selectedCountInfo"></div>
               <div class="cards-list" id="countStockList"></div>
             </div>
 
             <label class="count-field">
               Kode Material
-              <input id="countSkuInput" list="materialOptions" autocomplete="off" required placeholder="Cari kode material atau nama" />
+              <input id="countSkuInput" list="materialOptions" autocomplete="off" required placeholder="Scan kode material atau cari nama material" />
             </label>
 
             <label class="count-field">
@@ -196,10 +203,10 @@
               Status
               <select id="countStatusInput">
                 <option value="">All statuses</option>
-                <option value="可用">Available</option>
-                <option value="待检">QC Hold</option>
-                <option value="冻结">Frozen</option>
-                <option value="保留">Reserved</option>
+                <option value="available">Available</option>
+                <option value="pending">Pending</option>
+                <option value="hold">Hold</option>
+                <option value="quarantine">Quarantine</option>
               </select>
             </label>
 
@@ -222,7 +229,7 @@
 
             <label>
               Lokasi Opname
-              <input id="countLocationInput" list="locationOptions" autocomplete="off" required placeholder="Cari lokasi opname" />
+              <input id="countLocationInput" list="locationOptions" autocomplete="off" required placeholder="Scan label lokasi aktual" />
             </label>
 
             <label class="wide">
@@ -245,13 +252,12 @@
           <div class="pager" id="stockPager"></div>
         </section>
       </section>
-      </section>
 
       <section class="view admin-view hidden" id="import">
         <section class="panel">
           <div class="panel-title">
             <h2>Initial Stock Import</h2>
-            <p>Admin only. Fields: Material Code, Material Name, Batch No., Qty, Location Code, Status.</p>
+            <p>Admin only. Fields: Material Code, Material Name, Batch No., Qty, Location Code, Status. Keep one row per batch-location-status.</p>
           </div>
           <input id="inventoryFile" type="file" accept=".xlsx,.xls,.csv" />
           <div class="button-row">
@@ -265,9 +271,8 @@
             <button class="secondary-button danger-button server-write" id="restoreBackup" type="button">Restore from Backup</button>
           </div>
           <div class="import-report hidden" id="importReport"></div>
-          <div class="hint-box">Use standard numbers only, e.g. 1000 or 1000.123456; up to 6 decimals. Do not use 1.000 or 1.000,5.</div>
+          <div class="hint-box">Use standard numbers only, e.g. 1000 or 1000.123456; up to 6 decimals. Do not use 1.000 or 1.000,5. For floor use, keep location labels and file rows in the same scan order.</div>
         </section>
-      </section>
       </section>
 
       <section class="view admin-view hidden" id="master">
@@ -319,7 +324,6 @@
           </div>
         </section>
       </section>
-      </section>
 
       <section class="view admin-view hidden" id="users">
         <section class="panel">
@@ -341,7 +345,6 @@
           <div class="cards-list" id="userList"></div>
         </section>
       </section>
-      </section>
 
       <section class="view admin-view hidden" id="logs">
         <section class="panel">
@@ -355,7 +358,6 @@
           <div class="cards-list" id="logList"></div>
           <div class="pager" id="logPager"></div>
         </section>
-      </section>
       </section>
 
       <section class="view admin-view hidden" id="audit">
@@ -381,7 +383,7 @@
     <section class="confirm-sheet hidden" id="operationConfirmSheet" aria-live="polite">
       <div class="confirm-card">
         <div class="panel-title">
-          <h2>Confirm Submission</h2>
+          <h2>Confirm Operation</h2>
           <p id="operationConfirmText"></p>
         </div>
         <div class="confirm-grid" id="operationConfirmGrid"></div>

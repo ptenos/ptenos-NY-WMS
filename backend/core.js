@@ -23,11 +23,15 @@ async function migrateDb(data = {}) {
     sku: item.sku,
     name: item.name
   }));
-  merged.locations = Array.isArray(merged.locations) ? merged.locations : [];
+  merged.locations = (Array.isArray(merged.locations) ? merged.locations : []).map((item) => ({
+    ...item,
+    status: normalizeLocationStatus(item.status)
+  }));
   merged.stock = (Array.isArray(merged.stock) ? merged.stock : []).map((row) => ({
     version: 1,
     updatedAt: new Date().toISOString(),
-    ...row
+    ...row,
+    status: normalizeStockStatus(row.status)
   }));
   merged.logs = Array.isArray(merged.logs) ? merged.logs : [];
   merged.auditLogs = Array.isArray(merged.auditLogs) ? merged.auditLogs : [];
@@ -56,7 +60,7 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
   if (method === "POST" && pathname === "/api/login") {
     const db = await storage.readDb();
     const user = findUserById(db, body.userId);
-    if (!user || !(await verifyPassword(user, body.password))) return json(401, { errorCode: "INVALID_LOGIN", error: "账号或密码错误" });
+    if (!user || !(await verifyPassword(user, body.password))) return json(401, { errorCode: "INVALID_LOGIN", error: "Invalid username or password" });
     cleanupSessions(db);
     const token = globalThis.crypto.randomUUID();
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
@@ -113,7 +117,7 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     const denied = await requireAdmin(db, "", "", authToken(body, headers));
     if (denied) return json(403, { error: denied });
     const backup = await storage.readBackup?.("latest");
-    if (!backup) return json(404, { errorCode: "USER_NOT_FOUND", error: "暂无自动备份" });
+    if (!backup) return json(404, { errorCode: "USER_NOT_FOUND", error: "No auto backup available" });
     return json(200, backup);
   }
 
@@ -128,12 +132,12 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     nextDb.sessions = db.sessions;
     nextDb.auditLogs.unshift(makeAuditLog({
       actor,
-      action: "恢复备份",
-      entity: "系统数据",
+      action: "Restore Backup",
+      entity: "System Data",
       key: "RESTORE",
       before: stateSummary(db),
       after: stateSummary(nextDb),
-      note: "管理员从备份文件恢复"
+      note: "Admin restored data from backup file"
     }));
     await storage.writeDb(nextDb);
     return json(200, statePayload(headers, nextDb));
@@ -180,10 +184,10 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     if (!sku || !body.name) return json(422, { errorCode: "INVALID_QTY", error: "sku and name are required" });
     const previousSku = normalizeCode(body.previousSku);
     if (previousSku && previousSku !== sku && db.materials.some((item) => item.sku === sku)) {
-      return json(409, { errorCode: "MATERIAL_EXISTS", error: "物料编码已存在" });
+      return json(409, { errorCode: "MATERIAL_EXISTS", error: "Material code already exists" });
     }
     if (!previousSku && db.materials.some((item) => item.sku === sku)) {
-      return json(409, { errorCode: "MATERIAL_EXISTS", error: "物料编码已存在，请搜索后修改" });
+      return json(409, { errorCode: "MATERIAL_EXISTS", error: "Material code already exists; search and edit it" });
     }
     const existing = db.materials.find((item) => item.sku === (previousSku || sku));
     const before = existing ? { ...existing } : null;
@@ -202,8 +206,8 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     }
     db.auditLogs.unshift(makeAuditLog({
       actor,
-      action: existing ? (previousSku && previousSku !== sku ? "修改物料编码" : "修改物料") : "新增物料",
-      entity: "物料主数据",
+      action: existing ? (previousSku && previousSku !== sku ? "Edit Material Code" : "Edit Material") : "Add Material",
+      entity: "Material Master",
       key: sku,
       before,
       after: { sku, name: body.name }
@@ -221,15 +225,15 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     if (!code) return json(422, { errorCode: "INVALID_LOCATION", error: "code is required" });
     const previousCode = normalizeCode(body.previousCode);
     if (previousCode && previousCode !== code && db.locations.some((item) => item.code === code)) {
-      return json(409, { errorCode: "LOCATION_EXISTS", error: "库位编码已存在" });
+      return json(409, { errorCode: "LOCATION_EXISTS", error: "Location code already exists" });
     }
     if (!previousCode && db.locations.some((item) => item.code === code)) {
-      return json(409, { errorCode: "LOCATION_EXISTS", error: "库位已存在，请搜索后修改" });
+      return json(409, { errorCode: "LOCATION_EXISTS", error: "Location already exists; search and edit it" });
     }
     const existing = db.locations.find((item) => item.code === (previousCode || code));
     const before = existing ? { ...existing } : null;
     if (existing) {
-      Object.assign(existing, { code, status: body.status || existing.status || "空闲" });
+      Object.assign(existing, { code, status: normalizeLocationStatus(body.status || existing.status || "empty") });
       if (previousCode && previousCode !== code) {
         db.stock.forEach((row) => {
           if (row.location === previousCode) {
@@ -240,14 +244,14 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
         });
       }
     } else {
-      db.locations.push({ code, status: body.status || "空闲" });
+      db.locations.push({ code, status: normalizeLocationStatus(body.status || "empty") });
     }
     refreshLocationUsage(db);
-    const after = db.locations.find((item) => item.code === code) || { code, status: body.status || "空闲" };
+    const after = db.locations.find((item) => item.code === code) || { code, status: normalizeLocationStatus(body.status || "empty") };
     db.auditLogs.unshift(makeAuditLog({
       actor,
-      action: existing ? (previousCode && previousCode !== code ? "修改库位编码" : "修改库位") : "新增库位",
-      entity: "库位主数据",
+      action: existing ? (previousCode && previousCode !== code ? "Edit Location Code" : "Edit Location") : "Add Location",
+      entity: "Location Master",
       key: code,
       before,
       after
@@ -296,9 +300,9 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     const role = String(body.role || "").trim();
     const userPassword = String(body.userPassword || "").trim();
     const name = String(body.name || id).trim() || id;
-    if (!id || !["employee", "keeper", "admin"].includes(role)) return json(422, { errorCode: "INVALID_LOGIN", error: "账号和角色不能为空" });
+    if (!id || !["employee", "keeper", "admin"].includes(role)) return json(422, { errorCode: "INVALID_LOGIN", error: "Account and role are required" });
     const existing = db.users.find((user) => user.id === id);
-    if (!existing && !userPassword) return json(422, { errorCode: "PASSWORD_REQUIRED", error: "新增账号必须设置密码" });
+    if (!existing && !userPassword) return json(422, { errorCode: "PASSWORD_REQUIRED", error: "Password is required for new account" });
     const user = { id, name, role };
     if (userPassword) user.passwordHash = await hashPassword(userPassword);
     const before = existing ? sanitizeUser(existing) : null;
@@ -306,8 +310,8 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     else db.users.push(user);
     db.auditLogs.unshift(makeAuditLog({
       actor,
-      action: existing ? "修改账号" : "新增账号",
-      entity: "账号权限",
+      action: existing ? "Edit Account" : "Add Account",
+      entity: "Account Permissions",
       key: id,
       before,
       after: sanitizeUser(db.users.find((item) => item.id === id))
@@ -323,21 +327,21 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     const actor = await getActor(db, body.operatorId, body.password, authToken(body, headers));
     const targetId = normalizeCode(body.targetId);
     const userPassword = String(body.userPassword || "").trim();
-    if (!targetId) return json(422, { errorCode: "USER_NOT_FOUND", error: "账号不能为空" });
-    if (userPassword.length < 6) return json(422, { errorCode: "PASSWORD_TOO_SHORT", error: "密码至少 6 位" });
+    if (!targetId) return json(422, { errorCode: "USER_NOT_FOUND", error: "Account is required" });
+    if (userPassword.length < 6) return json(422, { errorCode: "PASSWORD_TOO_SHORT", error: "Password must be at least 6 characters" });
     const target = findUserById(db, targetId);
-    if (!target) return json(404, { errorCode: "USER_NOT_FOUND", error: "账号不存在" });
+    if (!target) return json(404, { errorCode: "USER_NOT_FOUND", error: "Account does not exist" });
     const before = sanitizeUser(target);
     target.passwordHash = await hashPassword(userPassword);
     delete target.password;
     db.auditLogs.unshift(makeAuditLog({
       actor,
-      action: "修改密码",
-      entity: "账号权限",
+      action: "Change Password",
+      entity: "Account Permissions",
       key: targetId,
       before,
       after: sanitizeUser(target),
-      note: "管理员重置账号密码"
+      note: "Admin reset account password"
     }));
     await storage.writeDb(db);
     return json(200, statePayload(headers, db));
@@ -350,14 +354,14 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     const actor = await getActor(db, body.operatorId, body.password, authToken(body, headers));
     const targetId = normalizeCode(body.targetId);
     const target = findUserById(db, targetId);
-    if (target?.role === "admin") return json(422, { errorCode: "ADMIN_CANNOT_BE_DELETED", error: "不能删除管理员账号" });
+    if (target?.role === "admin") return json(422, { errorCode: "ADMIN_CANNOT_BE_DELETED", error: "Admin account cannot be deleted" });
     const before = sanitizeUser(target);
     db.users = db.users.filter((user) => user.id !== targetId);
     if (before) {
       db.auditLogs.unshift(makeAuditLog({
         actor,
-        action: "删除账号",
-        entity: "账号权限",
+        action: "Delete Account",
+        entity: "Account Permissions",
         key: targetId,
         before,
         after: null
@@ -383,12 +387,12 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     }
     db.auditLogs.unshift(makeAuditLog({
       actor,
-      action: "导入物料主数据",
-      entity: "物料主数据",
+      action: "Import Material Master",
+      entity: "Material Master",
       key: "IMPORT",
       before: null,
       after: { imported, sourceRows: rows.length },
-      note: `导入物料 ${imported} 行`
+      note: `Imported ${imported} material rows`
     }));
     await storage.writeDb(db);
     return json(200, statePayload(headers, db));
@@ -403,22 +407,22 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     let imported = 0;
     for (const row of rows) {
       const code = normalizeCode(pickField(row, ["code", "location", "库位", "库位编码", "仓库名称", "仓库"]));
-      const status = String(pickField(row, ["status", "状态", "库位状态"]) || "空闲").trim();
+      const status = normalizeLocationStatus(pickField(row, ["status", "状态", "库位状态"]) || "empty");
       if (!code) continue;
       const existing = db.locations.find((item) => item.code === code);
-      if (existing) existing.status = status || existing.status || "空闲";
-      else db.locations.push({ code, status: status || "空闲" });
+      if (existing) existing.status = status || existing.status || "empty";
+      else db.locations.push({ code, status: status || "empty" });
       imported += 1;
     }
     refreshLocationUsage(db);
     db.auditLogs.unshift(makeAuditLog({
       actor,
-      action: "导入库位主数据",
-      entity: "库位主数据",
+      action: "Import Location Master",
+      entity: "Location Master",
       key: "IMPORT",
       before: null,
       after: { imported, sourceRows: rows.length },
-      note: `导入库位 ${imported} 行`
+      note: `Imported ${imported} location rows`
     }));
     await storage.writeDb(db);
     return json(200, statePayload(headers, db));
@@ -437,7 +441,7 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
       const batch = normalizeCode(pickField(row, ["batch", "批号"]));
       const location = normalizeCode(pickField(row, ["location", "库位", "库位编码", "仓库名称", "仓库"]));
       const qty = parseSystemQty(pickField(row, ["qty", "数量", "可用数量", "现存量"]));
-      const status = String(pickField(row, ["status", "状态", "库存状态"]) || "可用").trim();
+      const status = normalizeStockStatus(pickField(row, ["status", "状态", "库存状态"]) || "available");
       if (!sku || !name || !batch || !location || qty === null) continue;
       const key = `${sku}||${batch}||${location}||${status}`;
       const existing = groupedRows.get(key);
@@ -446,7 +450,7 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     }
     for (const row of groupedRows.values()) {
       upsertMaterial(db, { sku: row.sku, name: row.name });
-      upsertLocation(db, { code: row.location, status: "空闲" });
+      upsertLocation(db, { code: row.location, status: "empty" });
       setStock(db, { sku: row.sku, batch: row.batch, location: row.location, status: row.status, qty: row.qty });
     }
     const imported = groupedRows.size;
@@ -458,23 +462,23 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
       operator: actor ? `${actor.id} ${actor.name}` : body.operator || "system",
       sku: "IMPORT",
       qty: imported,
-      note: `导入期初库存 ${imported} 行`
+      note: `Imported ${imported} initial stock rows`
     }));
     db.auditLogs.unshift(makeAuditLog({
       actor,
-      action: "导入期初库存",
-      entity: "库存导入",
+      action: "Import Initial Stock",
+      entity: "Stock Import",
       key: "IMPORT",
       before: null,
       after: { imported, sourceRows: rows.length },
-      note: `导入期初库存 ${imported} 行`
+      note: `Imported ${imported} initial stock rows`
     }));
     await storage.writeDb(db);
     return json(200, statePayload(headers, db));
   }
 
   if (method === "POST" && pathname === "/api/clear-master-data") {
-    return json(403, { errorCode: "FORBIDDEN", error: "清空基础数据接口已关闭" });
+    return json(403, { errorCode: "FORBIDDEN", error: "Clear master data API is disabled" });
   }
 
   return json(404, { errorCode: "USER_NOT_FOUND", error: "Not found" });
@@ -548,10 +552,10 @@ function backupPayload(db) {
 
 async function restorePayload(body = {}) {
   const candidate = body.data || body.backup?.data || body.backup || body;
-  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) return { error: "备份文件格式不正确" };
+  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) return { error: "Invalid backup file format" };
   const db = await migrateDb(candidate);
   if (!Array.isArray(db.materials) || !Array.isArray(db.locations) || !Array.isArray(db.stock)) {
-    return { error: "备份文件缺少库存基础数据" };
+    return { error: "Backup file is missing required WMS data" };
   }
   return { db };
 }
@@ -747,7 +751,7 @@ function auditValue(value) {
 }
 
 function typeLabel(type) {
-  return { in: "入库", out: "出库", move: "移库", count: "盘点", adjust: "盘点调整", initial: "期初" }[type] || type || "";
+  return { in: "Inbound", out: "Outbound", move: "Move", count: "Stock Count", adjust: "Stock Adjustment", initial: "Initial Stock" }[type] || type || "";
 }
 
 function fuzzyMatchText(text, keyword) {
@@ -805,34 +809,34 @@ async function applyOperation(db, operation, token = "") {
   const batch = normalizeCode(operation.batch);
   const location = normalizeCode(operation.location);
   const targetLocation = normalizeCode(operation.targetLocation);
-  const status = operation.status || "可用";
+  const status = normalizeStockStatus(operation.status || "available");
   const qty = parseSystemQty(operation.qty);
 
-  if (!db.materials.some((item) => item.sku === sku)) return { errorCode: "INVALID_LOCATION", error: "物料必须从主数据选择" };
-  if (!db.locations.some((item) => item.code === location)) return { errorCode: "INVALID_LOCATION", error: "库位必须从主数据选择" };
-  if (!batch || qty === null || qty < 0) return { errorCode: "INVALID_QTY", error: "数量只能使用系统数字格式，最多 6 位小数，例如 1000 或 1000.123456" };
+  if (!db.materials.some((item) => item.sku === sku)) return { errorCode: "MATERIAL_NOT_FOUND", error: "Material must be selected from master data" };
+  if (!db.locations.some((item) => item.code === location)) return { errorCode: "INVALID_LOCATION", error: "Location must be selected from master data" };
+  if (!batch || qty === null || qty < 0) return { errorCode: "INVALID_QTY", error: "Use standard quantity format, up to 6 decimals, e.g. 1000 or 1000.123456" };
 
   if (type === "in") {
-    if (qty <= 0) return { errorCode: "INVALID_QTY", error: "入库数量必须大于 0" };
+    if (qty <= 0) return { errorCode: "INVALID_QTY", error: "Inbound quantity must be greater than 0" };
     addStock(db, { sku, batch, location, status, qty });
   } else if (type === "out") {
-    if (qty <= 0) return { errorCode: "INVALID_QTY", error: "出库数量必须大于 0" };
+    if (qty <= 0) return { errorCode: "INVALID_QTY", error: "Outbound quantity must be greater than 0" };
     const row = findStock(db, { sku, batch, location, status });
-    if (!row) return { errorCode: "STOCK_NOT_ENOUGH", error: "库存不足或状态不匹配" };
-    if (Number(row.qty || 0) < qty) return { errorCode: "STOCK_NOT_ENOUGH", error: "库存不足，不能出库" };
+    if (!row) return { errorCode: "STOCK_NOT_ENOUGH", error: "Stock not found or status mismatch" };
+    if (Number(row.qty || 0) < qty) return { errorCode: "STOCK_NOT_ENOUGH", error: "Stock not enough for outbound" };
     const versionError = assertVersion(row, operation.expectedVersion);
     if (versionError) return { error: versionError };
     row.qty = roundQty(row.qty - qty);
     touchStock(row);
   } else if (type === "move") {
-    if (qty <= 0) return { errorCode: "INVALID_QTY", error: "移库数量必须大于 0" };
+    if (qty <= 0) return { errorCode: "INVALID_QTY", error: "Move quantity must be greater than 0" };
     const target = db.locations.find((item) => item.code === targetLocation);
-    if (!target) return { errorCode: "INVALID_LOCATION", error: "目标库位必须从主数据选择" };
-    if (target.status === "冻结") return { errorCode: "INVALID_LOCATION", error: "目标库位已冻结" };
-    if (targetLocation === location) return { errorCode: "INVALID_LOCATION", error: "目标库位不能和原库位相同" };
+    if (!target) return { errorCode: "INVALID_LOCATION", error: "Target location must be selected from master data" };
+    if (normalizeLocationStatus(target.status) === "frozen") return { errorCode: "TARGET_LOCATION_FROZEN", error: "Target location is frozen" };
+    if (targetLocation === location) return { errorCode: "TARGET_LOCATION_SAME", error: "Target location cannot equal source location" };
     const row = findStock(db, { sku, batch, location, status });
-    if (!row) return { errorCode: "STOCK_NOT_ENOUGH", error: "原库位库存不足" };
-    if (Number(row.qty || 0) < qty) return { errorCode: "STOCK_NOT_ENOUGH", error: "原库位库存不足，不能移出" };
+    if (!row) return { errorCode: "STOCK_NOT_ENOUGH", error: "Source stock not found" };
+    if (Number(row.qty || 0) < qty) return { errorCode: "STOCK_NOT_ENOUGH", error: "Source stock not enough for move" };
     const versionError = assertVersion(row, operation.expectedVersion);
     if (versionError) return { error: versionError };
     row.qty = roundQty(row.qty - qty);
@@ -842,13 +846,13 @@ async function applyOperation(db, operation, token = "") {
     const sourceSku = normalizeCode(operation.sourceSku || operation.sku);
     const sourceBatch = normalizeCode(operation.sourceBatch || operation.batch);
     const sourceLocation = normalizeCode(operation.sourceLocation || operation.location);
-    const sourceStatus = operation.sourceStatus || status;
-    if (sourceSku !== sku || sourceBatch !== batch || sourceStatus !== status) return { errorCode: "INVALID_QTY", error: "盘点只能调整选中的库存明细" };
+    const sourceStatus = normalizeStockStatus(operation.sourceStatus || status);
+    if (sourceSku !== sku || sourceBatch !== batch || sourceStatus !== status) return { errorCode: "INVALID_QTY", error: "Stock count can only adjust selected stock detail" };
     const target = db.locations.find((item) => item.code === location);
-    if (!target) return { errorCode: "INVALID_LOCATION", error: "盘点库位必须从主数据选择" };
-    if (sourceLocation !== location && target.status === "冻结") return { errorCode: "INVALID_LOCATION", error: "盘点库位已冻结，请换一个库位" };
+    if (!target) return { errorCode: "INVALID_LOCATION", error: "Count location must be selected from master data" };
+    if (sourceLocation !== location && normalizeLocationStatus(target.status) === "frozen") return { errorCode: "TARGET_LOCATION_FROZEN", error: "Count location is frozen" };
     const row = findStock(db, { sku: sourceSku, batch: sourceBatch, location: sourceLocation, status: sourceStatus });
-    if (!row) return { errorCode: "INVALID_QTY", error: "请先选择要盘点的库存明细" };
+    if (!row) return { errorCode: "INVALID_QTY", error: "Select stock detail before count" };
     const beforeQty = row.qty;
     const versionError = assertVersion(row, operation.expectedVersion);
     if (versionError) return { error: versionError };
@@ -887,11 +891,15 @@ function upsertLocation(db, location) {
 
 function findStock(db, key) {
   return db.stock.find(
-    (item) => item.sku === key.sku && item.batch === key.batch && item.location === key.location && item.status === key.status
+    (item) => item.sku === key.sku &&
+      item.batch === key.batch &&
+      item.location === key.location &&
+      normalizeStockStatus(item.status) === normalizeStockStatus(key.status)
   );
 }
 
 function addStock(db, row) {
+  row.status = normalizeStockStatus(row.status);
   const existing = findStock(db, row);
   if (existing) {
     existing.qty = roundQty(existing.qty + row.qty);
@@ -902,6 +910,7 @@ function addStock(db, row) {
 }
 
 function setStock(db, row) {
+  row.status = normalizeStockStatus(row.status);
   const existing = findStock(db, row);
   if (existing) {
     existing.qty = roundQty(row.qty);
@@ -918,7 +927,7 @@ function touchStock(row) {
 
 function assertVersion(row, expectedVersion) {
   if (expectedVersion === undefined || expectedVersion === null || expectedVersion === "") return null;
-  return Number(row.version || 1) === Number(expectedVersion) ? null : "库存已被其他人更新，请刷新后重试";
+  return Number(row.version || 1) === Number(expectedVersion) ? null : "Stock has changed. Refresh and try again.";
 }
 
 async function getActor(db, operatorId, password, token = "") {
@@ -940,18 +949,18 @@ function getActorByToken(db, token) {
 }
 
 function authorizeOperation(actor, type) {
-  if (!actor) return "请先登录";
+  if (!actor) return "UNAUTHORIZED";
   const role = actor.role === "operator" ? "employee" : actor.role;
   if (role === "admin") return null;
-  if (role === "keeper") return ["in", "out", "count"].includes(type) ? null : "仓管无权执行该操作";
-  if (role === "employee") return ["in", "out"].includes(type) ? null : "员工无权执行该操作";
-  return "账号权限无效";
+  if (role === "keeper") return ["in", "out", "move", "count"].includes(type) ? null : "FORBIDDEN";
+  if (role === "employee") return ["in", "out", "move"].includes(type) ? null : "FORBIDDEN";
+  return "FORBIDDEN";
 }
 
 async function requireAdmin(db, operatorId, password, token = "") {
   const actor = await getActor(db, operatorId, password, token);
-  if (!actor) return "请先登录";
-  return actor.role === "admin" ? null : "只有管理员可以执行该操作";
+  if (!actor) return "UNAUTHORIZED";
+  return actor.role === "admin" ? null : "FORBIDDEN";
 }
 
 function cleanup(db) {
@@ -960,8 +969,8 @@ function cleanup(db) {
 
 function refreshLocationUsage(db) {
   for (const location of db.locations) {
-    if (location.status !== "冻结") {
-      location.status = db.stock.some((item) => item.location === location.code) ? "占用" : "空闲";
+    if (normalizeLocationStatus(location.status) !== "frozen") {
+      location.status = db.stock.some((item) => item.location === location.code) ? "occupied" : "empty";
     }
   }
 }
@@ -1093,6 +1102,46 @@ function formatMinute(value = new Date()) {
 
 function normalizeCode(value) {
   return String(value || "").trim().toUpperCase();
+}
+
+function normalizeStockStatus(status) {
+  const value = String(status || "").trim().toLowerCase();
+  if (/^\?+$/.test(value)) return "available";
+  const map = {
+    available: "available",
+    released: "available",
+    release: "available",
+    "可用": "available",
+    pending: "pending",
+    quarantine: "pending",
+    "待检": "pending",
+    hold: "hold",
+    frozen: "hold",
+    "冻结": "hold",
+    reserved: "hold",
+    "保留": "hold",
+    reject: "reject",
+    rejected: "reject",
+    "不良": "reject"
+  };
+  return map[value] || value || "available";
+}
+
+function normalizeLocationStatus(status) {
+  const value = String(status || "").trim().toLowerCase();
+  if (/^\?+$/.test(value)) return "empty";
+  const map = {
+    empty: "empty",
+    "空闲": "empty",
+    kosong: "empty",
+    occupied: "occupied",
+    "占用": "occupied",
+    terisi: "occupied",
+    frozen: "frozen",
+    "冻结": "frozen",
+    dibekukan: "frozen"
+  };
+  return map[value] || value || "empty";
 }
 
 function pickField(row, keys) {

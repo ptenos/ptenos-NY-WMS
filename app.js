@@ -31,61 +31,211 @@ const wmsLocalStorage = safeStorage("localStorage");
 const wmsSessionStorage = safeStorage("sessionStorage");
 
 const state = loadState();
-const frontendBuildVersion = "runtime-userflow-20260603c";
-const labels = {
-  operation: {
-    save: "Simpan",
-    cancel: "Batal",
-    confirm: "Konfirmasi",
-    back: "Kembali Ubah",
-    submit: "Konfirmasi Kirim",
-    materialCode: "Kode Material",
-    materialName: "Nama Material",
-    batchNo: "Batch",
-    location: "Lokasi",
-    fromLocation: "Lokasi Awal",
-    toLocation: "Lokasi Tujuan",
-    qty: "Jumlah",
-    status: "Status",
-    remark: "Catatan",
-    in: "Barang Masuk",
-    out: "Barang Keluar",
-    move: "Pindah Lokasi",
-    count: "Stock Opname",
-    stock: "Stok",
-    checkStock: "Cek Stok",
-    delete: "Hapus"
+const frontendBuildVersion = "runtime-language-template-20260611a";
+const languageStorageKey = "wms-lite-display-language-v1";
+let displayLanguage = loadDisplayLanguage();
+const languageTemplates = {
+  en: {
+    ui: {
+      appTitle: "WMS Lite Warehouse Execution System",
+      connecting: "Connecting",
+      connected: "Server connected",
+      connectionFailed: "Server connection failed",
+      localDemo: "Local demo",
+      notLoggedIn: "Not logged in",
+      install: "Install",
+      logout: "Logout",
+      username: "Username",
+      password: "Password",
+      login: "Login",
+      resetAdminPassword: "Reset Admin Password",
+      usernamePlaceholder: "Enter account",
+      passwordPlaceholder: "Enter password",
+      offlineBanner: "Server is not connected. You can only view cached data for now.",
+      passwordWarning: "The administrator is still using the default password. Change it before formal use.",
+      language: "Language",
+      noData: "No data",
+      save: "Save",
+      cancel: "Cancel",
+      edit: "Edit",
+      back: "Back",
+      confirmSubmit: "Confirm Submit",
+      confirmOperation: "Confirm Operation",
+      loading: "Loading..."
+    },
+    operation: {
+      save: "Save",
+      cancel: "Cancel",
+      confirm: "Confirm",
+      back: "Back",
+      submit: "Submit",
+      materialCode: "Material Code",
+      materialName: "Material Name",
+      batchNo: "Batch",
+      location: "Location",
+      fromLocation: "Source Location",
+      toLocation: "Target Location",
+      qty: "Qty",
+      status: "Status",
+      remark: "Remark",
+      in: "Inbound",
+      out: "Outbound",
+      move: "Move",
+      count: "Stock Count",
+      stock: "Stock",
+      checkStock: "Check Stock",
+      delete: "Delete"
+    },
+    admin: {
+      accountPermissions: "Account Permissions",
+      masterData: "Master Data",
+      import: "Import",
+      transactionLog: "Transaction Log",
+      changeLog: "Change Log",
+      changePassword: "Change Password",
+      addAccount: "Add Account",
+      deleteAccount: "Delete Account",
+      accessScope: "Access Scope",
+      systemAdminLocked: "System admin, cannot be deleted",
+      allFeatures: "All Features",
+      operateStock: "Operation, Stock",
+      operateCountStock: "Operation, Stock Count, Stock"
+    },
+    roles: {
+      employee: "Employee",
+      keeper: "Warehouse Keeper",
+      admin: "Admin",
+      operator: "Employee"
+    },
+    type: {
+      in: "Inbound",
+      out: "Outbound",
+      move: "Move",
+      count: "Stock Count",
+      adjust: "Stock Adjustment",
+      initial: "Initial Stock"
+    },
+    errors: {
+      INVALID_LOGIN: { operation: "Login failed", admin: "Invalid username or password" },
+      STOCK_NOT_ENOUGH: { operation: "Stock not enough", admin: "Stock not enough" },
+      MATERIAL_EXISTS: { operation: "Material code already exists", admin: "Material code already exists" },
+      MATERIAL_NOT_FOUND: { operation: "Material must be selected from master data", admin: "Material must be selected from master data" },
+      LOCATION_EXISTS: { operation: "Location code already exists", admin: "Location code already exists" },
+      INVALID_LOCATION: { operation: "Invalid location", admin: "Invalid location" },
+      TARGET_LOCATION_SAME: { operation: "Target location cannot be the same", admin: "Target location cannot be the same" },
+      TARGET_LOCATION_FROZEN: { operation: "Target location is frozen", admin: "Target location is frozen" },
+      INVALID_QTY: { operation: "Invalid quantity", admin: "Invalid quantity" },
+      USER_NOT_FOUND: { operation: "Account not found", admin: "Account not found" },
+      ADMIN_CANNOT_BE_DELETED: { operation: "Admin account cannot be deleted", admin: "Admin account cannot be deleted" },
+      PASSWORD_TOO_SHORT: { operation: "Password must be at least 6 characters", admin: "Password must be at least 6 characters" },
+      PASSWORD_REQUIRED: { operation: "Password is required", admin: "Password is required" },
+      UNAUTHORIZED: { operation: "Unauthorized", admin: "Unauthorized" },
+      FORBIDDEN: { operation: "Forbidden", admin: "Forbidden" },
+      VERSION_CONFLICT: { operation: "Stock changed. Refresh and try again.", admin: "Stock changed. Refresh and try again." }
+    }
   },
-  admin: {
-    accountPermissions: "Account Permissions",
-    masterData: "Master Data",
-    import: "Import",
-    transactionLog: "Transaction Log",
-    changeLog: "Change Log",
-    changePassword: "Change Password",
-    addAccount: "Add Account",
-    deleteAccount: "Delete Account",
-    accessScope: "Access Scope",
-    systemAdminLocked: "System admin, cannot be deleted",
-    allFeatures: "All Features",
-    operateStock: "Operation, Stock",
-    operateCountStock: "Operation, Stock Opname, Stock"
-  },
-  errors: {
-    INVALID_LOGIN: { operation: "Masuk gagal", admin: "Invalid login / Invalid login" },
-    STOCK_NOT_ENOUGH: { operation: "Stok tidak cukup", admin: "Stock not enough" },
-    MATERIAL_EXISTS: { operation: "Kode material sudah ada", admin: "Material code exists" },
-    LOCATION_EXISTS: { operation: "Kode lokasi sudah ada", admin: "Location code already exists / Location code exists" },
-    INVALID_LOCATION: { operation: "Lokasi tidak valid", admin: "Location无效 / Invalid location" },
-    INVALID_QTY: { operation: "Jumlah tidak valid", admin: "鏁伴噺鏃犳晥 / Invalid quantity" },
-    USER_NOT_FOUND: { operation: "Akun tidak ditemukan", admin: "User not found" },
-    ADMIN_CANNOT_BE_DELETED: { operation: "Akun admin tidak bisa dihapus", admin: "Cannot delete admin account / Admin cannot be deleted" },
-    PASSWORD_TOO_SHORT: { operation: "Password minimal 6 karakter", admin: "密码至少 6 位 / Password too short" },
-    PASSWORD_REQUIRED: { operation: "Password wajib diisi", admin: "必须设置密码 / Password required" },
-    UNAUTHORIZED: { operation: "Tidak punya izin", admin: "未授权 / Unauthorized" },
-    FORBIDDEN: { operation: "Dilarang", admin: "禁止访问 / Forbidden" }
+  zh: {
+    ui: {
+      appTitle: "轻量仓库执行系统 / WMS Lite",
+      connecting: "连接中",
+      connected: "服务器已连接",
+      connectionFailed: "服务器连接失败",
+      localDemo: "本机演示",
+      notLoggedIn: "未登录",
+      install: "安装",
+      logout: "退出",
+      username: "账号",
+      password: "密码",
+      login: "登录",
+      resetAdminPassword: "重置管理员密码",
+      usernamePlaceholder: "请输入账号",
+      passwordPlaceholder: "请输入密码",
+      offlineBanner: "服务器未连接，当前只能查看缓存数据。",
+      passwordWarning: "管理员仍在使用默认密码，正式使用前请先修改。",
+      language: "语言",
+      noData: "暂无数据",
+      save: "保存",
+      cancel: "取消",
+      edit: "修改",
+      back: "返回",
+      confirmSubmit: "确认提交",
+      confirmOperation: "确认作业",
+      loading: "加载中..."
+    },
+    operation: {
+      save: "保存",
+      cancel: "取消",
+      confirm: "确认",
+      back: "返回修改",
+      submit: "提交",
+      materialCode: "物料编码",
+      materialName: "物料名称",
+      batchNo: "批号",
+      location: "库位",
+      fromLocation: "原库位",
+      toLocation: "目标库位",
+      qty: "数量",
+      status: "状态",
+      remark: "备注",
+      in: "入库",
+      out: "出库",
+      move: "移库",
+      count: "盘点",
+      stock: "库存",
+      checkStock: "查库存",
+      delete: "删除"
+    },
+    admin: {
+      accountPermissions: "账号权限",
+      masterData: "主数据",
+      import: "导入",
+      transactionLog: "流水账",
+      changeLog: "修改记录",
+      changePassword: "修改密码",
+      addAccount: "新增账号",
+      deleteAccount: "删除账号",
+      accessScope: "权限范围",
+      systemAdminLocked: "系统管理员，不可删除",
+      allFeatures: "全部功能",
+      operateStock: "作业、库存",
+      operateCountStock: "作业、盘点、库存"
+    },
+    roles: {
+      employee: "员工",
+      keeper: "仓管",
+      admin: "管理员",
+      operator: "员工"
+    },
+    type: {
+      in: "入库",
+      out: "出库",
+      move: "移库",
+      count: "盘点",
+      adjust: "盘点调整",
+      initial: "期初库存"
+    },
+    errors: {
+      INVALID_LOGIN: { operation: "登录失败", admin: "账号或密码错误" },
+      STOCK_NOT_ENOUGH: { operation: "库存不足", admin: "库存不足" },
+      MATERIAL_EXISTS: { operation: "物料编码已存在", admin: "物料编码已存在" },
+      MATERIAL_NOT_FOUND: { operation: "物料必须从主数据选择", admin: "物料必须从主数据选择" },
+      LOCATION_EXISTS: { operation: "库位编码已存在", admin: "库位编码已存在" },
+      INVALID_LOCATION: { operation: "库位无效", admin: "库位无效" },
+      TARGET_LOCATION_SAME: { operation: "目标库位不能相同", admin: "目标库位不能相同" },
+      TARGET_LOCATION_FROZEN: { operation: "目标库位已冻结", admin: "目标库位已冻结" },
+      INVALID_QTY: { operation: "数量无效", admin: "数量无效" },
+      USER_NOT_FOUND: { operation: "账号不存在", admin: "账号不存在" },
+      ADMIN_CANNOT_BE_DELETED: { operation: "不能删除管理员账号", admin: "不能删除管理员账号" },
+      PASSWORD_TOO_SHORT: { operation: "密码至少 6 位", admin: "密码至少 6 位" },
+      PASSWORD_REQUIRED: { operation: "必须设置密码", admin: "必须设置密码" },
+      UNAUTHORIZED: { operation: "未授权", admin: "未授权" },
+      FORBIDDEN: { operation: "禁止访问", admin: "禁止访问" },
+      VERSION_CONFLICT: { operation: "库存已变化，请刷新后重试", admin: "库存已变化，请刷新后重试" }
+    }
   }
 };
+let labels = languageTemplates[displayLanguage] || languageTemplates.en;
+document.documentElement.lang = displayLanguage === "zh" ? "zh-CN" : "en";
 let sessionAuth = loadSessionAuth();
 if (!sessionAuth.token || sessionAuth.userId !== state.currentUserId) state.currentUserId = "";
 let operationType = "in";
@@ -193,6 +343,19 @@ function clearSessionAuth() {
   wmsSessionStorage.removeItem(authKey);
 }
 
+function loadDisplayLanguage() {
+  const value = wmsLocalStorage.getItem(languageStorageKey);
+  return value === "zh" ? "zh" : "en";
+}
+
+function setDisplayLanguage(value) {
+  displayLanguage = value === "zh" ? "zh" : "en";
+  labels = languageTemplates[displayLanguage] || languageTemplates.en;
+  wmsLocalStorage.setItem(languageStorageKey, displayLanguage);
+  document.documentElement.lang = displayLanguage === "zh" ? "zh-CN" : "en";
+  render();
+}
+
 function migrateState(data) {
   const defaults = defaultState().users;
   data.users = Array.isArray(data.users) ? data.users : defaults;
@@ -209,21 +372,27 @@ function migrateState(data) {
     sku: item.sku,
     name: item.name
   }));
-  data.locations = Array.isArray(data.locations) ? data.locations : [];
+  data.locations = (Array.isArray(data.locations) ? data.locations : []).map((item) => ({
+    ...item,
+    status: normalizeLocationStatus(item.status)
+  }));
   cacheMaterials(data.materials);
   cacheLocations(data.locations);
   data.auditLogs = Array.isArray(data.auditLogs) ? data.auditLogs : [];
   data.stock = (Array.isArray(data.stock) ? data.stock : []).map((row) => ({
     version: 1,
     updatedAt: new Date().toISOString(),
-    ...row
+    ...row,
+    status: normalizeStockStatus(row.status)
   }));
   return data;
 }
 
 function ensureAdminAccount() {
   if (serverRequired) {
-    showToast("正式服务不能在手机端重置管理员密码，请在Account Permissions里修改密码");
+    showToast(displayLanguage === "zh"
+      ? "正式服务不能在手机端重置管理员密码，请在账号权限里修改密码"
+      : "Admin password reset is disabled here. Change it in Account Permissions.");
     return;
   }
   let admin = state.users.find((user) => String(user.id).toLowerCase() === "admin");
@@ -237,7 +406,7 @@ function ensureAdminAccount() {
   delete admin.passwordHash;
   saveState();
   render();
-  showToast("管理员密码已重置为 admin123");
+  showToast(displayLanguage === "zh" ? "管理员密码已重置为 admin123" : "Admin password reset to admin123");
 }
 function currentUser() {
   if (!state.currentUserId) return null;
@@ -287,49 +456,82 @@ function canOpenView(viewId) {
 }
 
 function roleLabel(role) {
-  return {
-    employee: "Employee",
-    keeper: "Warehouse Keeper",
-    admin: "Admin",
-    operator: "Employee"
-  }[role] || role;
+  return labels.roles?.[role] || role;
 }
 
 function permissionScope(role) {
   return {
-    admin: "All features",
-    keeper: "Operation, Stock Opname, Stock",
-    employee: "Operation, Stock",
-    operator: "Operation, Stock"
+    admin: labels.admin.allFeatures,
+    keeper: labels.admin.operateCountStock,
+    employee: labels.admin.operateStock,
+    operator: labels.admin.operateStock
   }[role] || role;
 }
 
 function locationStatusLabel(status) {
-  const value = String(status || '').trim();
+  const value = normalizeLocationStatus(status);
   const map = {
-    'Empty': 'Empty',
-    'Occupied': 'Occupied',
-    'Frozen': 'Frozen',
-    '空闲': 'Empty',
-    '占用': 'Occupied',
-    '冻结': 'Frozen',
-    'kosong': 'Empty',
-    'terisi': 'Occupied',
-    'dibekukan': 'Frozen'
+    empty: displayLanguage === "zh" ? "空闲" : "Empty",
+    occupied: displayLanguage === "zh" ? "占用" : "Occupied",
+    frozen: displayLanguage === "zh" ? "冻结" : "Frozen"
   };
-  return map[value] || value || '-';
+  return map[value] || value || "-";
+}
+
+function normalizeLocationStatus(status) {
+  const value = String(status || "").trim().toLowerCase();
+  if (/^\?+$/.test(value)) return "empty";
+  const map = {
+    empty: "empty",
+    "空闲": "empty",
+    kosong: "empty",
+    occupied: "occupied",
+    "占用": "occupied",
+    terisi: "occupied",
+    frozen: "frozen",
+    "冻结": "frozen",
+    dibekukan: "frozen"
+  };
+  return map[value] || value || "empty";
+}
+
+function normalizeStockStatus(status) {
+  const value = String(status || "").trim().toLowerCase();
+  if (/^\?+$/.test(value)) return "available";
+  const map = {
+    available: "available",
+    released: "available",
+    release: "available",
+    "可用": "available",
+    pending: "pending",
+    quarantine: "pending",
+    "待检": "pending",
+    hold: "hold",
+    frozen: "hold",
+    "冻结": "hold",
+    reserved: "hold",
+    "保留": "hold",
+    reject: "reject",
+    rejected: "reject",
+    "不良": "reject"
+  };
+  return map[value] || value || "available";
 }
 
 function isFrozenLocationStatus(status) {
-  return locationStatusLabel(status) === "Frozen";
+  return normalizeLocationStatus(status) === "frozen";
 }
 
 function locationUsageStatus(hasStock) {
-  return hasStock ? "Occupied" : "Empty";
+  return hasStock ? "occupied" : "empty";
 }
 
 function getDefaultStockStatus() {
-  return "可用";
+  return "available";
+}
+
+function canUseMoveOperation() {
+  return !!currentUser() && canOpenView("operate");
 }
 
 function batchModeEnabled() {
@@ -389,10 +591,22 @@ function debugLogin(message) {
   return message;
 }
 
-function apiErrorText(data, fallback = "操作失败", scope = "operation") {
+function apiErrorText(data, fallback = "Operation failed", scope = "operation") {
   const code = String(data?.errorCode || "").trim();
   if (code && labels.errors[code]) return labels.errors[code][scope] || labels.errors[code].operation || fallback;
   return data?.error || fallback;
+}
+
+function handleExpiredSessionResponse(response, data) {
+  const expired = response.status === 401 ||
+    data?.errorCode === "UNAUTHORIZED" ||
+    (sessionAuth.token && data?.error === "请先登录");
+  if (!expired) return false;
+  clearSessionAuth();
+  state.currentUserId = "";
+  wmsLocalStorage.setItem(storeKey, JSON.stringify(state));
+  render();
+  return true;
 }
 
 function applyLanguageLabels() {
@@ -404,15 +618,30 @@ function applyLanguageLabels() {
     const node = $(selector);
     if (node && value) node.placeholder = value;
   };
-  setText("#loginButton", labels.operation.login);
-  setText("#logoutButton", "Keluar");
-  setText("#resetAdminButton", "Reset Password Admin");
-  setPlaceholder("#loginUserInput", "Masukkan akun");
-  setPlaceholder("#loginPasswordInput", "Masukkan kata sandi");
-  setText("#connectionBanner", "Server belum tersambung. Hanya data cache yang bisa dilihat untuk sementara.");
-  setText("#passwordWarning", "Administrator masih memakai password default, harap ubah di menu akun sebelum dipakai resmi.");
+  const setLabelText = (selector, value) => {
+    const node = $(selector);
+    if (!node) return;
+    const textNode = [...node.childNodes].find((child) => child.nodeType === Node.TEXT_NODE && child.textContent.trim());
+    if (textNode) textNode.textContent = `\n              ${value}\n              `;
+  };
+  const languageSelect = $("#displayLanguageSelect");
+  if (languageSelect) languageSelect.value = displayLanguage;
+  setText("h1", labels.ui.appTitle);
+  setText("#languageLabel", labels.ui.language);
+  setText("#loginButton", labels.ui.login);
+  setText("#logoutButton", labels.ui.logout);
+  setText("#installAppButton", labels.ui.install);
+  setText("#resetAdminButton", labels.ui.resetAdminPassword);
+  setLabelText(".login-panel label:nth-of-type(1)", labels.ui.username);
+  setLabelText(".login-panel label:nth-of-type(2)", labels.ui.password);
+  setPlaceholder("#loginUserInput", labels.ui.usernamePlaceholder);
+  setPlaceholder("#loginPasswordInput", labels.ui.passwordPlaceholder);
+  setText("#connectionBanner", labels.ui.offlineBanner);
+  setText("#passwordWarning", labels.ui.passwordWarning);
   setText("#operationSubmitButton", labels.operation.submit);
   setText("#countSubmitButton", labels.operation.submit);
+  setLabelText("#operationForm label.wide:nth-of-type(1)", displayLanguage === "zh" ? "作业类型" : "Operation Type");
+  setLabelText("#skuInput", labels.operation.materialCode);
   const operationSelect = $("#operationTypeInput");
   if (operationSelect?.options?.length >= 3) {
     operationSelect.options[0].textContent = labels.operation.in;
@@ -426,20 +655,24 @@ function applyLanguageLabels() {
     statusSelect.options[2].textContent = "hold";
     statusSelect.options[3].textContent = "quarantine";
   }
-  setText("#materialSaveButton", "Simpan / Save");
-  setText("#locationSaveButton", "Simpan / Save");
-  setText("#importMaterials", "Import / 导入");
-  setText("#importLocations", "Import / 导入");
-  setText("#importInventory", "Import / 导入");
+  setText("#materialSaveButton", labels.ui.save);
+  setText("#locationSaveButton", labels.ui.save);
+  setText("#importMaterials", labels.admin.import);
+  setText("#importLocations", labels.admin.import);
+  setText("#importInventory", labels.admin.import);
   setText("#downloadBackup", "Download Backup");
   setText("#downloadAutoBackup", "Download Auto Backup");
   setText("#restoreBackup", "Restore Backup");
+  setText("#operationConfirmCancel", labels.ui.back);
+  setText("#operationConfirmSubmit", labels.ui.confirmSubmit);
+  setText("#passwordDialogCancel", labels.ui.cancel);
+  setText("#passwordDialogSubmit", displayLanguage === "zh" ? "保存密码" : "Save Password");
 
   const tabMap = {
-    operate: "Operation",
-    count: "Stock Opname",
-    stock: "Stock",
-    import: "Import",
+    operate: labels.operation.in === "入库" ? "作业" : "Operation",
+    count: labels.operation.count,
+    stock: labels.operation.stock,
+    import: labels.admin.import,
     master: "Master Data",
     users: labels.admin.accountPermissions,
     logs: labels.admin.transactionLog,
@@ -454,8 +687,6 @@ function applyLanguageLabels() {
   $$("[data-home-action='move']").forEach((item) => item.textContent = labels.operation.move);
   $$("[data-home-action='stock']").forEach((item) => item.textContent = labels.operation.checkStock);
   $$("[data-home-action='count']").forEach((item) => item.textContent = labels.operation.count);
-  const title = $("h1");
-  if (title) title.textContent = "轻量仓库执行系统 / WMS Lite";
 }
 
 async function initApiSync() {
@@ -513,10 +744,10 @@ async function pushRemoteState() {
       body: JSON.stringify(state)
     });
     if (!response.ok) throw new Error("Remote save failed");
-    setSyncStatus("Server synced");
+    setSyncStatus(displayLanguage === "zh" ? "服务器已同步" : "Server synced");
   } catch {
     apiAvailable = false;
-    setSyncStatus("Local demo");
+    setSyncStatus(labels.ui.localDemo);
   }
 }
 
@@ -526,10 +757,10 @@ function setSyncStatus(text) {
 }
 
 function syncStatusText() {
-  if (apiConnectionState === "connecting" && !apiSyncAttempted) return "Connecting";
-  if (apiAvailable || apiConnectionState === "connected") return "Server connected";
-  if (apiConnectionState === "failed") return serverRequired ? "Server connection failed" : "Local demo";
-  return serverRequired ? "Server belum tersambung" : "Demo lokal";
+  if (apiConnectionState === "connecting" && !apiSyncAttempted) return labels.ui.connecting;
+  if (apiAvailable || apiConnectionState === "connected") return labels.ui.connected;
+  if (apiConnectionState === "failed") return serverRequired ? labels.ui.connectionFailed : labels.ui.localDemo;
+  return serverRequired ? labels.ui.connectionFailed : labels.ui.localDemo;
 }
 
 async function validateSessionAuth(auth = {}) {
@@ -601,9 +832,20 @@ function fuzzySequence(text, token) {
 
 function formatMinute(value = new Date()) {
   const date = value instanceof Date ? value : new Date(value);
-  if (text.includes(",")) return "Jumlah tidak boleh memakai koma, gunakan format standar contoh 1000.5";
-  if (/^\d{1,3}(\.\d{3})+$/.test(text)) return "Jumlah tidak boleh memakai format ribuan seperti 1.000";
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  if (Number.isNaN(date.getTime())) return String(value || "");
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Jakarta",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      hourCycle: "h23"
+    }).formatToParts(date).map((part) => [part.type, part.value])
+  );
+  return `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:${parts.minute}`;
 }
 
 function parseSystemQty(value) {
@@ -662,7 +904,7 @@ function cacheMaterials(rows = []) {
 
 function cacheLocations(rows = []) {
   rows.forEach((item) => {
-    if (item?.code) locationCache.set(normalize(item.code), { code: normalize(item.code), status: item.status || "" });
+    if (item?.code) locationCache.set(normalize(item.code), { code: normalize(item.code), status: normalizeLocationStatus(item.status) });
   });
 }
 
@@ -700,7 +942,8 @@ async function postOperation(payload) {
     body: JSON.stringify({ ...payload, operatorId: auth.operatorId })
   });
   const data = await response.json();
-  if (!response.ok) throw new Error(apiErrorText(data, "操作失败", "operation"));
+  if (handleExpiredSessionResponse(response, data)) throw new Error("Sesi login berakhir, silakan masuk lagi");
+  if (!response.ok) throw new Error(apiErrorText(data, displayLanguage === "zh" ? "操作失败" : "Operation failed", "operation"));
   const currentUserId = state.currentUserId;
   Object.assign(state, migrateState({ ...defaultState(), ...data }));
   state.currentUserId = currentUserId;
@@ -720,7 +963,8 @@ async function postOperationBatch(payload) {
     body: JSON.stringify({ ...payload, operatorId: auth.operatorId })
   });
   const data = await response.json();
-  if (!response.ok) throw new Error(apiErrorText(data, "操作失败", "operation"));
+  if (handleExpiredSessionResponse(response, data)) throw new Error("Sesi login berakhir, silakan masuk lagi");
+  if (!response.ok) throw new Error(apiErrorText(data, displayLanguage === "zh" ? "操作失败" : "Operation failed", "operation"));
   const currentUserId = state.currentUserId;
   Object.assign(state, migrateState({ ...defaultState(), ...data }));
   state.currentUserId = currentUserId;
@@ -740,6 +984,7 @@ async function postMasterData(path, payload) {
     body: JSON.stringify({ ...payload, operatorId: auth.operatorId })
   });
   const data = await response.json();
+  if (handleExpiredSessionResponse(response, data)) throw new Error("Sesi login berakhir, silakan masuk lagi");
   if (!response.ok) throw new Error(apiErrorText(data, "Save failed", "admin"));
   const currentUserId = state.currentUserId;
   if (data.materials || data.locations || data.stock) {
@@ -766,6 +1011,7 @@ async function postUserData(path, payload) {
     body: JSON.stringify({ ...payload, operatorId: auth.operatorId })
   });
   const data = await response.json();
+  if (handleExpiredSessionResponse(response, data)) throw new Error("Sesi login berakhir, silakan masuk lagi");
   if (!response.ok) throw new Error(apiErrorText(data, "Account save failed", "admin"));
   const currentUserId = state.currentUserId;
   Object.assign(state, migrateState({ ...defaultState(), ...data }));
@@ -864,7 +1110,7 @@ function applyBatchOperationLocally(payload) {
   const batchItems = Array.isArray(payload.batchItems) ? payload.batchItems : [];
   for (const item of batchItems) {
     const qty = Number(item.qty);
-    const status = item.status || getDefaultStockStatus();
+    const status = normalizeStockStatus(item.status || getDefaultStockStatus());
     const sourceKey = { sku: payload.sku, batch: item.batch, location: item.location, status };
     const sourceRow = findStockInData(draft, sourceKey) || (item.location ? (draft.stock || []).filter((stock) => stock.sku === payload.sku && stock.batch === item.batch && stock.location === item.location).length === 1 ? (draft.stock || []).find((stock) => stock.sku === payload.sku && stock.batch === item.batch && stock.location === item.location) : null : null);
     if (payload.type === "in") {
@@ -955,7 +1201,7 @@ async function submitOperation(event, overridePayload = null) {
   }
   const inputSku = normalize($("#skuInput").value);
   const material = findMaterial($("#skuInput").value) ||
-    (selectedOperationSourceMatches(inputSku, normalize($("#batchInput").value), $("#statusInput").value || getDefaultStockStatus())
+    (selectedOperationSourceMatches(inputSku, normalize($("#batchInput").value), normalizeStockStatus($("#statusInput").value || getDefaultStockStatus()))
       ? { sku: selectedOperationStock.sku, name: selectedOperationStock.name }
       : null);
   const sku = material?.sku || "";
@@ -964,7 +1210,7 @@ async function submitOperation(event, overridePayload = null) {
   const qty = parseSystemQty(rawQty);
   const location = normalize($("#locationInput").value);
   const targetLocation = normalize($("#targetLocationInput").value);
-  const status = $("#statusInput").value || getDefaultStockStatus();
+  const status = normalizeStockStatus($("#statusInput").value || getDefaultStockStatus());
   const note = $("#noteInput").value.trim();
 
   if (!material) return showToast("Material harus dipilih dari master data");
@@ -1066,7 +1312,7 @@ function buildBatchOperationPayload() {
     const normalizedLocation = normalize(location);
     const normalizedTarget = normalize(targetLocation);
     const qty = parseSystemQty(qtyText);
-    const status = rowStatus ? String(rowStatus).trim() : getDefaultStockStatus();
+    const status = rowStatus ? normalizeStockStatus(rowStatus) : getDefaultStockStatus();
     if (!normalizedBatch) return { error: `Baris ${row.lineNo}: batch wajib diisi` };
     if (!normalizedLocation) return { error: `Baris ${row.lineNo}: lokasi wajib diisi` };
     if (qty === null) return { error: `Baris ${row.lineNo}: ${qtyErrorText(qtyText)}` };
@@ -1283,7 +1529,7 @@ function renderSelectedStockInfo() {
   const sku = material?.sku || "";
   const batch = normalize($("#batchInput").value);
   const location = normalize($("#locationInput").value);
-  const status = $("#statusInput").value;
+  const status = normalizeStockStatus($("#statusInput").value || getDefaultStockStatus());
   const row = selectedOperationMatches(sku, batch, location, status) ? selectedOperationStock : findStock(sku, batch, location, status);
   $("#selectedStockInfo").classList.toggle("hidden", !row);
   $("#selectedStockInfo").innerHTML = row
@@ -1319,7 +1565,7 @@ function updateOperationHelper() {
   const inputSku = normalize($("#skuInput").value);
   const batch = normalize($("#batchInput").value);
   const location = normalize($("#locationInput").value);
-  const status = $("#statusInput").value || getDefaultStockStatus();
+  const status = normalizeStockStatus($("#statusInput").value || getDefaultStockStatus());
   const qty = parseSystemQty(qtyInput.value);
   const targetLocation = normalize($("#targetLocationInput").value);
   const selectedRow = selectedOperationSourceMatches(inputSku, batch, status) ? selectedOperationStock : null;
@@ -1412,7 +1658,7 @@ function syncOperationSelection() {
   const sku = material?.sku || "";
   const batch = normalize($("#batchInput").value);
   const location = normalize($("#locationInput").value);
-  const status = $("#statusInput").value;
+  const status = normalizeStockStatus($("#statusInput").value || getDefaultStockStatus());
   const matches = operationType === "in"
     ? selectedOperationMatches(sku, batch, location, status)
     : selectedOperationSourceMatches(sku, batch, status);
@@ -1444,7 +1690,9 @@ async function submitCount(event) {
     return showToast("Pilih detail stok untuk opname terlebih dahulu");
   }
   const targetLocation = findLocation(location);
-  if (selectedCountStock.location !== location && targetLocation?.status === "Frozen") return showToast("Lokasi opname dibekukan, pilih lokasi lain.");
+  if (selectedCountStock.location !== location && isFrozenLocationStatus(targetLocation?.status)) {
+    return showToast("Lokasi opname dibekukan, pilih lokasi lain.");
+  }
 
   setFormSubmitting(event.target, true);
   try {
@@ -1474,16 +1722,34 @@ async function submitCount(event) {
       return showToast("Opname diperbarui");
     }
 
-    const row = findStock(sku, batch, location, status);
-    const beforeQty = row ? row.qty : 0;
-    if (row) {
-      row.qty = qty;
-      touchStock(row);
-    } else if (qty > 0) {
-      upsertStock({ sku, batch, location, status, qty });
+    const sourceRow = findStock(
+      selectedCountStock.sku,
+      selectedCountStock.batch,
+      selectedCountStock.location,
+      selectedCountStock.status
+    );
+    if (!sourceRow) return showToast("Detail stok opname sudah berubah, refresh lalu pilih ulang");
+    const beforeQty = sourceRow.qty;
+    if (selectedCountStock.location === location) {
+      sourceRow.qty = qty;
+      touchStock(sourceRow);
+    } else {
+      sourceRow.qty = 0;
+      touchStock(sourceRow);
+      if (qty > 0) upsertStock({ sku, batch, location, status, qty });
     }
 
-    addLog({ type: "adjust", sku, batch, qty, beforeQty, location, targetLocation: "", status, note });
+    addLog({
+      type: "adjust",
+      sku,
+      batch,
+      qty,
+      beforeQty,
+      location: selectedCountStock.location,
+      targetLocation: selectedCountStock.location === location ? "" : location,
+      status,
+      note
+    });
     removeZeroStock();
     refreshLocationUsage();
     saveState();
@@ -1720,9 +1986,9 @@ function seedDemo() {
     { code: "QC-HOLD", status: "Frozen" }
   ];
   state.stock = [
-    { id: uid(), sku: "RM-1001", batch: "B20260501", location: "A-01-01", status: "可用", qty: 120, version: 1, updatedAt: new Date().toISOString() },
-    { id: uid(), sku: "PK-2030", batch: "P260528", location: "B-02-01", status: "可用", qty: 560, version: 1, updatedAt: new Date().toISOString() },
-    { id: uid(), sku: "FG-8801", batch: "F260527", location: "QC-HOLD", status: "待检", qty: 48, version: 1, updatedAt: new Date().toISOString() }
+    { id: uid(), sku: "RM-1001", batch: "B20260501", location: "A-01-01", status: "available", qty: 120, version: 1, updatedAt: new Date().toISOString() },
+    { id: uid(), sku: "PK-2030", batch: "P260528", location: "B-02-01", status: "available", qty: 560, version: 1, updatedAt: new Date().toISOString() },
+    { id: uid(), sku: "FG-8801", batch: "F260527", location: "QC-HOLD", status: "pending", qty: 48, version: 1, updatedAt: new Date().toISOString() }
   ];
   addLog({ type: "initial", sku: "IMPORT", batch: "", qty: 3, location: "", targetLocation: "", status: "", note: "Demo data initialized" });
   addAuditLog({ action: "Load demo data", entity: "System data", key: "DEMO", before: null, after: { materials: state.materials.length, locations: state.locations.length, stock: state.stock.length }, note: "Demo data initialized" });
@@ -1743,7 +2009,7 @@ function renderPermissions() {
   $(".tabbar").classList.toggle("hidden", !loggedIn);
   $("#passwordWarning")?.classList.toggle("hidden", !passwordWarning);
   $$(".view").forEach((item) => item.classList.toggle("hidden", !loggedIn));
-  $("#accountBadge").textContent = loggedIn ? `${currentUser().id} / ${roleLabel(currentUser().role)}` : "Not logged in";
+  $("#accountBadge").textContent = loggedIn ? `${currentUser().id} / ${roleLabel(currentUser().role)}` : labels.ui.notLoggedIn;
   if (!loggedIn) return;
   if (lockdown) {
     $$(".tab").forEach((item) => item.classList.toggle("hidden", item.dataset.view !== "users"));
@@ -1755,6 +2021,15 @@ function renderPermissions() {
   $$(".admin-only, .admin-view").forEach((item) => item.classList.toggle("hidden", !admin));
   $$(".keeper-only").forEach((item) => item.classList.toggle("hidden", !keeper));
   $$(".admin-option").forEach((item) => item.hidden = !admin);
+  const moveOption = $("#operationTypeInput")?.querySelector("option[value='move']");
+  if (moveOption) {
+    moveOption.hidden = !canUseMoveOperation();
+    moveOption.disabled = !canUseMoveOperation();
+  }
+  if (!canUseMoveOperation() && operationType === "move") {
+    operationType = "in";
+    $("#operationTypeInput").value = "in";
+  }
   const activeView = $(".view.active");
   if (activeView && !canOpenView(activeView.id)) activateView("operate");
   $("#mobileHome").classList.toggle("hidden", !loggedIn);
@@ -1774,6 +2049,10 @@ function homeActionToView(action) {
 }
 
 function selectHomeAction(action) {
+  if (action === "move" && !canUseMoveOperation()) {
+    showToast("Hanya admin yang dapat memindahkan stok antar lokasi");
+    return;
+  }
   const view = homeActionToView(action);
   activateView(view);
   if (view === "operate") {
@@ -1809,7 +2088,9 @@ function openOperationConfirm(payload) {
         ["Location", payload.type === "move" ? `${payload.location} -> ${payload.targetLocation || "-"}` : payload.location],
         ["Qty", payload.qty]
       ];
-  $("#operationConfirmText").textContent = batchItems ? "Review batch rows before submit." : "Review before submit.";
+  $("#operationConfirmText").textContent = batchItems
+    ? (displayLanguage === "zh" ? "提交前请核对批量明细。" : "Review batch rows before submit.")
+    : (displayLanguage === "zh" ? "提交前请核对本次作业。" : "Review before submit.");
   $("#operationConfirmGrid").innerHTML = batchItems
     ? `
       <div class="confirm-row"><span>Batch mode</span><span>${escapeHtml(batchOperationLabel(payload.type))}</span></div>
@@ -1980,7 +2261,7 @@ function renderMetrics() {
   const total = state.stock.reduce((sum, item) => sum + item.qty, 0);
   if ($("#totalQty")) $("#totalQty").textContent = roundQty(total);
   if ($("#skuCount")) $("#skuCount").textContent = new Set(state.stock.map((item) => item.sku)).size;
-  if ($("#holdCount")) $("#holdCount").textContent = state.stock.filter((item) => item.status !== "可用").length;
+  if ($("#holdCount")) $("#holdCount").textContent = state.stock.filter((item) => normalizeStockStatus(item.status) !== "available").length;
 }
 
 function renderStock() {
@@ -2477,7 +2758,7 @@ async function exportStock() {
 }
 
 function downloadTemplate() {
-  downloadCsv([{ "Material Code": "RM-1001", "Material Name": "Glycerin", "Batch No.": "B20260501", "Qty": "120", "Location": "A-01-01", "Status": "available" }], "stock-import-template.csv");
+  downloadCsv([{ "Material Code": "RM-1001", "Material Name": "Glycerin", "Batch No.": "B20260501", "Qty": "120", "Location Code": "A-01-01", "Status": "available" }], "stock-import-template.csv");
 }
 
 function downloadMaterialTemplate() {
@@ -2534,7 +2815,7 @@ async function importInventory() {
     const rawQty = pickField(row, ["Qty", "Quantity", "qty"]);
     const qty = parseSystemQty(rawQty);
     const location = normalize(pickField(row, ["Location", "Location Code", "Warehouse Location", "Storage Location", "location"]));
-    const status = String(pickField(row, ["Status", "stockStatus", "status"]) || getDefaultStockStatus()).trim();
+    const status = normalizeStockStatus(pickField(row, ["Status", "stockStatus", "status"]) || getDefaultStockStatus());
     if (!sku || !name || !batch || !location || qty === null) {
       rejected += 1;
       return;
@@ -2549,7 +2830,7 @@ async function importInventory() {
   });
   groupedRows.forEach((item) => {
     upsertMaterial({ sku: item.sku, name: item.name });
-    if (!findLocation(item.location)) state.locations.push({ code: item.location, status: "Empty" });
+    if (!findLocation(item.location)) state.locations.push({ code: item.location, status: "empty" });
     const existing = findStock(item.sku, item.batch, item.location, item.status);
     if (existing) {
       existing.qty = item.qty;
@@ -2618,7 +2899,7 @@ async function importLocations() {
   let imported = 0;
   rows.forEach((row) => {
     const code = normalize(row["Location"] || row["Location Code"] || row.location || row.code);
-    const status = String(row["Status"] || row.status || "Empty").trim();
+    const status = normalizeLocationStatus(row["Status"] || row.status || "empty");
     if (!code) return;
     const existing = findLocation(code);
     if (existing) existing.status = status;
@@ -3223,6 +3504,10 @@ $$(".tab").forEach((button) => {
 });
 
 $("#operationTypeInput").addEventListener("change", (event) => {
+  if (event.target.value === "move" && !canUseMoveOperation()) {
+    showToast("Hanya admin yang dapat memindahkan stok antar lokasi");
+    event.target.value = "in";
+  }
   operationType = event.target.value;
   $("#operationStockSearch").value = "";
   $("#selectedStockInfo").innerHTML = "";
@@ -3240,6 +3525,7 @@ $$("#mobileHome [data-home-action]").forEach((button) => {
 
 $("#operationConfirmCancel").addEventListener("click", closeOperationConfirm);
 $("#operationConfirmSubmit").addEventListener("click", commitPendingOperation);
+$("#displayLanguageSelect")?.addEventListener("change", (event) => setDisplayLanguage(event.target.value));
 
 bindLoginButton();
 $("#resetAdminButton").addEventListener("click", ensureAdminAccount);
@@ -3343,12 +3629,12 @@ $("#exportStock").addEventListener("click", exportStock);
 $("#downloadTemplate").addEventListener("click", downloadTemplate);
 $("#downloadMaterialTemplate").addEventListener("click", downloadMaterialTemplate);
 $("#downloadLocationTemplate").addEventListener("click", downloadLocationTemplate);
-$("#importInventory").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "导入中", importInventory));
-$("#importMaterials").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "导入中", importMaterials));
-$("#importLocations").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "导入中", importLocations));
+$("#importInventory").addEventListener("click", (event) => withButtonBusy(event.currentTarget, displayLanguage === "zh" ? "导入中" : "Importing", importInventory));
+$("#importMaterials").addEventListener("click", (event) => withButtonBusy(event.currentTarget, displayLanguage === "zh" ? "导入中" : "Importing", importMaterials));
+$("#importLocations").addEventListener("click", (event) => withButtonBusy(event.currentTarget, displayLanguage === "zh" ? "导入中" : "Importing", importLocations));
 $("#downloadBackup").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "Backing up", downloadBackup));
-$("#downloadAutoBackup").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "下载中", downloadAutoBackup));
-$("#restoreBackup").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "恢复中", restoreBackup));
+$("#downloadAutoBackup").addEventListener("click", (event) => withButtonBusy(event.currentTarget, displayLanguage === "zh" ? "下载中" : "Downloading", downloadAutoBackup));
+$("#restoreBackup").addEventListener("click", (event) => withButtonBusy(event.currentTarget, displayLanguage === "zh" ? "恢复中" : "Restoring", restoreBackup));
 $("#materialForm").addEventListener("submit", addMaterial);
 $("#locationForm").addEventListener("submit", addLocation);
 $("#cancelMaterialEdit").addEventListener("click", resetMaterialEdit);
@@ -3376,7 +3662,7 @@ $("#passwordDialog").addEventListener("click", (event) => {
 window.addEventListener("storage", (event) => {
   if (event.key !== storeKey || !event.newValue) return;
   Object.assign(state, JSON.parse(event.newValue));
-  setSyncStatus("Updated");
+  setSyncStatus(displayLanguage === "zh" ? "已更新" : "Updated");
   render();
 });
 
@@ -3391,7 +3677,7 @@ if (channel) {
     if (event.data?.type !== "state-updated") return;
     Object.assign(state, event.data.state);
     saveState(false);
-    setSyncStatus("Updated");
+    setSyncStatus(displayLanguage === "zh" ? "已更新" : "Updated");
     render();
   });
 }
