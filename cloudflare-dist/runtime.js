@@ -559,9 +559,9 @@ function findUniqueStockRow(sku, batch, location) {
 
 function batchOperationLabel(type) {
   return {
-    in: "Batch Barang Masuk",
-    out: "Batch Barang Keluar",
-    move: "Batch Pindah Lokasi"
+    in: "Batch Inbound",
+    out: "Batch Outbound",
+    move: "Batch Move"
   }[type] || "Batch Operation";
 }
 
@@ -857,9 +857,9 @@ function parseSystemQty(value) {
 
 function qtyErrorText(value) {
   const text = String(value ?? "").trim();
-  if (text.includes(",")) return "Jumlah tidak boleh memakai koma, gunakan format standar contoh 1000.5";
-  if (/^\d{1,3}(\.\d{3})+$/.test(text)) return "Jumlah tidak boleh memakai format ribuan seperti 1.000";
-  return "Masukkan angka standar, maksimal 6 desimal, contoh 1000 atau 1000.123456";
+  if (text.includes(",")) return "Do not use comma decimals. Use standard format, for example 1000.5.";
+  if (/^\d{1,3}(\.\d{3})+$/.test(text)) return "Do not use thousand separators such as 1.000.";
+  return "Enter a standard number, up to 6 decimals, for example 1000 or 1000.123456.";
 }
 
 function roundQty(value) {
@@ -1116,9 +1116,9 @@ function applyBatchOperationLocally(payload) {
     if (payload.type === "in") {
       upsertStockInData(draft, { sku: payload.sku, batch: item.batch, location: item.location, status, qty });
     } else if (payload.type === "out") {
-      if (!sourceRow || Number(sourceRow.qty || 0) < qty) return { error: `Baris ${item.lineNo}: stok tidak cukup` };
+      if (!sourceRow || Number(sourceRow.qty || 0) < qty) return { error: `Row ${item.lineNo}: stock is not enough` };
       const versionError = sourceRow && item.expectedVersion !== undefined && item.expectedVersion !== null && item.expectedVersion !== "" && Number(sourceRow.version || 1) !== Number(item.expectedVersion)
-        ? "Data stok sudah berubah, silakan refresh lalu coba lagi"
+        ? "Stock data has changed. Refresh and try again."
         : null;
       if (versionError) return { error: versionError };
       sourceRow.qty = roundQty(Number(sourceRow.qty || 0) - qty);
@@ -1127,14 +1127,14 @@ function applyBatchOperationLocally(payload) {
     } else if (payload.type === "move") {
       const targetLocation = item.targetLocation;
       const target = (draft.locations || []).find((location) => location.code === targetLocation);
-      if (!sourceRow || Number(sourceRow.qty || 0) < qty) return { error: `Baris ${item.lineNo}: stok tidak cukup` };
+      if (!sourceRow || Number(sourceRow.qty || 0) < qty) return { error: `Row ${item.lineNo}: stock is not enough` };
       const versionError = sourceRow && item.expectedVersion !== undefined && item.expectedVersion !== null && item.expectedVersion !== "" && Number(sourceRow.version || 1) !== Number(item.expectedVersion)
-        ? "Data stok sudah berubah, silakan refresh lalu coba lagi"
+        ? "Stock data has changed. Refresh and try again."
         : null;
       if (versionError) return { error: versionError };
-      if (!target) return { error: `Baris ${item.lineNo}: lokasi tujuan tidak valid` };
-      if (isFrozenLocationStatus(target.status)) return { error: `Baris ${item.lineNo}: lokasi tujuan dibekukan` };
-      if (targetLocation === item.location) return { error: `Baris ${item.lineNo}: lokasi tujuan tidak boleh sama dengan lokasi awal` };
+      if (!target) return { error: `Row ${item.lineNo}: invalid target location` };
+      if (isFrozenLocationStatus(target.status)) return { error: `Row ${item.lineNo}: target location is frozen` };
+      if (targetLocation === item.location) return { error: `Row ${item.lineNo}: target location cannot equal source location` };
       sourceRow.qty = roundQty(Number(sourceRow.qty || 0) - qty);
       sourceRow.version = Number(sourceRow.version || 0) + 1;
       sourceRow.updatedAt = new Date().toISOString();
@@ -1213,19 +1213,19 @@ async function submitOperation(event, overridePayload = null) {
   const status = normalizeStockStatus($("#statusInput").value || getDefaultStockStatus());
   const note = $("#noteInput").value.trim();
 
-  if (!material) return showToast("Material harus dipilih dari master data");
-  if (!findLocation(location)) return showToast("Lokasi harus dipilih dari master data");
+  if (!material) return showToast("Material must be selected from master data");
+  if (!findLocation(location)) return showToast("Location must be selected from master data");
   if (!batch || qty === null) return showToast(qtyErrorText(rawQty));
-  if (qty <= 0) return showToast(operationType === "in" ? "Jumlah barang masuk harus lebih dari 0" : "Jumlah harus lebih dari 0");
+  if (qty <= 0) return showToast(operationType === "in" ? "Inbound quantity must be greater than 0" : "Quantity must be greater than 0");
   const selectedRow = selectedOperationSourceMatches(sku, batch, status) ? selectedOperationStock : null;
   if (["out", "move"].includes(operationType)) {
-    if (!selectedRow) return showToast("Pilih detail stok terlebih dahulu");
-    if (qty > Number(selectedRow.qty || 0)) return showToast("Jumlah tidak boleh melebihi stok tersedia");
+    if (!selectedRow) return showToast("Select a stock detail first");
+    if (qty > Number(selectedRow.qty || 0)) return showToast("Quantity cannot exceed available stock");
   }
   if (operationType === "move") {
-    if (!targetLocation || !findLocation(targetLocation)) return showToast("Pilih lokasi tujuan yang valid");
-    if (isFrozenLocationStatus(findLocation(targetLocation)?.status)) return showToast("Lokasi tujuan dibekukan");
-    if (targetLocation === (selectedRow?.location || location)) return showToast("Lokasi tujuan tidak boleh sama dengan lokasi awal");
+    if (!targetLocation || !findLocation(targetLocation)) return showToast("Select a valid target location");
+    if (isFrozenLocationStatus(findLocation(targetLocation)?.status)) return showToast("Target location is frozen");
+    if (targetLocation === (selectedRow?.location || location)) return showToast("Target location cannot equal source location");
   }
 
   const sourceLocation = selectedRow?.location || location;
@@ -1248,29 +1248,29 @@ async function submitOperation(event, overridePayload = null) {
         selectedOperationVersion = null;
         selectedOperationStock = null;
         render();
-        return showToast("Pekerjaan terkirim");
+        return showToast("Operation submitted");
       }
     } catch (error) {
       return showToast(error.message);
     }
 
     if (operationType === "in") {
-      if (qty <= 0) return showToast("Jumlah barang masuk harus lebih dari 0");
+      if (qty <= 0) return showToast("Inbound quantity must be greater than 0");
       upsertStock({ sku, batch, location, status, qty });
     }
 
     if (operationType === "out") {
-      if (qty <= 0) return showToast("Jumlah barang keluar harus lebih dari 0");
+      if (qty <= 0) return showToast("Outbound quantity must be greater than 0");
       const row = findStock(sku, batch, selectedRow?.location || location, status);
-      if (!row || row.qty < qty) return showToast("Stok tidak cukup atau status tidak cocok");
+      if (!row || row.qty < qty) return showToast("Stock is not enough or status does not match");
       row.qty = roundQty(row.qty - qty);
       touchStock(row);
     }
 
     if (operationType === "move") {
-      if (qty <= 0) return showToast("Jumlah pindah lokasi harus lebih dari 0");
+      if (qty <= 0) return showToast("Move quantity must be greater than 0");
       const row = findStock(sku, batch, selectedRow?.location || location, status);
-      if (!row || row.qty < qty) return showToast("Stok lokasi awal tidak cukup");
+      if (!row || row.qty < qty) return showToast("Source location stock is not enough");
       row.qty = roundQty(row.qty - qty);
       touchStock(row);
       upsertStock({ sku, batch, location: targetLocation, status, qty });
@@ -1284,7 +1284,7 @@ async function submitOperation(event, overridePayload = null) {
     selectedOperationVersion = null;
     selectedOperationStock = null;
     render();
-    showToast("Pekerjaan terkirim");
+    showToast("Operation submitted");
   } finally {
     setFormSubmitting(event.target, false);
   }
@@ -1295,17 +1295,17 @@ function buildBatchOperationPayload() {
   const material = findMaterial($("#skuInput").value);
   const batchRows = parseBatchOperationRows($("#batchRowsInput").value);
   const note = $("#noteInput").value.trim();
-  if (!material) return { error: "Material harus dipilih dari master data" };
-  if (!sku) return { error: "SKU harus diisi" };
-  if (!batchRows.length) return { error: "Tambahkan minimal satu baris batch" };
+  if (!material) return { error: "Material must be selected from master data" };
+  if (!sku) return { error: "SKU is required" };
+  if (!batchRows.length) return { error: "Add at least one batch row" };
 
   const batchItems = [];
   const seenKeys = new Set();
   for (const row of batchRows) {
     if (operationType === "move") {
-      if (row.parts.length < 4) return { error: `Baris ${row.lineNo} tidak valid` };
+      if (row.parts.length < 4) return { error: `Row ${row.lineNo} is invalid` };
     } else {
-      if (row.parts.length < 3) return { error: `Baris ${row.lineNo} tidak valid` };
+      if (row.parts.length < 3) return { error: `Row ${row.lineNo} is invalid` };
     }
     const [batch, location, qtyText, targetLocation = "", rowNote = "", rowStatus = ""] = row.parts;
     const normalizedBatch = normalize(batch);
@@ -1313,30 +1313,30 @@ function buildBatchOperationPayload() {
     const normalizedTarget = normalize(targetLocation);
     const qty = parseSystemQty(qtyText);
     const status = rowStatus ? normalizeStockStatus(rowStatus) : getDefaultStockStatus();
-    if (!normalizedBatch) return { error: `Baris ${row.lineNo}: batch wajib diisi` };
-    if (!normalizedLocation) return { error: `Baris ${row.lineNo}: lokasi wajib diisi` };
-    if (qty === null) return { error: `Baris ${row.lineNo}: ${qtyErrorText(qtyText)}` };
-    if (operationType !== "count" && qty <= 0) return { error: `Baris ${row.lineNo}: jumlah harus lebih dari 0` };
-    if (operationType === "in" && !findLocation(normalizedLocation)) return { error: `Baris ${row.lineNo}: lokasi tidak valid` };
+    if (!normalizedBatch) return { error: `Row ${row.lineNo}: batch is required` };
+    if (!normalizedLocation) return { error: `Row ${row.lineNo}: location is required` };
+    if (qty === null) return { error: `Row ${row.lineNo}: ${qtyErrorText(qtyText)}` };
+    if (operationType !== "count" && qty <= 0) return { error: `Row ${row.lineNo}: quantity must be greater than 0` };
+    if (operationType === "in" && !findLocation(normalizedLocation)) return { error: `Row ${row.lineNo}: invalid location` };
     if (operationType === "move") {
-      if (!normalizedTarget) return { error: `Baris ${row.lineNo}: lokasi tujuan wajib diisi` };
-      if (!findLocation(normalizedTarget)) return { error: `Baris ${row.lineNo}: lokasi tujuan tidak valid` };
-      if (isFrozenLocationStatus(findLocation(normalizedTarget)?.status)) return { error: `Baris ${row.lineNo}: lokasi tujuan dibekukan` };
-      if (normalizedTarget === normalizedLocation) return { error: `Baris ${row.lineNo}: lokasi tujuan tidak boleh sama dengan lokasi awal` };
+      if (!normalizedTarget) return { error: `Row ${row.lineNo}: target location is required` };
+      if (!findLocation(normalizedTarget)) return { error: `Row ${row.lineNo}: invalid target location` };
+      if (isFrozenLocationStatus(findLocation(normalizedTarget)?.status)) return { error: `Row ${row.lineNo}: target location is frozen` };
+      if (normalizedTarget === normalizedLocation) return { error: `Row ${row.lineNo}: target location cannot equal source location` };
     }
 
     const key = `${sku}__${normalizedBatch}__${normalizedLocation}__${status}`;
-    if (seenKeys.has(key)) return { error: `Baris ${row.lineNo}: detail stok duplikat` };
+    if (seenKeys.has(key)) return { error: `Row ${row.lineNo}: duplicate stock detail` };
     seenKeys.add(key);
 
     const sourceRow = operationType === "in"
       ? null
       : findStock(sku, normalizedBatch, normalizedLocation, status) || findUniqueStockRow(sku, normalizedBatch, normalizedLocation);
     if (["out", "move"].includes(operationType) && !sourceRow) {
-      return { error: `Baris ${row.lineNo}: detail stok tidak ditemukan` };
+      return { error: `Row ${row.lineNo}: stock detail not found` };
     }
     if (["out", "move"].includes(operationType) && qty > Number(sourceRow.qty || 0)) {
-      return { error: `Baris ${row.lineNo}: stok tidak cukup` };
+      return { error: `Row ${row.lineNo}: stock is not enough` };
     }
 
     batchItems.push({
@@ -1370,7 +1370,7 @@ async function submitBatchOperation(event, payload) {
       selectedOperationVersion = null;
       selectedOperationStock = null;
       render();
-      showToast("Pekerjaan terkirim");
+      showToast("Operation submitted");
       return;
     }
     const localResult = applyBatchOperationLocally(payload);
@@ -1379,7 +1379,7 @@ async function submitBatchOperation(event, payload) {
     selectedOperationVersion = null;
     selectedOperationStock = null;
     render();
-    showToast("Pekerjaan terkirim");
+    showToast("Operation submitted");
   } finally {
     setFormSubmitting(event.target, false);
   }
@@ -1410,7 +1410,7 @@ function updateOperationStockList() {
   $$(".operation-field").forEach((item) => item.classList.toggle("hidden", useStockPicker));
   $("#operationStatusWrap")?.classList.add("hidden");
   $("#targetLocationWrap").classList.toggle("hidden", operationType !== "move");
-  $("#operationStockHint").textContent = operationType === "move" ? "Cari dan pilih stok untuk dipindah." : "Cari dan pilih stok untuk dikeluarkan.";
+  $("#operationStockHint").textContent = operationType === "move" ? "Search and select stock to move." : "Search and select stock to issue.";
   updateOperationHelper();
   if (!useStockPicker) return;
   syncOperationSelection();
@@ -1431,7 +1431,7 @@ function scheduleOperationStockLoad() {
 async function loadOperationStockRows() {
   if (!["out", "move"].includes(operationType)) return;
   const requestId = ++operationStockRequestId;
-  $("#operationStockList").innerHTML = `<div class="empty-state">Memuat stok...</div>`;
+  $("#operationStockList").innerHTML = `<div class="empty-state">Loading stock...</div>`;
   try {
     const material = findMaterial($("#skuInput").value);
     const data = await fetchApiPage("/api/stock", {
@@ -1515,7 +1515,7 @@ function selectOperationStock(event) {
   $("#statusInput").value = card.dataset.status;
   $("#qtyInput").value = "";
   $("#qtyInput").dataset.maxQty = card.dataset.qty;
-  $("#qtyInput").placeholder = `最大 ${card.dataset.qty}`;
+  $("#qtyInput").placeholder = `Max ${card.dataset.qty}`;
   $("#operationStockSearch").value = `${card.dataset.sku} ${card.dataset.batch} ${card.dataset.location}`;
   selectedOperationVersion = Number(card.dataset.version || 1);
   selectedOperationStock = stockFromDataset(card.dataset);
@@ -1533,18 +1533,18 @@ function renderSelectedStockInfo() {
   const row = selectedOperationMatches(sku, batch, location, status) ? selectedOperationStock : findStock(sku, batch, location, status);
   $("#selectedStockInfo").classList.toggle("hidden", !row);
   $("#selectedStockInfo").innerHTML = row
-    ? `<strong>Detail stok dipilih</strong>
+    ? `<strong>Selected stock detail</strong>
       <span>Material: ${escapeHtml(sku)} / ${escapeHtml(row.name || material?.name || "")}</span>
-      <span>Batch: ${escapeHtml(batch)} / Lokasi: ${escapeHtml(location)}</span>
-      <span>Stok tersedia: ${row.qty}, masukkan jumlah di bawah.</span>`
+      <span>Batch: ${escapeHtml(batch)} / Location: ${escapeHtml(location)}</span>
+      <span>Available stock: ${row.qty}. Enter quantity below.</span>`
     : "";
   updateOperationHelper();
 }
 
 function operationEmptyText() {
   const keyword = $("#operationStockSearch")?.value.trim();
-  if (!keyword) return "Silakan scan atau masukkan kode material, batch, atau lokasi untuk mencari stok.";
-  return "Stok yang bisa diproses tidak ditemukan, periksa kode material, batch, atau lokasi.";
+  if (!keyword) return "Scan or enter material code, batch, or location to search stock.";
+  return "No processable stock found. Check material code, batch, or location.";
 }
 
 function updateOperationHelper() {
@@ -1554,13 +1554,13 @@ function updateOperationHelper() {
   const submitButton = $("#operationSubmitButton");
   if (!guide || !qtyHint || !qtyInput || !submitButton) return;
 
-  const labels = { in: "Barang Masuk", out: "Barang Keluar", move: "Pindah Lokasi" };
+  const labels = { in: "Inbound", out: "Outbound", move: "Move" };
   const batchMode = batchModeEnabled();
   const steps = {
-    in: batchMode ? ["Pilih SKU", "Isi batch rows", "Konfirmasi kirim"] : ["Pilih material", "Pilih lokasi", "Masukkan jumlah", "Konfirmasi kirim"],
-    out: batchMode ? ["Pilih SKU", "Isi batch rows", "Konfirmasi kirim"] : ["Pilih detail stok", "Masukkan jumlah", "Konfirmasi kirim"],
-    move: batchMode ? ["Pilih SKU", "Isi batch rows", "Konfirmasi kirim"] : ["Pilih detail stok", "Masukkan jumlah", "Pilih lokasi tujuan", "Konfirmasi kirim"]
-  }[operationType] || ["Isi data", "Konfirmasi kirim"];
+    in: batchMode ? ["Select SKU", "Fill batch rows", "Confirm submit"] : ["Select material", "Select location", "Enter quantity", "Confirm submit"],
+    out: batchMode ? ["Select SKU", "Fill batch rows", "Confirm submit"] : ["Select stock detail", "Enter quantity", "Confirm submit"],
+    move: batchMode ? ["Select SKU", "Fill batch rows", "Confirm submit"] : ["Select stock detail", "Enter quantity", "Select target location", "Confirm submit"]
+  }[operationType] || ["Fill data", "Confirm submit"];
 
   const inputSku = normalize($("#skuInput").value);
   const batch = normalize($("#batchInput").value);
@@ -1580,16 +1580,16 @@ function updateOperationHelper() {
     activeStep = skuReady ? 1 : 0;
     if (skuReady && rows.length) activeStep = 2;
     ready = skuReady && rows.length > 0;
-    nextText = ready ? "Periksa batch rows lalu kirim." : "Pilih SKU lalu isi batch rows.";
+    nextText = ready ? "Review batch rows, then submit." : "Select SKU, then fill batch rows.";
     qtyInput.placeholder = "Batch mode uses rows below";
   } else if (operationType === "in") {
     if (findMaterial($("#skuInput").value)) activeStep = 1;
     if (findLocation(location)) activeStep = 2;
     if (qty !== null && qty > 0) activeStep = 3;
     delete qtyInput.dataset.maxQty;
-    qtyInput.placeholder = "Contoh 1000 atau 1000.123456";
+    qtyInput.placeholder = "Example 1000 or 1000.123456";
     ready = !!findMaterial($("#skuInput").value) && !!findLocation(location) && !!batch && qty !== null && qty > 0;
-    nextText = ready ? "Bisa konfirmasi lalu kirim barang masuk." : "Pilih material, lokasi, lalu masukkan jumlah.";
+    nextText = ready ? "Ready to confirm and submit inbound." : "Select material and location, then enter quantity.";
   } else {
     if (selectedRow) activeStep = 1;
     if (qty !== null && qty > 0 && selectedRow && qty <= Number(selectedRow.qty || 0)) activeStep = 2;
@@ -1598,30 +1598,30 @@ function updateOperationHelper() {
       qtyInput.dataset.maxQty = selectedRow.qty;
       qtyInput.placeholder = `Maks ${selectedRow.qty}`;
       if (selectedRow.location !== location) {
-        nextText = `Stok ${selectedRow.location} sudah dipilih, lanjut masukkan jumlah.`;
+        nextText = `Stock at ${selectedRow.location} is selected. Enter quantity.`;
       } else if (qty !== null && qty > Number(selectedRow.qty || 0)) {
-        nextText = "Jumlah melebihi stok tersedia, kurangi jumlah.";
+        nextText = "Quantity exceeds available stock. Reduce quantity.";
       } else if (operationType === "move" && targetLocation && targetLocation === location) {
-        nextText = "Lokasi tujuan tidak boleh sama dengan lokasi awal.";
+        nextText = "Target location cannot equal source location.";
       } else {
-        nextText = `Stok tersedia ${selectedRow.qty}, lanjut masukkan jumlah.`;
+        nextText = `Available stock ${selectedRow.qty}. Enter quantity.`;
       }
     } else {
       delete qtyInput.dataset.maxQty;
-      qtyInput.placeholder = "Pilih detail stok terlebih dahulu";
-      nextText = operationType === "move" ? "Pilih detail stok yang akan dipindah." : "Pilih detail stok yang akan dikeluarkan.";
+      qtyInput.placeholder = "Select stock detail first";
+      nextText = operationType === "move" ? "Select stock detail to move." : "Select stock detail to issue.";
     }
     ready = !!selectedRow && qty !== null && qty > 0 && qty <= Number(selectedRow.qty || 0);
     if (operationType === "move") {
       const target = findLocation(targetLocation);
       ready = ready && !!target && targetLocation !== location && !isFrozenLocationStatus(target.status);
-      if (isFrozenLocationStatus(target?.status)) nextText = "Lokasi tujuan dibekukan, pilih lokasi lain.";
+      if (isFrozenLocationStatus(target?.status)) nextText = "Target location is frozen. Select another location.";
     }
   }
 
   guide.innerHTML = steps.map((step, index) => `<span class="step-pill ${index <= activeStep ? "active" : ""}">${index + 1}. ${escapeHtml(step)}</span>`).join("");
   qtyHint.textContent = nextText;
-  submitButton.textContent = `${labels[operationType] || "Operation"} / Kirim`;
+  submitButton.textContent = `${labels[operationType] || "Operation"} / Submit`;
   submitButton.dataset.logicDisabled = ready ? "" : "1";
   submitButton.disabled = (serverRequired && !apiAvailable) || !ready || submitButton.dataset.busy === "1";
 }
@@ -1682,16 +1682,16 @@ async function submitCount(event) {
   const location = normalize($("#countLocationInput").value);
   const note = $("#countNoteInput").value.trim();
 
-  if (!material) return showToast("Material harus dipilih dari master data");
+  if (!material) return showToast("Material must be selected from master data");
   if (!batch || qty === null) return showToast(qtyErrorText(rawQty));
-  if (!status) return showToast("Pilih status opname");
-  if (!findLocation(location)) return showToast("Lokasi opname harus dipilih dari master data");
+  if (!status) return showToast("Select count status");
+  if (!findLocation(location)) return showToast("Count location must be selected from master data");
   if (!selectedCountStock || selectedCountStock.sku !== sku || selectedCountStock.batch !== batch || selectedCountStock.status !== status) {
-    return showToast("Pilih detail stok untuk opname terlebih dahulu");
+    return showToast("Select stock detail for count first");
   }
   const targetLocation = findLocation(location);
   if (selectedCountStock.location !== location && isFrozenLocationStatus(targetLocation?.status)) {
-    return showToast("Lokasi opname dibekukan, pilih lokasi lain.");
+    return showToast("Count location is frozen. Select another location.");
   }
 
   setFormSubmitting(event.target, true);
@@ -1719,7 +1719,7 @@ async function submitCount(event) {
       $("#selectedCountInfo").classList.add("hidden");
       $("#selectedCountInfo").innerHTML = "";
       render();
-      return showToast("Opname diperbarui");
+      return showToast("Count updated");
     }
 
     const sourceRow = findStock(
@@ -1728,7 +1728,7 @@ async function submitCount(event) {
       selectedCountStock.location,
       selectedCountStock.status
     );
-    if (!sourceRow) return showToast("Detail stok opname sudah berubah, refresh lalu pilih ulang");
+    if (!sourceRow) return showToast("Count stock detail has changed. Refresh and select again.");
     const beforeQty = sourceRow.qty;
     if (selectedCountStock.location === location) {
       sourceRow.qty = qty;
@@ -1761,7 +1761,7 @@ async function submitCount(event) {
     $("#selectedCountInfo").innerHTML = "";
     render();
     updateCountPreview();
-    showToast("Opname diperbarui");
+    showToast("Count updated");
   } catch (error) {
     return showToast(error.message);
   } finally {
@@ -1801,8 +1801,8 @@ function updateCountPreview() {
 
 function countEmptyText() {
   const keyword = $("#countStockSearch")?.value.trim();
-  if (!keyword) return "Silakan scan atau masukkan kode material, batch, atau lokasi untuk mencari stok opname.";
-  return "Stok opname tidak ditemukan, periksa kode material, batch, atau lokasi.";
+  if (!keyword) return "Scan or enter material code, batch, or location to search count stock.";
+  return "No count stock found. Check material code, batch, or location.";
 }
 
 function scheduleCountStockLoad() {
@@ -1812,7 +1812,7 @@ function scheduleCountStockLoad() {
 
 async function loadCountStockRows() {
   const requestId = ++countStockRequestId;
-  $("#countStockList").innerHTML = `<div class="empty-state">Memuat stok...</div>`;
+  $("#countStockList").innerHTML = `<div class="empty-state">Loading stock...</div>`;
   try {
     const material = findMaterial($("#countSkuInput").value);
     const data = await fetchApiPage("/api/stock", {
@@ -1838,7 +1838,7 @@ async function loadCountStockRows() {
 function formatLocations(locations, total) {
   const text = locations.join(" / ");
   if (!total || total <= locations.length) return text;
-  return `${text} = ${total} lokasi.`;
+  return `${text} = ${total} locations.`;
 }
 
 function renderCountStockList(rows = []) {
@@ -1891,10 +1891,10 @@ function renderSelectedCountInfo() {
   const selected = $("#selectedCountInfo");
   selected.classList.toggle("hidden", !row);
   selected.innerHTML = row
-    ? `<strong>Detail opname dipilih</strong>
+    ? `<strong>Selected count detail</strong>
       <span>Material: ${escapeHtml(sku)} / ${escapeHtml(row.name || material?.name || "")}</span>
-      <span>Batch: ${escapeHtml(batch)} / Lokasi awal: ${escapeHtml(row.location)}</span>
-      <span>Jumlah buku: ${row.qty}, masukkan jumlah aktual dan lokasi aktual di bawah.</span>`
+      <span>Batch: ${escapeHtml(batch)} / Source Location: ${escapeHtml(row.location)}</span>
+      <span>Book qty: ${row.qty}. Enter actual quantity and actual location below.</span>`
     : "";
   updateCountHelper();
 }
@@ -1932,15 +1932,15 @@ function updateCountHelper() {
   const target = findLocation(location);
   let ready = !!selected && qty !== null && !!target;
   let text = "";
-  if (!selected) text = "Pilih detail stok untuk opname terlebih dahulu.";
-  else if (qty === null) text = "Masukkan jumlah aktual, 0 boleh, maksimal 6 desimal.";
-  else if (!target) text = "Lokasi opname harus dipilih dari master data.";
+  if (!selected) text = "Select stock detail for count first.";
+  else if (qty === null) text = "Enter actual quantity. 0 is allowed, up to 6 decimals.";
+  else if (!target) text = "Count location must be selected from master data.";
   else if (selected.location !== location && isFrozenLocationStatus(target.status)) {
     ready = false;
-    text = "Lokasi opname dibekukan, pilih lokasi lain.";
+    text = "Count location is frozen. Select another location.";
   } else {
-    const locationText = selected.location === location ? "Lokasi tetap" : `Lokasi akan berubah dari ${selected.location} ke ${location}`;
-    text = `Qty buku ${selected.qty}, qty aktual ${qty}. ${locationText}.`;
+    const locationText = selected.location === location ? "Location unchanged" : `Location will change from ${selected.location} to ${location}`;
+    text = `Book qty ${selected.qty}, actual qty ${qty}. ${locationText}.`;
   }
   hint.textContent = text;
   submitButton.dataset.logicDisabled = ready ? "" : "1";
@@ -2277,7 +2277,7 @@ function renderStock() {
 
 async function loadStockPage() {
   const requestId = ++stockRequestId;
-  $("#stockList").innerHTML = `<div class="empty-state">Memuat stok...</div>`;
+  $("#stockList").innerHTML = `<div class="empty-state">Loading stock...</div>`;
   renderStockPager();
   try {
     const data = await fetchApiPage("/api/stock", stockQueryParams());
@@ -2306,7 +2306,7 @@ function renderStockRows(rows) {
                   <strong>${escapeHtml(item.sku)}</strong>
                   <span>${escapeHtml(item.name || material?.name || "Unknown material")}</span>
                   <span>Batch: ${escapeHtml(item.batch)}</span>
-                  <span>Lokasi: ${escapeHtml(item.location)}</span>
+                  <span>Location: ${escapeHtml(item.location)}</span>
                 </div>
                 <div class="card-meta">
                   <b>${item.qty}</b>
@@ -2322,8 +2322,8 @@ function renderStockRows(rows) {
               <th class="sortable-th ${stockSortClass("sku")}" data-stock-sort="sku">Material Code</th>
               <th class="sortable-th ${stockSortClass("name")}" data-stock-sort="name">Material Name</th>
               <th class="sortable-th ${stockSortClass("batch")}" data-stock-sort="batch">Batch</th>
-              <th class="sortable-th ${stockSortClass("location")}" data-stock-sort="location">Lokasi</th>
-              <th class="num-cell sortable-th ${stockSortClass("qty")}" data-stock-sort="qty">Jumlah</th>
+              <th class="sortable-th ${stockSortClass("location")}" data-stock-sort="location">Location</th>
+              <th class="num-cell sortable-th ${stockSortClass("qty")}" data-stock-sort="qty">Qty</th>
             </tr>
           </thead>
           <tbody>
@@ -2341,7 +2341,7 @@ function renderStockRows(rows) {
           </tbody>
         </table>
       </div>`
-    : `<div class="empty-state">Belum ada data stok. Silakan cari material, batch, atau lokasi di halaman stok.</div>`;
+    : `<div class="empty-state">No stock data. Search material, batch, or location on the stock page.</div>`;
 }
 
 function renderStockPager() {
@@ -2400,7 +2400,7 @@ function renderMaterials() {
 
 async function loadMaterialPage() {
   const requestId = ++materialRequestId;
-  $("#materialList").innerHTML = `<div class="empty-state">Memuat...</div>`;
+  $("#materialList").innerHTML = `<div class="empty-state">Loading...</div>`;
   try {
     const data = await fetchApiPage("/api/materials", {
       query: $("#materialSearch")?.value.trim() || "",
@@ -2452,7 +2452,7 @@ function renderLocations() {
 
 async function loadLocationPage() {
   const requestId = ++locationRequestId;
-  $("#locationList").innerHTML = `<div class="empty-state">Memuat...</div>`;
+  $("#locationList").innerHTML = `<div class="empty-state">Loading...</div>`;
   try {
     const data = await fetchApiPage("/api/locations", {
       query: $("#locationSearch")?.value.trim() || "",
@@ -2534,7 +2534,7 @@ function renderLogs() {
 
 async function loadLogPage() {
   const requestId = ++logRequestId;
-  $("#logList").innerHTML = `<div class="empty-state">Memuat log...</div>`;
+  $("#logList").innerHTML = `<div class="empty-state">Loading log...</div>`;
   renderLogPager();
   try {
     const data = await fetchApiPage("/api/logs", {
@@ -2560,13 +2560,13 @@ function renderLogRows(rows) {
             <tr>
               <th>Date</th>
               <th>Account</th>
-              <th>类型</th>
+              <th>Type</th>
               <th>Material Code</th>
               <th>Batch No.</th>
               <th>Location</th>
               <th>Target Location</th>
               <th>Status</th>
-              <th class="num-cell">Jumlah</th>
+              <th class="num-cell">Qty</th>
               <th>Remark</th>
             </tr>
           </thead>
@@ -2605,11 +2605,11 @@ function renderAuditLogs() {
             <tr>
               <th>Date</th>
               <th>Account</th>
-              <th>对象</th>
-              <th>操作</th>
-              <th>主键</th>
-              <th>修改前</th>
-              <th>修改后</th>
+              <th>Object</th>
+              <th>Action</th>
+              <th>Key</th>
+              <th>Before</th>
+              <th>After</th>
               <th>Remark</th>
             </tr>
           </thead>
@@ -2655,7 +2655,7 @@ function ledgerQty(item) {
 }
 
 function typeLabel(type) {
-  return { in: "Barang Masuk", out: "Barang Keluar", move: "Pindah Lokasi", count: "Stock Opname", adjust: "Penyesuaian Opname", initial: "Saldo Awal" }[type] || type;
+  return { in: "Inbound", out: "Outbound", move: "Move", count: "Stock Count", adjust: "Stock Adjustment", initial: "Initial Stock" }[type] || type;
 }
 
 function emptyHtml() {
@@ -2694,7 +2694,7 @@ function showToast(text) {
   setTimeout(() => toast.classList.remove("show"), 2200);
 }
 
-function setButtonBusy(button, busy, busyText = "处理中") {
+function setButtonBusy(button, busy, busyText = "Processing") {
   if (!button) return;
   if (busy) {
     button.dataset.busy = "1";
@@ -2715,7 +2715,7 @@ function setFormSubmitting(form, busy) {
     button.disabled = busy;
     if (busy) {
       button.dataset.label = button.textContent;
-      button.textContent = "Mengirim";
+      button.textContent = "Submitting";
     } else if (button.dataset.label) {
       button.textContent = button.dataset.label;
     }
@@ -2792,16 +2792,16 @@ function downloadBlob(blob, filename) {
 async function importInventory() {
   if (!isAdmin()) return showToast("No permission");
   const rows = await readSelectedRows("#inventoryFile");
-  if (!rows.length) return showToast("File tidak memiliki data impor");
+  if (!rows.length) return showToast("File has no import data");
   const report = validateInventoryRows(rows);
-  renderImportReport("Laporan validasi saldo awal", report);
-  if (!report.validRows) return showToast("Tidak ada baris stok valid, periksa file");
-  if (!confirm(importConfirmText("Saldo Awal", report))) return;
+  renderImportReport("Initial stock validation report", report);
+  if (!report.validRows) return showToast("No valid stock rows, please check the file");
+  if (!confirm(importConfirmText("Initial Stock", report))) return;
   try {
     const remote = await postMasterData("/api/import-inventory", { rows });
     if (remote) {
       render();
-      return showToast("Impor stok terkirim");
+      return showToast("Stock import submitted");
     }
   } catch (error) {
     return showToast(error.message);
@@ -2841,26 +2841,26 @@ async function importInventory() {
   });
   const imported = groupedRows.size;
   refreshLocationUsage();
-  addLog({ type: "initial", sku: "IMPORT", batch: "", qty: imported, location: "", targetLocation: "", status: "", note: `Impor saldo awal ${imported} baris, ditolak ${rejected} baris` });
-  addAuditLog({ action: "Impor saldo awal", entity: "Impor stok", key: "IMPORT", before: null, after: { imported, rejected, sourceRows: rows.length }, note: `Impor saldo awal ${imported} baris, ditolak ${rejected} baris` });
+  addLog({ type: "initial", sku: "IMPORT", batch: "", qty: imported, location: "", targetLocation: "", status: "", note: `Imported initial stock ${imported} rows, rejected ${rejected} rows` });
+  addAuditLog({ action: "Import Initial Stock", entity: "Stock Import", key: "IMPORT", before: null, after: { imported, rejected, sourceRows: rows.length }, note: `Imported initial stock ${imported} rows, rejected ${rejected} rows` });
   saveState();
   render();
-  showToast(`Berhasil impor ${imported} baris, ditolak ${rejected} baris`);
+  showToast(`Imported ${imported} rows, rejected ${rejected} rows`);
 }
 
 async function importMaterials() {
   if (!isAdmin()) return showToast("No permission");
   const rows = await readSelectedRows("#materialFile");
-  if (!rows.length) return showToast("File tidak memiliki data impor");
+  if (!rows.length) return showToast("File has no import data");
   const report = validateMaterialRows(rows);
-  renderImportReport("Laporan validasi master material", report);
+  renderImportReport("Material master validation report", report);
   if (!report.validRows) return showToast("No valid material rows, please check the file");
   if (!confirm(importConfirmText("Master Material", report))) return;
   try {
     const remote = await postMasterData("/api/import-materials", { rows });
     if (remote) {
       render();
-      return showToast("Impor master material terkirim");
+      return showToast("Material master import submitted");
     }
   } catch (error) {
     return showToast(error.message);
@@ -2873,25 +2873,25 @@ async function importMaterials() {
     upsertMaterial({ sku, name });
     imported += 1;
   });
-  addAuditLog({ action: "Impor master material", entity: "Material Master Data", key: "IMPORT", before: null, after: { imported }, note: `Impor material ${imported} baris` });
+  addAuditLog({ action: "Import Material Master", entity: "Material Master Data", key: "IMPORT", before: null, after: { imported }, note: `Imported ${imported} material rows` });
   saveState();
   render();
-  showToast(`Berhasil impor material ${imported} baris`);
+  showToast(`Imported ${imported} material rows`);
 }
 
 async function importLocations() {
   if (!isAdmin()) return showToast("No permission");
   const rows = await readSelectedRows("#locationFile");
-  if (!rows.length) return showToast("File tidak memiliki data impor");
+  if (!rows.length) return showToast("File has no import data");
   const report = validateLocationRows(rows);
-  renderImportReport("Laporan validasi master lokasi", report);
-  if (!report.validRows) return showToast("Tidak ada baris lokasi valid, periksa file");
-  if (!confirm(importConfirmText("Master Lokasi", report))) return;
+  renderImportReport("Location master validation report", report);
+  if (!report.validRows) return showToast("No valid location rows, please check the file");
+  if (!confirm(importConfirmText("Location Master", report))) return;
   try {
     const remote = await postMasterData("/api/import-locations", { rows });
     if (remote) {
       render();
-      return showToast("Impor master lokasi terkirim");
+      return showToast("Location master import submitted");
     }
   } catch (error) {
     return showToast(error.message);
@@ -2907,10 +2907,10 @@ async function importLocations() {
     imported += 1;
   });
   refreshLocationUsage();
-  addAuditLog({ action: "Impor master lokasi", entity: "Location Master Data", key: "IMPORT", before: null, after: { imported }, note: `Impor lokasi ${imported} baris` });
+  addAuditLog({ action: "Import Location Master", entity: "Location Master Data", key: "IMPORT", before: null, after: { imported }, note: `Imported ${imported} location rows` });
   saveState();
   render();
-  showToast(`Berhasil impor lokasi ${imported} baris`);
+  showToast(`Imported ${imported} location rows`);
 }
 
 async function downloadBackup() {
@@ -2958,7 +2958,7 @@ async function restoreBackup() {
   if (!requireLiveServer("restore backup")) return;
   const file = $("#restoreFile").files[0];
   if (!file) return showToast("Please select a backup JSON file");
-  if (!confirm("Restore backup akan menimpa stok, master data, akun, dan log saat ini. Lanjutkan?")) return;
+  if (!confirm("Restoring backup will overwrite current stock, master data, accounts, and logs. Continue?")) return;
   try {
     const backup = JSON.parse(await readTextFile(file));
     const auth = currentAuthPayload();
@@ -3003,9 +3003,9 @@ function validateInventoryRows(rows) {
     const status = String(pickField(row, ["Status", "stockStatus", "status"]) || getDefaultStockStatus()).trim();
     const reasons = [];
     if (!sku) reasons.push("Material code missing");
-    if (!name) reasons.push("Nama material kosong");
-    if (!batch) reasons.push("Batch kosong");
-    if (!location) reasons.push("Lokasi kosong");
+    if (!name) reasons.push("Material name missing");
+    if (!batch) reasons.push("Batch missing");
+    if (!location) reasons.push("Location missing");
     if (qty === null) reasons.push(qtyErrorText(rawQty));
     if (reasons.length) return addInvalid(report, index, reasons);
     report.validRows += 1;
@@ -3026,7 +3026,7 @@ function validateMaterialRows(rows) {
     const name = String(pickField(row, ["Material Name", "Item Name", "name"]) || "").trim();
     const reasons = [];
     if (!sku) reasons.push("Material code missing");
-    if (!name) reasons.push("Nama material kosong");
+    if (!name) reasons.push("Material name missing");
     if (reasons.length) return addInvalid(report, index, reasons);
     report.validRows += 1;
     if (seen.has(sku)) report.duplicateRows += 1;
@@ -3041,7 +3041,7 @@ function validateLocationRows(rows) {
   const seen = new Set();
   rows.forEach((row, index) => {
     const code = normalize(pickField(row, ["Location", "Location Code", "Warehouse Location", "Storage Location", "location", "code"]));
-    if (!code) return addInvalid(report, index, ["Kode lokasi kosong"]);
+    if (!code) return addInvalid(report, index, ["Location code missing"]);
     report.validRows += 1;
     if (seen.has(code)) report.duplicateRows += 1;
     seen.add(code);
@@ -3182,9 +3182,9 @@ async function addMaterial(event) {
   const sku = normalize($("#newSku").value);
   const name = $("#newName").value.trim();
   const previousSku = editingMaterialSku;
-  if (!sku || !name) return showToast("Kode material dan nama tidak boleh kosong");
-  if (!previousSku && state.materials.some((item) => item.sku === sku)) return showToast("Kode material sudah ada, cari lalu klik ubah");
-  if (previousSku && previousSku !== sku && state.materials.some((item) => item.sku === sku)) return showToast("Kode material sudah ada");
+  if (!sku || !name) return showToast("Material code and name are required");
+  if (!previousSku && state.materials.some((item) => item.sku === sku)) return showToast("Material code already exists. Search it, then edit.");
+  if (previousSku && previousSku !== sku && state.materials.some((item) => item.sku === sku)) return showToast("Material code already exists");
   try {
     const remote = await postMasterData("/api/materials", { previousSku, sku, name });
     if (!remote) {
@@ -3208,7 +3208,7 @@ async function addMaterial(event) {
   materialPage.page = 1;
   resetMaterialEdit();
   render();
-  showToast("Master material tersimpan");
+  showToast("Material master saved");
 }
 
 async function addLocation(event) {
@@ -3217,9 +3217,9 @@ async function addLocation(event) {
   const code = normalize($("#newLocation").value);
   const previousCode = editingLocationCode;
   const status = $("#newLocationStatus").value;
-  if (!code) return showToast("Kode lokasi tidak boleh kosong");
-  if (!previousCode && state.locations.some((item) => item.code === code)) return showToast("Kode lokasi sudah ada, cari lalu klik ubah");
-  if (previousCode && previousCode !== code && state.locations.some((item) => item.code === code)) return showToast("Kode lokasi sudah ada");
+  if (!code) return showToast("Location code is required");
+  if (!previousCode && state.locations.some((item) => item.code === code)) return showToast("Location code already exists. Search it, then edit.");
+  if (previousCode && previousCode !== code && state.locations.some((item) => item.code === code)) return showToast("Location code already exists");
   try {
     const remote = await postMasterData("/api/locations", { previousCode, code, status });
     if (!remote) {
@@ -3245,7 +3245,7 @@ async function addLocation(event) {
   locationPage.page = 1;
   resetLocationEdit();
   render();
-  showToast("Master lokasi tersimpan");
+  showToast("Location master saved");
 }
 
 function editMaterial(sku) {
@@ -3293,7 +3293,7 @@ async function addUser(event) {
   const role = $("#newUserRole").value;
   const modules = normalizeModules($("#newUserModules").value);
   const user = { id, role, modules: modules.length ? modules : defaultModulesForRole(role) };
-  if (!existing && !password) return showToast("Akun baru wajib punya password");
+  if (!existing && !password) return showToast("New account requires a password");
   try {
     const remote = await postUserData("/api/users", { id, role: user.role, modules: user.modules, userPassword: password });
     if (!remote) {
@@ -3337,12 +3337,12 @@ function closePasswordDialog() {
 
 async function submitPasswordChange() {
   if (!isAdmin()) return showToast("No permission");
-  if (!pendingPasswordUserId) return showToast("Pilih akun terlebih dahulu");
+  if (!pendingPasswordUserId) return showToast("Select an account first");
   const newPassword = $("#passwordDialogNew").value.trim();
   const confirmPassword = $("#passwordDialogConfirm").value.trim();
-  if (!newPassword) return showToast("Masukkan password baru");
-  if (newPassword.length < 6) return showToast("Password minimal 6 karakter");
-  if (newPassword !== confirmPassword) return showToast("Dua password tidak sama");
+  if (!newPassword) return showToast("Enter a new password");
+  if (newPassword.length < 6) return showToast("Password must be at least 6 characters");
+  if (newPassword !== confirmPassword) return showToast("Passwords do not match");
   const account = pendingPasswordUserId;
   if (!confirm(`Change password for account ${account}?`)) return;
   try {
@@ -3353,11 +3353,11 @@ async function submitPasswordChange() {
     if (account.toLowerCase() === "admin" && sessionAuth.userId?.toLowerCase() === "admin") {
       saveSessionAuth(sessionAuth.userId, sessionAuth.token, sessionAuth.expiresAt, false);
     }
-    showToast("Password berhasil diubah");
+    showToast("Password changed");
     closePasswordDialog();
     render();
   } catch (error) {
-    showToast(error.message || "Gagal ubah password");
+    showToast(error.message || "Failed to change password");
   }
 }
 
@@ -3371,7 +3371,7 @@ async function loginAsync() {
   const password = $("#loginPasswordInput").value;
   const button = $("#loginButton");
   if (button.dataset.busy === "1") return;
-  setButtonBusy(button, true, "Sedang masuk");
+  setButtonBusy(button, true, "Logging in");
   try {
     debugLogin("sending /api/login");
     const response = await fetch("/api/login", {
@@ -3381,7 +3381,7 @@ async function loginAsync() {
     });
     const data = await response.json();
     debugLogin(`/api/login status ${response.status}`);
-    if (!response.ok) throw new Error(apiErrorText(data, "Akun atau password salah", "admin"));
+    if (!response.ok) throw new Error(apiErrorText(data, "Wrong account or password", "admin"));
     Object.assign(state, migrateState({ ...defaultState(), ...(data.state || {}) }));
 
     state.currentUserId = data.user.id;
@@ -3397,7 +3397,7 @@ async function loginAsync() {
     debugLogin("render called after login");
     if (data.mustChangePassword) {
       activateView("users");
-      showToast("Administrator masih memakai password default, silakan ubah dulu");
+      showToast("Administrator is still using the default password. Change it first.");
     }
   } catch (error) {
     debugLogin(`login error ${error?.message || "unknown"}`);
@@ -3426,7 +3426,7 @@ function logout() {
 async function deleteUser(userId) {
   if (!isAdmin()) return showToast("No permission");
   const target = state.users.find((user) => user.id === userId);
-  if (target?.role === "admin") return showToast("Akun admin tidak bisa dihapus");
+  if (target?.role === "admin") return showToast("Admin account cannot be deleted");
   if (!confirm(`Delete account ${userId}?\nThis account will not be able to log in after deletion.`)) return;
   try {
     const remote = await postUserData("/api/users/delete", { targetId: userId });
@@ -3505,7 +3505,7 @@ $$(".tab").forEach((button) => {
 
 $("#operationTypeInput").addEventListener("change", (event) => {
   if (event.target.value === "move" && !canUseMoveOperation()) {
-    showToast("Hanya admin yang dapat memindahkan stok antar lokasi");
+    showToast("No permission to move stock between locations");
     event.target.value = "in";
   }
   operationType = event.target.value;
@@ -3558,7 +3558,7 @@ $("#qtyInput").addEventListener("blur", (event) => {
   if (event.target.value && parseSystemQty(event.target.value) === null) showToast(qtyErrorText(event.target.value));
   const qty = parseSystemQty(event.target.value);
   const maxQty = Number(event.target.dataset.maxQty || 0);
-  if (qty !== null && maxQty && qty > maxQty) showToast("Jumlah tidak boleh melebihi stok tersedia");
+  if (qty !== null && maxQty && qty > maxQty) showToast("Quantity cannot exceed available stock");
 });
 $("#qtyInput").addEventListener("input", updateOperationHelper);
 $("#operationForm").addEventListener("submit", submitOperation);

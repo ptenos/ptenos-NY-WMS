@@ -33,7 +33,7 @@
             </select>
           </label>
           <button class="ghost-button hidden" id="installAppButton" type="button">Install</button>
-          <button class="ghost-button" id="logoutButton" type="button">Keluar</button>
+          <button class="ghost-button" id="logoutButton" type="button">Logout</button>
           <button class="ghost-button admin-only local-demo-only hidden" id="seedDemo" type="button">Load Demo</button>
         </div>
       </header>
@@ -41,13 +41,13 @@
       <section class="login-panel" id="loginPanel">
         <label>
           Username
-          <input id="loginUserInput" autocomplete="username" placeholder="Masukkan username" />
+          <input id="loginUserInput" autocomplete="username" placeholder="Enter username" />
         </label>
         <label>
           Password
-          <input id="loginPasswordInput" type="password" autocomplete="current-password" placeholder="Masukkan password" />
+          <input id="loginPasswordInput" type="password" autocomplete="current-password" placeholder="Enter password" />
         </label>
-        <button class="primary-button" id="loginButton" type="button">Masuk</button>
+        <button class="primary-button" id="loginButton" type="button">Login</button>
         <button class="secondary-button" id="resetAdminButton" type="button">Reset Password Admin</button>
       </section>
 
@@ -60,16 +60,16 @@
       </section>
 
       <section class="mobile-home hidden" id="mobileHome">
-        <button class="home-action" type="button" data-home-action="in">Barang Masuk</button>
-        <button class="home-action" type="button" data-home-action="out">Barang Keluar</button>
-        <button class="home-action" type="button" data-home-action="move">Pindah Lokasi</button>
-        <button class="home-action" type="button" data-home-action="stock">Cek Stok</button>
-        <button class="home-action keeper-only" type="button" data-home-action="count">Stock Opname</button>
+        <button class="home-action" type="button" data-home-action="in">Inbound</button>
+        <button class="home-action" type="button" data-home-action="out">Outbound</button>
+        <button class="home-action" type="button" data-home-action="move">Move</button>
+        <button class="home-action" type="button" data-home-action="stock">Check Stock</button>
+        <button class="home-action keeper-only" type="button" data-home-action="count">Stock Count</button>
       </section>
 
       <nav class="tabbar hidden" aria-label="Main navigation">
         <button class="tab active" data-view="operate" type="button">Operation</button>
-        <button class="tab keeper-only" data-view="count" type="button">Stock Opname</button>
+        <button class="tab keeper-only" data-view="count" type="button">Stock Count</button>
         <button class="tab" data-view="stock" type="button">Stock</button>
         <button class="tab admin-only" data-view="import" type="button">Import</button>
         <button class="tab admin-only" data-view="master" type="button">Master Data</button>
@@ -82,11 +82,11 @@
         <section class="panel action-panel">
           <form id="operationForm" class="form-grid">
             <label class="wide">
-              Jenis Pekerjaan
+              Operation Type
               <select id="operationTypeInput">
-                <option value="in">Barang Masuk</option>
-                <option value="out">Barang Keluar</option>
-                <option value="move">Pindah Lokasi</option>
+                <option value="in">Inbound</option>
+                <option value="out">Outbound</option>
+                <option value="move">Move</option>
               </select>
             </label>
 
@@ -94,17 +94,17 @@
 
             <div class="operation-stock-list wide hidden" id="operationStockWrap">
               <div class="panel-title compact-title">
-                <h2>Detail Stok Tersedia</h2>
-                <p id="operationStockHint">Cari dan pilih stok yang akan diproses.</p>
+                <h2>Available Stock Details</h2>
+                <p id="operationStockHint">Search and select stock to process.</p>
               </div>
-              <input id="operationStockSearch" type="search" placeholder="Scan barcode stok, material, batch, atau lokasi" />
+              <input id="operationStockSearch" type="search" placeholder="Scan stock barcode, material, batch, or location" />
               <div class="selected-stock hidden" id="selectedStockInfo"></div>
               <div class="cards-list" id="operationStockList"></div>
             </div>
 
             <label class="operation-field">
-              Kode Material
-              <input id="skuInput" list="materialOptions" autocomplete="off" required placeholder="Scan kode material atau cari nama material" />
+              Material Code
+              <input id="skuInput" list="materialOptions" autocomplete="off" required placeholder="Scan material code or search material name" />
               <datalist id="materialOptions"></datalist>
             </label>
 
@@ -113,30 +113,30 @@
             </div>
 
             <label class="operation-field">
-              Nama Material
+              Material Name
               <input id="materialNameInput" disabled placeholder="Akan terisi otomatis setelah pilih master data" />
             </label>
 
             <label class="operation-field">
               Batch
-              <input id="batchInput" autocomplete="off" required placeholder="Contoh B20260528" />
+              <input id="batchInput" autocomplete="off" required placeholder="Example B20260528" />
             </label>
 
             <label>
-              Jumlah
-              <input id="qtyInput" inputmode="decimal" required placeholder="Contoh 1000 atau 1000.123456" />
+              Qty
+              <input id="qtyInput" inputmode="decimal" required placeholder="Example 1000 or 1000.123456" />
               <small class="field-hint" id="qtyHint"></small>
             </label>
 
             <label class="operation-field">
-              Lokasi Saat Ini
-              <input id="locationInput" list="locationOptions" autocomplete="off" required placeholder="Scan label lokasi asal" />
+              Current Location
+              <input id="locationInput" list="locationOptions" autocomplete="off" required placeholder="Scan source location label" />
               <datalist id="locationOptions"></datalist>
             </label>
 
             <label id="targetLocationWrap" class="hidden">
-              Lokasi Tujuan
-              <input id="targetLocationInput" list="targetLocationOptions" autocomplete="off" placeholder="Scan label lokasi tujuan" />
+              Target Location
+              <input id="targetLocationInput" list="targetLocationOptions" autocomplete="off" placeholder="Scan target location label" />
               <datalist id="targetLocationOptions"></datalist>
             </label>
 
@@ -151,8 +151,8 @@
             </label>
 
             <label class="wide">
-              Catatan
-              <textarea id="noteInput" placeholder="Nomor dokumen, pelanggan, alasan, catatan opname"></textarea>
+              Remark
+              <textarea id="noteInput" placeholder="Document number, customer, reason, count note"></textarea>
             </label>
 
             <label class="wide batch-toggle">
@@ -161,12 +161,12 @@
             </label>
 
             <label class="wide hidden" id="batchRowsWrap">
-              Batch rows / Baris batch
+              Batch rows
               <textarea id="batchRowsInput" placeholder="Batch|Source Location|Qty|Target Location|Note|Status"></textarea>
-              <small class="field-hint">Satu baris per detail. Contoh masuk/keluar: `B20260528|A-01-01|120`. Contoh pindah: `B20260528|A-01-01|120|B-02-01`. Tambahkan catatan dan status bila perlu.</small>
+              <small class="field-hint">One row per detail. Inbound/outbound example: `B20260528|A-01-01|120`. Move example: `B20260528|A-01-01|120|B-02-01`. Add remark and status if needed.</small>
             </label>
 
-            <button class="primary-button wide server-write" id="operationSubmitButton" type="submit">Kirim Pekerjaan</button>
+            <button class="primary-button wide server-write" id="operationSubmitButton" type="submit">Submit Operation</button>
           </form>
         </section>
       </section>
@@ -176,27 +176,27 @@
           <form id="countForm" class="form-grid">
             <div class="count-stock-list wide">
               <div class="panel-title compact-title">
-                <h2>Detail Stok Tersedia</h2>
-                <p>Cari dan pilih stok yang akan dihitung.</p>
+                <h2>Available Stock Details</h2>
+                <p>Search and select stock to count.</p>
               </div>
-              <input id="countStockSearch" type="search" placeholder="Scan barcode stok, material, batch, atau lokasi" />
+              <input id="countStockSearch" type="search" placeholder="Scan stock barcode, material, batch, or location" />
               <div class="selected-stock hidden" id="selectedCountInfo"></div>
               <div class="cards-list" id="countStockList"></div>
             </div>
 
             <label class="count-field">
-              Kode Material
-              <input id="countSkuInput" list="materialOptions" autocomplete="off" required placeholder="Scan kode material atau cari nama material" />
+              Material Code
+              <input id="countSkuInput" list="materialOptions" autocomplete="off" required placeholder="Scan material code or search material name" />
             </label>
 
             <label class="count-field">
-              Nama Material
+              Material Name
               <input id="countMaterialNameInput" disabled placeholder="Akan terisi otomatis setelah pilih master data" />
             </label>
 
             <label class="count-field">
               Batch
-              <input id="countBatchInput" autocomplete="off" required placeholder="Contoh B20260528" />
+              <input id="countBatchInput" autocomplete="off" required placeholder="Example B20260528" />
             </label>
 
             <label class="count-field hidden" id="countStatusWrap">
@@ -212,32 +212,32 @@
 
             <div class="inventory-preview wide hidden">
               <div>
-                <span>Jumlah Stok Saat Ini</span>
+                <span>Current Book Qty</span>
                 <strong id="currentCountQty">-</strong>
               </div>
               <div>
-                <span>Lokasi Saat Ini</span>
+                <span>Current Location</span>
                 <strong id="currentCountLocation">-</strong>
               </div>
             </div>
 
             <label>
-              Jumlah Opname
-              <input id="countQtyInput" inputmode="decimal" required placeholder="Contoh 1000 atau 1000.123456" />
+              Count Qty
+              <input id="countQtyInput" inputmode="decimal" required placeholder="Example 1000 or 1000.123456" />
               <small class="field-hint" id="countQtyHint"></small>
             </label>
 
             <label>
-              Lokasi Opname
-              <input id="countLocationInput" list="locationOptions" autocomplete="off" required placeholder="Scan label lokasi aktual" />
+              Count Location
+              <input id="countLocationInput" list="locationOptions" autocomplete="off" required placeholder="Scan actual location label" />
             </label>
 
             <label class="wide">
-              Catatan
-              <textarea id="countNoteInput" placeholder="Keterangan opname"></textarea>
+              Remark
+              <textarea id="countNoteInput" placeholder="Count note"></textarea>
             </label>
 
-            <button class="primary-button wide server-write" id="countSubmitButton" type="submit">Kirim Opname</button>
+            <button class="primary-button wide server-write" id="countSubmitButton" type="submit">Submit Count</button>
           </form>
         </section>
       </section>
