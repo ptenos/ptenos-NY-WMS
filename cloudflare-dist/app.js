@@ -236,6 +236,153 @@ const languageTemplates = {
 };
 let labels = languageTemplates[displayLanguage] || languageTemplates.en;
 document.documentElement.lang = displayLanguage === "zh" ? "zh-CN" : "en";
+
+function uiCopy() {
+  return displayLanguage === "zh" ? {
+    operationType: "作业类型",
+    availableStock: "可操作库存明细",
+    operationStockHint: "搜索并选择要操作的库存。",
+    operationStockSearch: "扫描库存条码，或输入物料、批号、库位",
+    materialNameAuto: "选择主数据后自动带出",
+    batchExample: "例如 B20260528",
+    qtyExample: "例如 1000 或 1000.123456",
+    sourceLocationScan: "扫描原库位标签",
+    targetLocationScan: "扫描目标库位标签",
+    notePlaceholder: "单号、客户、原因、盘点说明",
+    batchMode: "批量模式",
+    batchRows: "批量明细行",
+    batchRowsHint: "每行一条明细。入库/出库示例：`B20260528|A-01-01|120`。移库示例：`B20260528|A-01-01|120|B-02-01`。必要时可追加备注和状态。",
+    countStockHint: "搜索并选择要盘点的库存。",
+    currentBookQty: "当前账面数量",
+    currentLocation: "当前库位",
+    countQty: "盘点数量",
+    countLocation: "盘点库位",
+    countNote: "盘点说明",
+    stockSearch: "搜索库位、物料编码、名称、批号",
+    exportCurrentStock: "导出当前库存",
+    importTitle: "期初库存导入",
+    importDesc: "仅管理员使用。字段：Material Code, Material Name, Batch No., Qty, Location Code, Status。每一行对应一个批号-库位-状态。",
+    importStock: "导入库存",
+    downloadStockTemplate: "下载库存模板",
+    downloadBackup: "下载备份",
+    downloadAutoBackup: "下载自动备份",
+    restoreBackup: "恢复备份",
+    importHint: "数量必须使用标准格式，例如 1000 或 1000.123456，最多 6 位小数。不要使用 1.000 或 1.000,5。现场使用时，库位标签顺序要和文件行顺序保持一致。",
+    materialMasterTitle: "物料主数据",
+    locationMasterTitle: "库位主数据",
+    masterDesc: "支持手工维护和文件导入追加/更新。",
+    materialCodePlaceholder: "物料编码",
+    materialNamePlaceholder: "物料名称",
+    locationCodePlaceholder: "库位编码，例如 A-01-01",
+    searchMaterialPlaceholder: "搜索物料编码、名称",
+    searchLocationPlaceholder: "搜索库位编码、状态",
+    importMaterialMaster: "导入物料主数据",
+    importLocationMaster: "导入库位主数据",
+    downloadMaterialTemplate: "下载物料模板",
+    downloadLocationTemplate: "下载库位模板",
+    cancelEdit: "取消修改",
+    accountTitle: "账号与权限",
+    accountDesc: "管理员可以新增账号、设置角色、重置密码和管理模块权限。",
+    accountPlaceholder: "账号，例如 WH-001",
+    passwordPlaceholder: "密码，留空则不修改",
+    transactionDesc: "正式部署后，流水只允许系统自动追加，不允许手工修改或删除。",
+    logSearchPlaceholder: "搜索账号、日期、类型、物料、批号、库位",
+    auditTitle: "主数据修改记录",
+    auditDesc: "记录物料、库位、账号和导入动作的变更；正式部署后只追加，不删除。",
+    auditSearchPlaceholder: "搜索账号、对象、操作、主键、修改内容",
+    fileNoData: "文件没有可导入数据",
+    loadingStock: "正在加载库存...",
+    loading: "正在加载...",
+    loadingLog: "正在加载流水...",
+    noStock: "暂无库存数据。请在库存页面搜索物料、批号或库位。",
+    detail: "明细",
+    selectedStock: "已选择库存明细",
+    selectedCount: "已选择盘点明细",
+    availableStockText: "可用库存",
+    enterQtyBelow: "请在下方输入数量。",
+    noOperationStock: "未找到可操作库存，请确认物料编码、批号或库位。",
+    scanStockFirst: "请先扫码或输入物料编码、批号、库位查询库存。",
+    noCountStock: "未找到可盘点库存，请确认物料编码、批号或库位。",
+    scanCountFirst: "请先扫码或输入物料编码、批号、库位查询盘点库存。",
+    locationUnchanged: "库位不变",
+    rows: "行数",
+    totalQty: "总数量",
+    details: "明细",
+    batchModeLabel: "批量模式"
+  } : {
+    operationType: "Operation Type",
+    availableStock: "Available Stock Details",
+    operationStockHint: "Search and select stock to process.",
+    operationStockSearch: "Scan stock barcode, material, batch, or location",
+    materialNameAuto: "Auto-filled after selecting master data",
+    batchExample: "Example B20260528",
+    qtyExample: "Example 1000 or 1000.123456",
+    sourceLocationScan: "Scan source location label",
+    targetLocationScan: "Scan target location label",
+    notePlaceholder: "Document number, customer, reason, count note",
+    batchMode: "Batch mode",
+    batchRows: "Batch rows",
+    batchRowsHint: "One row per detail. Inbound/outbound example: `B20260528|A-01-01|120`. Move example: `B20260528|A-01-01|120|B-02-01`. Add remark and status if needed.",
+    countStockHint: "Search and select stock to count.",
+    currentBookQty: "Current Book Qty",
+    currentLocation: "Current Location",
+    countQty: "Count Qty",
+    countLocation: "Count Location",
+    countNote: "Count note",
+    stockSearch: "Search location, material code, name, batch",
+    exportCurrentStock: "Export Current Stock",
+    importTitle: "Initial Stock Import",
+    importDesc: "Admin only. Fields: Material Code, Material Name, Batch No., Qty, Location Code, Status. Keep one row per batch-location-status.",
+    importStock: "Import Stock",
+    downloadStockTemplate: "Download Stock Template",
+    downloadBackup: "Download Backup",
+    downloadAutoBackup: "Download Auto Backup",
+    restoreBackup: "Restore from Backup",
+    importHint: "Use standard numbers only, e.g. 1000 or 1000.123456; up to 6 decimals. Do not use 1.000 or 1.000,5. For floor use, keep location labels and file rows in the same scan order.",
+    materialMasterTitle: "Material Master Data",
+    locationMasterTitle: "Location Master Data",
+    masterDesc: "Supports manual maintenance and file import append/update.",
+    materialCodePlaceholder: "Material Code",
+    materialNamePlaceholder: "Material Name",
+    locationCodePlaceholder: "Location Code, e.g. A-01-01",
+    searchMaterialPlaceholder: "Search material code, name",
+    searchLocationPlaceholder: "Search location code, status",
+    importMaterialMaster: "Import Material Master Data",
+    importLocationMaster: "Import Location Master Data",
+    downloadMaterialTemplate: "Download Material Template",
+    downloadLocationTemplate: "Download Location Template",
+    cancelEdit: "Cancel Edit",
+    accountTitle: "Account & Permissions",
+    accountDesc: "Admins can add accounts, set roles, reset passwords, and manage module access.",
+    accountPlaceholder: "Account, e.g. WH-001",
+    passwordPlaceholder: "Password, leave blank to keep unchanged",
+    transactionDesc: "After formal deployment, only system auto-appends are allowed; manual edits or deletes are blocked.",
+    logSearchPlaceholder: "Search account, date, type, material, batch, location",
+    auditTitle: "Master Data Change Log",
+    auditDesc: "Records admin changes to materials, locations, accounts, and imports; after formal deployment, append only.",
+    auditSearchPlaceholder: "Search account, object, action, key, change details",
+    fileNoData: "File has no import data",
+    loadingStock: "Loading stock...",
+    loading: "Loading...",
+    loadingLog: "Loading log...",
+    noStock: "No stock data. Search material, batch, or location on the stock page.",
+    detail: "Details",
+    selectedStock: "Selected stock detail",
+    selectedCount: "Selected count detail",
+    availableStockText: "Available stock",
+    enterQtyBelow: "Enter quantity below.",
+    noOperationStock: "No processable stock found. Check material code, batch, or location.",
+    scanStockFirst: "Scan or enter material code, batch, or location to search stock.",
+    noCountStock: "No count stock found. Check material code, batch, or location.",
+    scanCountFirst: "Scan or enter material code, batch, or location to search count stock.",
+    locationUnchanged: "Location unchanged",
+    rows: "Rows",
+    totalQty: "Total qty",
+    details: "Details",
+    batchModeLabel: "Batch mode"
+  };
+}
+
 let sessionAuth = loadSessionAuth();
 if (!sessionAuth.token || sessionAuth.userId !== state.currentUserId) state.currentUserId = "";
 let operationType = "in";
@@ -478,6 +625,19 @@ function locationStatusLabel(status) {
   return map[value] || value || "-";
 }
 
+function stockStatusLabel(status) {
+  const raw = String(status ?? "").trim();
+  if (!raw || hasGarbledText(raw)) return "-";
+  const value = normalizeStockStatus(raw);
+  const map = {
+    available: displayLanguage === "zh" ? "可用" : "Available",
+    pending: displayLanguage === "zh" ? "待处理" : "Pending",
+    hold: displayLanguage === "zh" ? "保留" : "Hold",
+    reject: displayLanguage === "zh" ? "不良" : "Reject"
+  };
+  return map[value] || cleanDisplayText(raw, "-");
+}
+
 function normalizeLocationStatus(status) {
   const value = String(status || "").trim().toLowerCase();
   if (/^\?+$/.test(value)) return "empty";
@@ -558,11 +718,16 @@ function findUniqueStockRow(sku, batch, location) {
 }
 
 function batchOperationLabel(type) {
-  return {
+  const map = displayLanguage === "zh" ? {
+    in: "批量入库",
+    out: "批量出库",
+    move: "批量移库"
+  } : {
     in: "Batch Inbound",
     out: "Batch Outbound",
     move: "Batch Move"
-  }[type] || "Batch Operation";
+  };
+  return map[type] || (displayLanguage === "zh" ? "批量作业" : "Batch Operation");
 }
 
 
@@ -610,6 +775,7 @@ function handleExpiredSessionResponse(response, data) {
 }
 
 function applyLanguageLabels() {
+  const copy = uiCopy();
   const setText = (selector, value) => {
     const node = $(selector);
     if (node && value) node.textContent = value;
@@ -620,6 +786,12 @@ function applyLanguageLabels() {
   };
   const setLabelText = (selector, value) => {
     const node = $(selector);
+    if (!node) return;
+    const textNode = [...node.childNodes].find((child) => child.nodeType === Node.TEXT_NODE && child.textContent.trim());
+    if (textNode) textNode.textContent = `\n              ${value}\n              `;
+  };
+  const setInputLabel = (selector, value) => {
+    const node = $(selector)?.closest("label");
     if (!node) return;
     const textNode = [...node.childNodes].find((child) => child.nodeType === Node.TEXT_NODE && child.textContent.trim());
     if (textNode) textNode.textContent = `\n              ${value}\n              `;
@@ -640,8 +812,57 @@ function applyLanguageLabels() {
   setText("#passwordWarning", labels.ui.passwordWarning);
   setText("#operationSubmitButton", labels.operation.submit);
   setText("#countSubmitButton", labels.operation.submit);
-  setLabelText("#operationForm label.wide:nth-of-type(1)", displayLanguage === "zh" ? "作业类型" : "Operation Type");
+  setLabelText("#operationForm label.wide:nth-of-type(1)", copy.operationType);
   setLabelText("#skuInput", labels.operation.materialCode);
+  setText("#operationStockWrap .panel-title h2", copy.availableStock);
+  setText("#operationStockHint", copy.operationStockHint);
+  setPlaceholder("#operationStockSearch", copy.operationStockSearch);
+  setInputLabel("#skuInput", labels.operation.materialCode);
+  setInputLabel("#materialNameInput", labels.operation.materialName);
+  setPlaceholder("#materialNameInput", copy.materialNameAuto);
+  setInputLabel("#batchInput", labels.operation.batchNo);
+  setPlaceholder("#batchInput", copy.batchExample);
+  setInputLabel("#qtyInput", labels.operation.qty);
+  setPlaceholder("#qtyInput", copy.qtyExample);
+  setInputLabel("#locationInput", labels.operation.fromLocation);
+  setPlaceholder("#locationInput", copy.sourceLocationScan);
+  setLabelText("#targetLocationWrap", labels.operation.toLocation);
+  setPlaceholder("#targetLocationInput", copy.targetLocationScan);
+  setLabelText("#operationStatusWrap", labels.operation.status);
+  setInputLabel("#noteInput", labels.operation.remark);
+  setPlaceholder("#noteInput", copy.notePlaceholder);
+  setLabelText(".batch-toggle", copy.batchMode);
+  setLabelText("#batchRowsWrap", copy.batchRows);
+  setPlaceholder("#batchRowsInput", "Batch|Source Location|Qty|Target Location|Note|Status");
+  const batchRowsHint = $("#batchRowsWrap .field-hint");
+  if (batchRowsHint) batchRowsHint.textContent = copy.batchRowsHint;
+  setText("#count .panel-title h2", copy.availableStock);
+  setText("#count .panel-title p", copy.countStockHint);
+  setPlaceholder("#countStockSearch", copy.operationStockSearch);
+  setInputLabel("#countSkuInput", labels.operation.materialCode);
+  setPlaceholder("#countSkuInput", displayLanguage === "zh" ? "扫描物料编码或搜索物料名称" : "Scan material code or search material name");
+  setInputLabel("#countMaterialNameInput", labels.operation.materialName);
+  setPlaceholder("#countMaterialNameInput", copy.materialNameAuto);
+  setInputLabel("#countBatchInput", labels.operation.batchNo);
+  setPlaceholder("#countBatchInput", copy.batchExample);
+  setLabelText("#countStatusWrap", labels.operation.status);
+  const countStatusSelect = $("#countStatusInput");
+  if (countStatusSelect?.options?.length >= 5) {
+    countStatusSelect.options[0].textContent = displayLanguage === "zh" ? "全部状态" : "All statuses";
+    countStatusSelect.options[1].textContent = displayLanguage === "zh" ? "可用" : "Available";
+    countStatusSelect.options[2].textContent = displayLanguage === "zh" ? "待处理" : "Pending";
+    countStatusSelect.options[3].textContent = displayLanguage === "zh" ? "保留" : "Hold";
+    countStatusSelect.options[4].textContent = displayLanguage === "zh" ? "待检" : "Quarantine";
+  }
+  const previewLabels = $$(".inventory-preview span");
+  if (previewLabels[0]) previewLabels[0].textContent = copy.currentBookQty;
+  if (previewLabels[1]) previewLabels[1].textContent = copy.currentLocation;
+  setInputLabel("#countQtyInput", copy.countQty);
+  setPlaceholder("#countQtyInput", copy.qtyExample);
+  setInputLabel("#countLocationInput", copy.countLocation);
+  setPlaceholder("#countLocationInput", displayLanguage === "zh" ? "扫描实际库位标签" : "Scan actual location label");
+  setInputLabel("#countNoteInput", labels.operation.remark);
+  setPlaceholder("#countNoteInput", copy.countNote);
   const operationSelect = $("#operationTypeInput");
   if (operationSelect?.options?.length >= 3) {
     operationSelect.options[0].textContent = labels.operation.in;
@@ -650,19 +871,64 @@ function applyLanguageLabels() {
   }
   const statusSelect = $("#statusInput");
   if (statusSelect?.options?.length >= 4) {
-    statusSelect.options[0].textContent = "released";
-    statusSelect.options[1].textContent = "pending";
-    statusSelect.options[2].textContent = "hold";
-    statusSelect.options[3].textContent = "quarantine";
+    statusSelect.options[0].textContent = displayLanguage === "zh" ? "可用" : "Available";
+    statusSelect.options[1].textContent = displayLanguage === "zh" ? "待处理" : "Pending";
+    statusSelect.options[2].textContent = displayLanguage === "zh" ? "保留" : "Hold";
+    statusSelect.options[3].textContent = displayLanguage === "zh" ? "待检" : "Quarantine";
   }
   setText("#materialSaveButton", labels.ui.save);
   setText("#locationSaveButton", labels.ui.save);
-  setText("#importMaterials", labels.admin.import);
-  setText("#importLocations", labels.admin.import);
-  setText("#importInventory", labels.admin.import);
-  setText("#downloadBackup", "Download Backup");
-  setText("#downloadAutoBackup", "Download Auto Backup");
-  setText("#restoreBackup", "Restore Backup");
+  setText("#stock #exportStock", copy.exportCurrentStock);
+  setPlaceholder("#stockSearch", copy.stockSearch);
+  setText("#import .panel-title h2", copy.importTitle);
+  setText("#import .panel-title p", copy.importDesc);
+  setText("#importInventory", copy.importStock);
+  setText("#downloadTemplate", copy.downloadStockTemplate);
+  setText("#downloadBackup", copy.downloadBackup);
+  setText("#downloadAutoBackup", copy.downloadAutoBackup);
+  setText("#restoreBackup", copy.restoreBackup);
+  setText("#import .hint-box", copy.importHint);
+  setText("#master .split-grid .panel:nth-child(1) .panel-title h2", copy.materialMasterTitle);
+  setText("#master .split-grid .panel:nth-child(1) .panel-title p", copy.masterDesc);
+  setText("#master .split-grid .panel:nth-child(2) .panel-title h2", copy.locationMasterTitle);
+  setText("#master .split-grid .panel:nth-child(2) .panel-title p", copy.masterDesc);
+  setPlaceholder("#newSku", copy.materialCodePlaceholder);
+  setPlaceholder("#newName", copy.materialNamePlaceholder);
+  setPlaceholder("#materialSearch", copy.searchMaterialPlaceholder);
+  setText("#importMaterials", copy.importMaterialMaster);
+  setText("#downloadMaterialTemplate", copy.downloadMaterialTemplate);
+  setPlaceholder("#newLocation", copy.locationCodePlaceholder);
+  setPlaceholder("#locationSearch", copy.searchLocationPlaceholder);
+  const newLocationStatus = $("#newLocationStatus");
+  if (newLocationStatus?.options?.length >= 3) {
+    newLocationStatus.options[0].textContent = displayLanguage === "zh" ? "空闲" : "Empty";
+    newLocationStatus.options[1].textContent = displayLanguage === "zh" ? "占用" : "Occupied";
+    newLocationStatus.options[2].textContent = displayLanguage === "zh" ? "冻结" : "Frozen";
+  }
+  setText("#importLocations", copy.importLocationMaster);
+  setText("#downloadLocationTemplate", copy.downloadLocationTemplate);
+  setText("#cancelMaterialEdit", copy.cancelEdit);
+  setText("#cancelLocationEdit", copy.cancelEdit);
+  setText("#users .panel-title h2", copy.accountTitle);
+  setText("#users .panel-title p", copy.accountDesc);
+  setPlaceholder("#newUserId", copy.accountPlaceholder);
+  setPlaceholder("#newUserPassword", copy.passwordPlaceholder);
+  const roleSelect = $("#newUserRole");
+  if (roleSelect?.options?.length >= 3) {
+    roleSelect.options[0].textContent = roleLabel("employee");
+    roleSelect.options[1].textContent = roleLabel("keeper");
+    roleSelect.options[2].textContent = roleLabel("admin");
+  }
+  setText("#userForm button[type='submit']", labels.ui.save);
+  setText("#logs .panel-title h2", labels.admin.transactionLog);
+  setText("#logs .panel-title p", copy.transactionDesc);
+  setPlaceholder("#logSearch", copy.logSearchPlaceholder);
+  setText("#audit .panel-title h2", copy.auditTitle);
+  setText("#audit .panel-title p", copy.auditDesc);
+  setPlaceholder("#auditSearch", copy.auditSearchPlaceholder);
+  const emptyTemplate = $("#emptyTemplate");
+  if (emptyTemplate) emptyTemplate.innerHTML = `<div class="empty-state">${escapeHtml(labels.ui.noData)}</div>`;
+  setText("#operationConfirmSheet .panel-title h2", labels.ui.confirmOperation);
   setText("#operationConfirmCancel", labels.ui.back);
   setText("#operationConfirmSubmit", labels.ui.confirmSubmit);
   setText("#passwordDialogCancel", labels.ui.cancel);
@@ -673,7 +939,7 @@ function applyLanguageLabels() {
     count: labels.operation.count,
     stock: labels.operation.stock,
     import: labels.admin.import,
-    master: "Master Data",
+    master: labels.admin.masterData,
     users: labels.admin.accountPermissions,
     logs: labels.admin.transactionLog,
     audit: labels.admin.changeLog
@@ -857,9 +1123,9 @@ function parseSystemQty(value) {
 
 function qtyErrorText(value) {
   const text = String(value ?? "").trim();
-  if (text.includes(",")) return "Do not use comma decimals. Use standard format, for example 1000.5.";
-  if (/^\d{1,3}(\.\d{3})+$/.test(text)) return "Do not use thousand separators such as 1.000.";
-  return "Enter a standard number, up to 6 decimals, for example 1000 or 1000.123456.";
+  if (text.includes(",")) return displayLanguage === "zh" ? "不要使用逗号小数，请使用标准格式，例如 1000.5。" : "Do not use comma decimals. Use standard format, for example 1000.5.";
+  if (/^\d{1,3}(\.\d{3})+$/.test(text)) return displayLanguage === "zh" ? "不要使用 1.000 这类千分位格式。" : "Do not use thousand separators such as 1.000.";
+  return displayLanguage === "zh" ? "请输入标准数字，最多 6 位小数，例如 1000 或 1000.123456。" : "Enter a standard number, up to 6 decimals, for example 1000 or 1000.123456.";
 }
 
 function roundQty(value) {
@@ -1431,7 +1697,7 @@ function scheduleOperationStockLoad() {
 async function loadOperationStockRows() {
   if (!["out", "move"].includes(operationType)) return;
   const requestId = ++operationStockRequestId;
-  $("#operationStockList").innerHTML = `<div class="empty-state">Loading stock...</div>`;
+  $("#operationStockList").innerHTML = `<div class="empty-state">${escapeHtml(uiCopy().loadingStock)}</div>`;
   try {
     const material = findMaterial($("#skuInput").value);
     const data = await fetchApiPage("/api/stock", {
@@ -1525,6 +1791,7 @@ function selectOperationStock(event) {
 }
 
 function renderSelectedStockInfo() {
+  const copy = uiCopy();
   const material = findMaterial($("#skuInput").value);
   const sku = material?.sku || "";
   const batch = normalize($("#batchInput").value);
@@ -1533,34 +1800,42 @@ function renderSelectedStockInfo() {
   const row = selectedOperationMatches(sku, batch, location, status) ? selectedOperationStock : findStock(sku, batch, location, status);
   $("#selectedStockInfo").classList.toggle("hidden", !row);
   $("#selectedStockInfo").innerHTML = row
-    ? `<strong>Selected stock detail</strong>
-      <span>Material: ${escapeHtml(sku)} / ${escapeHtml(row.name || material?.name || "")}</span>
-      <span>Batch: ${escapeHtml(batch)} / Location: ${escapeHtml(location)}</span>
-      <span>Available stock: ${row.qty}. Enter quantity below.</span>`
+    ? `<strong>${escapeHtml(copy.selectedStock)}</strong>
+      <span>${escapeHtml(labels.operation.materialCode)}: ${escapeDisplay(sku)} / ${escapeDisplay(row.name || material?.name || "")}</span>
+      <span>${escapeHtml(labels.operation.batchNo)}: ${escapeDisplay(batch)} / ${escapeHtml(labels.operation.location)}: ${escapeDisplay(location)}</span>
+      <span>${escapeHtml(copy.availableStockText)}: ${row.qty}. ${escapeHtml(copy.enterQtyBelow)}</span>`
     : "";
   updateOperationHelper();
 }
 
 function operationEmptyText() {
+  const copy = uiCopy();
   const keyword = $("#operationStockSearch")?.value.trim();
-  if (!keyword) return "Scan or enter material code, batch, or location to search stock.";
-  return "No processable stock found. Check material code, batch, or location.";
+  if (!keyword) return copy.scanStockFirst;
+  return copy.noOperationStock;
 }
 
 function updateOperationHelper() {
+  const copy = uiCopy();
   const guide = $("#operationGuide");
   const qtyHint = $("#qtyHint");
   const qtyInput = $("#qtyInput");
   const submitButton = $("#operationSubmitButton");
   if (!guide || !qtyHint || !qtyInput || !submitButton) return;
 
-  const labels = { in: "Inbound", out: "Outbound", move: "Move" };
+  const operationLabels = { in: labels.operation.in, out: labels.operation.out, move: labels.operation.move };
   const batchMode = batchModeEnabled();
-  const steps = {
-    in: batchMode ? ["Select SKU", "Fill batch rows", "Confirm submit"] : ["Select material", "Select location", "Enter quantity", "Confirm submit"],
-    out: batchMode ? ["Select SKU", "Fill batch rows", "Confirm submit"] : ["Select stock detail", "Enter quantity", "Confirm submit"],
-    move: batchMode ? ["Select SKU", "Fill batch rows", "Confirm submit"] : ["Select stock detail", "Enter quantity", "Select target location", "Confirm submit"]
-  }[operationType] || ["Fill data", "Confirm submit"];
+  const steps = displayLanguage === "zh"
+    ? ({
+        in: batchMode ? ["选择物料", "填写批量明细", "确认提交"] : ["选择物料", "选择库位", "输入数量", "确认提交"],
+        out: batchMode ? ["选择物料", "填写批量明细", "确认提交"] : ["选择库存明细", "输入数量", "确认提交"],
+        move: batchMode ? ["选择物料", "填写批量明细", "确认提交"] : ["选择库存明细", "输入数量", "选择目标库位", "确认提交"]
+      }[operationType] || ["填写数据", "确认提交"])
+    : ({
+        in: batchMode ? ["Select SKU", "Fill batch rows", "Confirm submit"] : ["Select material", "Select location", "Enter quantity", "Confirm submit"],
+        out: batchMode ? ["Select SKU", "Fill batch rows", "Confirm submit"] : ["Select stock detail", "Enter quantity", "Confirm submit"],
+        move: batchMode ? ["Select SKU", "Fill batch rows", "Confirm submit"] : ["Select stock detail", "Enter quantity", "Select target location", "Confirm submit"]
+      }[operationType] || ["Fill data", "Confirm submit"]);
 
   const inputSku = normalize($("#skuInput").value);
   const batch = normalize($("#batchInput").value);
@@ -1580,16 +1855,20 @@ function updateOperationHelper() {
     activeStep = skuReady ? 1 : 0;
     if (skuReady && rows.length) activeStep = 2;
     ready = skuReady && rows.length > 0;
-    nextText = ready ? "Review batch rows, then submit." : "Select SKU, then fill batch rows.";
+    nextText = displayLanguage === "zh"
+      ? (ready ? "请检查批量明细，然后提交。" : "请选择物料，再填写批量明细。")
+      : (ready ? "Review batch rows, then submit." : "Select SKU, then fill batch rows.");
     qtyInput.placeholder = "Batch mode uses rows below";
   } else if (operationType === "in") {
     if (findMaterial($("#skuInput").value)) activeStep = 1;
     if (findLocation(location)) activeStep = 2;
     if (qty !== null && qty > 0) activeStep = 3;
     delete qtyInput.dataset.maxQty;
-    qtyInput.placeholder = "Example 1000 or 1000.123456";
+    qtyInput.placeholder = copy.qtyExample;
     ready = !!findMaterial($("#skuInput").value) && !!findLocation(location) && !!batch && qty !== null && qty > 0;
-    nextText = ready ? "Ready to confirm and submit inbound." : "Select material and location, then enter quantity.";
+    nextText = displayLanguage === "zh"
+      ? (ready ? "可以确认并提交入库。" : "请选择物料和库位，再输入数量。")
+      : (ready ? "Ready to confirm and submit inbound." : "Select material and location, then enter quantity.");
   } else {
     if (selectedRow) activeStep = 1;
     if (qty !== null && qty > 0 && selectedRow && qty <= Number(selectedRow.qty || 0)) activeStep = 2;
@@ -1598,30 +1877,32 @@ function updateOperationHelper() {
       qtyInput.dataset.maxQty = selectedRow.qty;
       qtyInput.placeholder = `Maks ${selectedRow.qty}`;
       if (selectedRow.location !== location) {
-        nextText = `Stock at ${selectedRow.location} is selected. Enter quantity.`;
+        nextText = displayLanguage === "zh" ? `已选择 ${selectedRow.location} 的库存，请输入数量。` : `Stock at ${selectedRow.location} is selected. Enter quantity.`;
       } else if (qty !== null && qty > Number(selectedRow.qty || 0)) {
-        nextText = "Quantity exceeds available stock. Reduce quantity.";
+        nextText = displayLanguage === "zh" ? "数量超过可用库存，请减少数量。" : "Quantity exceeds available stock. Reduce quantity.";
       } else if (operationType === "move" && targetLocation && targetLocation === location) {
-        nextText = "Target location cannot equal source location.";
+        nextText = displayLanguage === "zh" ? "目标库位不能等于原库位。" : "Target location cannot equal source location.";
       } else {
-        nextText = `Available stock ${selectedRow.qty}. Enter quantity.`;
+        nextText = displayLanguage === "zh" ? `可用库存 ${selectedRow.qty}，请继续输入数量。` : `Available stock ${selectedRow.qty}. Enter quantity.`;
       }
     } else {
       delete qtyInput.dataset.maxQty;
-      qtyInput.placeholder = "Select stock detail first";
-      nextText = operationType === "move" ? "Select stock detail to move." : "Select stock detail to issue.";
+      qtyInput.placeholder = displayLanguage === "zh" ? "请先选择库存明细" : "Select stock detail first";
+      nextText = operationType === "move"
+        ? (displayLanguage === "zh" ? "请选择要移库的库存明细。" : "Select stock detail to move.")
+        : (displayLanguage === "zh" ? "请选择要出库的库存明细。" : "Select stock detail to issue.");
     }
     ready = !!selectedRow && qty !== null && qty > 0 && qty <= Number(selectedRow.qty || 0);
     if (operationType === "move") {
       const target = findLocation(targetLocation);
       ready = ready && !!target && targetLocation !== location && !isFrozenLocationStatus(target.status);
-      if (isFrozenLocationStatus(target?.status)) nextText = "Target location is frozen. Select another location.";
+      if (isFrozenLocationStatus(target?.status)) nextText = displayLanguage === "zh" ? "目标库位已冻结，请选择其他库位。" : "Target location is frozen. Select another location.";
     }
   }
 
   guide.innerHTML = steps.map((step, index) => `<span class="step-pill ${index <= activeStep ? "active" : ""}">${index + 1}. ${escapeHtml(step)}</span>`).join("");
   qtyHint.textContent = nextText;
-  submitButton.textContent = `${labels[operationType] || "Operation"} / Submit`;
+  submitButton.textContent = `${operationLabels[operationType] || "Operation"} / ${labels.operation.submit}`;
   submitButton.dataset.logicDisabled = ready ? "" : "1";
   submitButton.disabled = (serverRequired && !apiAvailable) || !ready || submitButton.dataset.busy === "1";
 }
@@ -1800,9 +2081,10 @@ function updateCountPreview() {
 }
 
 function countEmptyText() {
+  const copy = uiCopy();
   const keyword = $("#countStockSearch")?.value.trim();
-  if (!keyword) return "Scan or enter material code, batch, or location to search count stock.";
-  return "No count stock found. Check material code, batch, or location.";
+  if (!keyword) return copy.scanCountFirst;
+  return copy.noCountStock;
 }
 
 function scheduleCountStockLoad() {
@@ -1812,7 +2094,7 @@ function scheduleCountStockLoad() {
 
 async function loadCountStockRows() {
   const requestId = ++countStockRequestId;
-  $("#countStockList").innerHTML = `<div class="empty-state">Loading stock...</div>`;
+  $("#countStockList").innerHTML = `<div class="empty-state">${escapeHtml(uiCopy().loadingStock)}</div>`;
   try {
     const material = findMaterial($("#countSkuInput").value);
     const data = await fetchApiPage("/api/stock", {
@@ -1882,6 +2164,7 @@ function selectCountStock(event) {
 }
 
 function renderSelectedCountInfo() {
+  const copy = uiCopy();
   const material = findMaterial($("#countSkuInput").value);
   const sku = material?.sku || "";
   const batch = normalize($("#countBatchInput").value);
@@ -1891,10 +2174,10 @@ function renderSelectedCountInfo() {
   const selected = $("#selectedCountInfo");
   selected.classList.toggle("hidden", !row);
   selected.innerHTML = row
-    ? `<strong>Selected count detail</strong>
-      <span>Material: ${escapeHtml(sku)} / ${escapeHtml(row.name || material?.name || "")}</span>
-      <span>Batch: ${escapeHtml(batch)} / Source Location: ${escapeHtml(row.location)}</span>
-      <span>Book qty: ${row.qty}. Enter actual quantity and actual location below.</span>`
+    ? `<strong>${escapeHtml(copy.selectedCount)}</strong>
+      <span>${escapeHtml(labels.operation.materialCode)}: ${escapeDisplay(sku)} / ${escapeDisplay(row.name || material?.name || "")}</span>
+      <span>${escapeHtml(labels.operation.batchNo)}: ${escapeDisplay(batch)} / ${escapeHtml(labels.operation.fromLocation)}: ${escapeDisplay(row.location)}</span>
+      <span>${displayLanguage === "zh" ? `账面数量：${row.qty}。请在下方输入实际数量和实际库位。` : `Book qty: ${row.qty}. Enter actual quantity and actual location below.`}</span>`
     : "";
   updateCountHelper();
 }
@@ -1932,15 +2215,17 @@ function updateCountHelper() {
   const target = findLocation(location);
   let ready = !!selected && qty !== null && !!target;
   let text = "";
-  if (!selected) text = "Select stock detail for count first.";
-  else if (qty === null) text = "Enter actual quantity. 0 is allowed, up to 6 decimals.";
-  else if (!target) text = "Count location must be selected from master data.";
+  if (!selected) text = displayLanguage === "zh" ? "请先选择要盘点的库存明细。" : "Select stock detail for count first.";
+  else if (qty === null) text = displayLanguage === "zh" ? "请输入实际数量，允许 0，最多 6 位小数。" : "Enter actual quantity. 0 is allowed, up to 6 decimals.";
+  else if (!target) text = displayLanguage === "zh" ? "盘点库位必须从主数据选择。" : "Count location must be selected from master data.";
   else if (selected.location !== location && isFrozenLocationStatus(target.status)) {
     ready = false;
-    text = "Count location is frozen. Select another location.";
+    text = displayLanguage === "zh" ? "盘点库位已冻结，请选择其他库位。" : "Count location is frozen. Select another location.";
   } else {
-    const locationText = selected.location === location ? "Location unchanged" : `Location will change from ${selected.location} to ${location}`;
-    text = `Book qty ${selected.qty}, actual qty ${qty}. ${locationText}.`;
+    const locationText = selected.location === location
+      ? (displayLanguage === "zh" ? "库位不变" : "Location unchanged")
+      : (displayLanguage === "zh" ? `库位将从 ${selected.location} 改为 ${location}` : `Location will change from ${selected.location} to ${location}`);
+    text = displayLanguage === "zh" ? `账面数量 ${selected.qty}，实际数量 ${qty}。${locationText}。` : `Book qty ${selected.qty}, actual qty ${qty}. ${locationText}.`;
   }
   hint.textContent = text;
   submitButton.dataset.logicDisabled = ready ? "" : "1";
@@ -2073,32 +2358,35 @@ function selectHomeAction(action) {
 function openOperationConfirm(payload) {
   pendingOperationPayload = payload;
   const batchItems = Array.isArray(payload.batchItems) ? payload.batchItems : null;
+  const confirmLabels = displayLanguage === "zh"
+    ? { action: "作业类型", material: "物料", batch: "批号", location: "库位", qty: "数量", batchMode: "批量模式", sku: "SKU", rows: "行数", totalQty: "总数量", details: "明细", batchOperation: "批量作业" }
+    : { action: "Action", material: "Material", batch: "Batch", location: "Location", qty: "Qty", batchMode: "Batch mode", sku: "SKU", rows: "Rows", totalQty: "Total qty", details: "Details", batchOperation: "Batch operation" };
   const rows = batchItems
     ? [
-        ["Action", batchOperationLabel(payload.type)],
-        ["SKU", payload.sku],
-        ["Rows", String(batchItems.length)],
-        ["Qty total", String(roundQty(batchItems.reduce((sum, item) => sum + Number(item.qty || 0), 0)))],
-        ["Batch", "Batch operation"]
+        [confirmLabels.action, batchOperationLabel(payload.type)],
+        [confirmLabels.sku, payload.sku],
+        [confirmLabels.rows, String(batchItems.length)],
+        [confirmLabels.totalQty, String(roundQty(batchItems.reduce((sum, item) => sum + Number(item.qty || 0), 0)))],
+        [confirmLabels.batch, confirmLabels.batchOperation]
       ]
     : [
-        ["Action", typeLabel(payload.type)],
-        ["Material", `${payload.sku}${payload.name || findMaterial(payload.sku)?.name ? ` / ${payload.name || findMaterial(payload.sku)?.name || ""}` : ""}`],
-        ["Batch", payload.batch],
-        ["Location", payload.type === "move" ? `${payload.location} -> ${payload.targetLocation || "-"}` : payload.location],
-        ["Qty", payload.qty]
+        [confirmLabels.action, typeLabel(payload.type)],
+        [confirmLabels.material, `${payload.sku}${payload.name || findMaterial(payload.sku)?.name ? ` / ${payload.name || findMaterial(payload.sku)?.name || ""}` : ""}`],
+        [confirmLabels.batch, payload.batch],
+        [confirmLabels.location, payload.type === "move" ? `${payload.location} -> ${payload.targetLocation || "-"}` : payload.location],
+        [confirmLabels.qty, payload.qty]
       ];
   $("#operationConfirmText").textContent = batchItems
     ? (displayLanguage === "zh" ? "提交前请核对批量明细。" : "Review batch rows before submit.")
     : (displayLanguage === "zh" ? "提交前请核对本次作业。" : "Review before submit.");
   $("#operationConfirmGrid").innerHTML = batchItems
     ? `
-      <div class="confirm-row"><span>Batch mode</span><span>${escapeHtml(batchOperationLabel(payload.type))}</span></div>
-      <div class="confirm-row"><span>SKU</span><span>${escapeHtml(payload.sku)}</span></div>
-      <div class="confirm-row"><span>Rows</span><span>${escapeHtml(String(batchItems.length))}</span></div>
-      <div class="confirm-row"><span>Total qty</span><span>${escapeHtml(String(roundQty(batchItems.reduce((sum, item) => sum + Number(item.qty || 0), 0))))}</span></div>
-      <div class="confirm-row wide"><span>Details</span><span>${batchItems.map((item) => `${escapeHtml(item.batch)} / ${escapeHtml(item.location)} / ${escapeHtml(String(item.qty))}${item.targetLocation ? ` -> ${escapeHtml(item.targetLocation)}` : ""}`).join("<br>")}</span></div>`
-    : rows.map(([label, value]) => `<div class="confirm-row"><span>${escapeHtml(label)}</span><span>${escapeHtml(value)}</span></div>`).join("");
+      <div class="confirm-row"><span>${escapeHtml(confirmLabels.batchMode)}</span><span>${escapeHtml(batchOperationLabel(payload.type))}</span></div>
+      <div class="confirm-row"><span>${escapeHtml(confirmLabels.sku)}</span><span>${escapeDisplay(payload.sku)}</span></div>
+      <div class="confirm-row"><span>${escapeHtml(confirmLabels.rows)}</span><span>${escapeHtml(String(batchItems.length))}</span></div>
+      <div class="confirm-row"><span>${escapeHtml(confirmLabels.totalQty)}</span><span>${escapeHtml(String(roundQty(batchItems.reduce((sum, item) => sum + Number(item.qty || 0), 0))))}</span></div>
+      <div class="confirm-row wide"><span>${escapeHtml(confirmLabels.details)}</span><span>${batchItems.map((item) => `${escapeDisplay(item.batch)} / ${escapeDisplay(item.location)} / ${escapeHtml(String(item.qty))}${item.targetLocation ? ` -> ${escapeDisplay(item.targetLocation)}` : ""}`).join("<br>")}</span></div>`
+    : rows.map(([label, value]) => `<div class="confirm-row"><span>${escapeHtml(label)}</span><span>${escapeDisplay(value)}</span></div>`).join("");
   $("#operationConfirmSheet").classList.remove("hidden");
 }
 
@@ -2129,11 +2417,11 @@ function renderMaterialOptions(rows) {
 
 function renderLocationOptions(rows) {
   $("#locationOptions").innerHTML = rows
-    .map((item) => `<option value="${escapeHtml(item.code)}">${escapeHtml(item.status || "")}</option>`)
+    .map((item) => `<option value="${escapeHtml(item.code)}">${escapeHtml(locationStatusLabel(item.status || ""))}</option>`)
     .join("");
   $("#targetLocationOptions").innerHTML = rows
     .filter((item) => !isFrozenLocationStatus(item.status))
-    .map((item) => `<option value="${escapeHtml(item.code)}">${escapeHtml(item.status || "")}</option>`)
+    .map((item) => `<option value="${escapeHtml(item.code)}">${escapeHtml(locationStatusLabel(item.status || ""))}</option>`)
     .join("");
 }
 
@@ -2277,7 +2565,7 @@ function renderStock() {
 
 async function loadStockPage() {
   const requestId = ++stockRequestId;
-  $("#stockList").innerHTML = `<div class="empty-state">Loading stock...</div>`;
+  $("#stockList").innerHTML = `<div class="empty-state">${escapeHtml(uiCopy().loadingStock)}</div>`;
   renderStockPager();
   try {
     const data = await fetchApiPage("/api/stock", stockQueryParams());
@@ -2294,6 +2582,9 @@ async function loadStockPage() {
 function renderStockRows(rows) {
   cacheMaterials(rows.filter((item) => item.sku && item.name).map((item) => ({ sku: item.sku, name: item.name })));
   const mobile = isMobileViewport();
+  const stockHeaders = displayLanguage === "zh"
+    ? { sku: "物料编码", name: "物料名称", batch: "批号", location: "库位", qty: "数量" }
+    : { sku: "Material Code", name: "Material Name", batch: "Batch", location: "Location", qty: "Qty" };
   $("#stockList").innerHTML = rows.length
     ? mobile
       ? `
@@ -2303,10 +2594,10 @@ function renderStockRows(rows) {
             return `
               <article class="data-card stock-card">
                 <div>
-                  <strong>${escapeHtml(item.sku)}</strong>
-                  <span>${escapeHtml(item.name || material?.name || "Unknown material")}</span>
-                  <span>Batch: ${escapeHtml(item.batch)}</span>
-                  <span>Location: ${escapeHtml(item.location)}</span>
+                  <strong>${escapeDisplay(item.sku)}</strong>
+                  <span>${escapeDisplay(item.name || material?.name || (displayLanguage === "zh" ? "未知物料" : "Unknown material"))}</span>
+                  <span>${stockHeaders.batch}: ${escapeDisplay(item.batch)}</span>
+                  <span>${stockHeaders.location}: ${escapeDisplay(item.location)}</span>
                 </div>
                 <div class="card-meta">
                   <b>${item.qty}</b>
@@ -2319,11 +2610,11 @@ function renderStockRows(rows) {
         <table class="data-table stock-table">
           <thead>
             <tr>
-              <th class="sortable-th ${stockSortClass("sku")}" data-stock-sort="sku">Material Code</th>
-              <th class="sortable-th ${stockSortClass("name")}" data-stock-sort="name">Material Name</th>
-              <th class="sortable-th ${stockSortClass("batch")}" data-stock-sort="batch">Batch</th>
-              <th class="sortable-th ${stockSortClass("location")}" data-stock-sort="location">Location</th>
-              <th class="num-cell sortable-th ${stockSortClass("qty")}" data-stock-sort="qty">Qty</th>
+              <th class="sortable-th ${stockSortClass("sku")}" data-stock-sort="sku">${stockHeaders.sku}</th>
+              <th class="sortable-th ${stockSortClass("name")}" data-stock-sort="name">${stockHeaders.name}</th>
+              <th class="sortable-th ${stockSortClass("batch")}" data-stock-sort="batch">${stockHeaders.batch}</th>
+              <th class="sortable-th ${stockSortClass("location")}" data-stock-sort="location">${stockHeaders.location}</th>
+              <th class="num-cell sortable-th ${stockSortClass("qty")}" data-stock-sort="qty">${stockHeaders.qty}</th>
             </tr>
           </thead>
           <tbody>
@@ -2331,17 +2622,17 @@ function renderStockRows(rows) {
               const material = findMaterial(item.sku);
               return `
                 <tr>
-                  <td>${escapeHtml(item.sku)}</td>
-                  <td>${escapeHtml(item.name || material?.name || "Unknown material")}</td>
-                  <td>${escapeHtml(item.batch)}</td>
-                  <td>${escapeHtml(item.location)}</td>
+                  <td>${escapeDisplay(item.sku)}</td>
+                  <td>${escapeDisplay(item.name || material?.name || (displayLanguage === "zh" ? "未知物料" : "Unknown material"))}</td>
+                  <td>${escapeDisplay(item.batch)}</td>
+                  <td>${escapeDisplay(item.location)}</td>
                   <td class="num-cell">${item.qty}</td>
                 </tr>`;
             }).join("")}
           </tbody>
         </table>
       </div>`
-    : `<div class="empty-state">No stock data. Search material, batch, or location on the stock page.</div>`;
+    : `<div class="empty-state">${escapeHtml(uiCopy().noStock)}</div>`;
 }
 
 function renderStockPager() {
@@ -2357,12 +2648,13 @@ function renderPager(selector, pageState, prefix) {
   }
   const from = (pageState.page - 1) * pageState.pageSize + 1;
   const to = Math.min(pageState.page * pageState.pageSize, pageState.total);
+  const showingText = displayLanguage === "zh" ? `显示 ${from}-${to} / ${pageState.total}` : `Showing ${from}-${to} / ${pageState.total}`;
   target.innerHTML = `
-    <span>Showing ${from}-${to} / ${pageState.total}</span>
+    <span>${escapeHtml(showingText)}</span>
     <div class="pager-actions">
-      <button class="ghost-button" type="button" data-${prefix}-page="prev" ${pageState.page <= 1 ? "disabled" : ""}>Prev</button>
+      <button class="ghost-button" type="button" data-${prefix}-page="prev" ${pageState.page <= 1 ? "disabled" : ""}>${displayLanguage === "zh" ? "上一页" : "Prev"}</button>
       <span>${pageState.page} / ${pageState.pages}</span>
-      <button class="ghost-button" type="button" data-${prefix}-page="next" ${pageState.page >= pageState.pages ? "disabled" : ""}>Next</button>
+      <button class="ghost-button" type="button" data-${prefix}-page="next" ${pageState.page >= pageState.pages ? "disabled" : ""}>${displayLanguage === "zh" ? "下一页" : "Next"}</button>
     </div>`;
 }
 
@@ -2400,7 +2692,7 @@ function renderMaterials() {
 
 async function loadMaterialPage() {
   const requestId = ++materialRequestId;
-  $("#materialList").innerHTML = `<div class="empty-state">Loading...</div>`;
+  $("#materialList").innerHTML = `<div class="empty-state">${escapeHtml(uiCopy().loading)}</div>`;
   try {
     const data = await fetchApiPage("/api/materials", {
       query: $("#materialSearch")?.value.trim() || "",
@@ -2452,7 +2744,7 @@ function renderLocations() {
 
 async function loadLocationPage() {
   const requestId = ++locationRequestId;
-  $("#locationList").innerHTML = `<div class="empty-state">Loading...</div>`;
+  $("#locationList").innerHTML = `<div class="empty-state">${escapeHtml(uiCopy().loading)}</div>`;
   try {
     const data = await fetchApiPage("/api/locations", {
       query: $("#locationSearch")?.value.trim() || "",
@@ -2476,7 +2768,7 @@ function renderLocationRows(rows) {
         <article class="data-card">
           <div>
             <strong>${escapeHtml(item.code)}</strong>
-            <span>${Number(item.stockRows ?? state.stock.filter((stock) => stock.location === item.code).length)} rows</span>
+            <span>${Number(item.stockRows ?? state.stock.filter((stock) => stock.location === item.code).length)} ${displayLanguage === "zh" ? "行库存" : "stock rows"}</span>
           </div>
           <div class="card-meta">
             <span>${escapeHtml(locationStatusLabel(item.status))}</span>
@@ -2487,16 +2779,19 @@ function renderLocationRows(rows) {
 }
 
 function renderUsers() {
+  const headers = displayLanguage === "zh"
+    ? { account: "账号", role: "角色", scope: "权限范围", action: "操作" }
+    : { account: "Account", role: "Role", scope: "Access Scope", action: "Action" };
   $("#userList").innerHTML = state.users.length
     ? `
       <div class="table-wrap">
         <table class="data-table">
           <thead>
             <tr>
-              <th>Account</th>
-                <th>角色 / Role</th>
-                <th>${labels.admin.accessScope}</th>
-                <th>操作 / Action</th>
+              <th>${headers.account}</th>
+                <th>${headers.role}</th>
+                <th>${headers.scope}</th>
+                <th>${headers.action}</th>
             </tr>
           </thead>
           <tbody>
@@ -2534,7 +2829,7 @@ function renderLogs() {
 
 async function loadLogPage() {
   const requestId = ++logRequestId;
-  $("#logList").innerHTML = `<div class="empty-state">Loading log...</div>`;
+  $("#logList").innerHTML = `<div class="empty-state">${escapeHtml(uiCopy().loadingLog)}</div>`;
   renderLogPager();
   try {
     const data = await fetchApiPage("/api/logs", {
@@ -2552,37 +2847,40 @@ async function loadLogPage() {
 }
 
 function renderLogRows(rows) {
+  const headers = displayLanguage === "zh"
+    ? { date: "日期", account: "账号", type: "类型", sku: "物料编码", batch: "批号", location: "库位", target: "目标库位", status: "状态", qty: "数量", remark: "备注" }
+    : { date: "Date", account: "Account", type: "Type", sku: "Material Code", batch: "Batch No.", location: "Location", target: "Target Location", status: "Status", qty: "Qty", remark: "Remark" };
   $("#logList").innerHTML = rows.length
     ? `
       <div class="table-wrap">
         <table class="data-table ledger-table">
           <thead>
             <tr>
-              <th>Date</th>
-              <th>Account</th>
-              <th>Type</th>
-              <th>Material Code</th>
-              <th>Batch No.</th>
-              <th>Location</th>
-              <th>Target Location</th>
-              <th>Status</th>
-              <th class="num-cell">Qty</th>
-              <th>Remark</th>
+              <th>${headers.date}</th>
+              <th>${headers.account}</th>
+              <th>${headers.type}</th>
+              <th>${headers.sku}</th>
+              <th>${headers.batch}</th>
+              <th>${headers.location}</th>
+              <th>${headers.target}</th>
+              <th>${headers.status}</th>
+              <th class="num-cell">${headers.qty}</th>
+              <th>${headers.remark}</th>
             </tr>
           </thead>
           <tbody>
             ${rows.map((item) => `
               <tr>
-                <td>${escapeHtml(formatMinute(item.time))}</td>
-                <td>${escapeHtml(ledgerAccount(item))}</td>
+                <td>${escapeDisplay(formatMinute(item.time))}</td>
+                <td>${escapeDisplay(ledgerAccount(item))}</td>
                 <td>${escapeHtml(typeLabel(item.type))}</td>
-                <td>${escapeHtml(item.sku || "")}</td>
-                <td>${escapeHtml(item.batch || "")}</td>
-                <td>${escapeHtml(item.location || "")}</td>
-                <td>${escapeHtml(item.targetLocation || "")}</td>
-                <td>${escapeHtml(item.status || "")}</td>
+                <td>${escapeDisplay(item.sku || "")}</td>
+                <td>${escapeDisplay(item.batch || "")}</td>
+                <td>${escapeDisplay(item.location || "")}</td>
+                <td>${escapeDisplay(item.targetLocation || "")}</td>
+                <td>${escapeHtml(stockStatusLabel(item.status || ""))}</td>
                 <td class="num-cell">${escapeHtml(ledgerQty(item))}</td>
-                <td>${escapeHtml(item.note || "")}</td>
+                <td>${escapeDisplay(item.note || "")}</td>
               </tr>`).join("")}
           </tbody>
         </table>
@@ -2597,33 +2895,36 @@ function renderLogPager() {
 function renderAuditLogs() {
   const keyword = $("#auditSearch").value.trim();
   const rows = state.auditLogs.filter((item) => fuzzyMatchText(`${auditAccount(item)} ${formatMinute(item.time)} ${item.action} ${item.entity} ${item.key} ${auditValue(item.before)} ${auditValue(item.after)} ${item.note || ""}`, keyword));
+  const headers = displayLanguage === "zh"
+    ? { date: "日期", account: "账号", object: "对象", action: "操作", key: "主键", before: "修改前", after: "修改后", remark: "备注" }
+    : { date: "Date", account: "Account", object: "Object", action: "Action", key: "Key", before: "Before", after: "After", remark: "Remark" };
   $("#auditList").innerHTML = rows.length
     ? `
       <div class="table-wrap">
         <table class="data-table audit-table">
           <thead>
             <tr>
-              <th>Date</th>
-              <th>Account</th>
-              <th>Object</th>
-              <th>Action</th>
-              <th>Key</th>
-              <th>Before</th>
-              <th>After</th>
-              <th>Remark</th>
+              <th>${headers.date}</th>
+              <th>${headers.account}</th>
+              <th>${headers.object}</th>
+              <th>${headers.action}</th>
+              <th>${headers.key}</th>
+              <th>${headers.before}</th>
+              <th>${headers.after}</th>
+              <th>${headers.remark}</th>
             </tr>
           </thead>
           <tbody>
             ${rows.map((item) => `
               <tr>
-                <td>${escapeHtml(formatMinute(item.time))}</td>
-                <td>${escapeHtml(auditAccount(item))}</td>
-                <td>${escapeHtml(item.entity || "")}</td>
-                <td>${escapeHtml(item.action || "")}</td>
-                <td>${escapeHtml(item.key || "")}</td>
-                <td>${escapeHtml(auditValue(item.before))}</td>
-                <td>${escapeHtml(auditValue(item.after))}</td>
-                <td>${escapeHtml(item.note || "")}</td>
+                <td>${escapeDisplay(formatMinute(item.time))}</td>
+                <td>${escapeDisplay(auditAccount(item))}</td>
+                <td>${escapeDisplay(item.entity || "")}</td>
+                <td>${escapeDisplay(item.action || "")}</td>
+                <td>${escapeDisplay(item.key || "")}</td>
+                <td>${escapeDisplay(auditValue(item.before))}</td>
+                <td>${escapeDisplay(auditValue(item.after))}</td>
+                <td>${escapeDisplay(item.note || "")}</td>
               </tr>`).join("")}
           </tbody>
         </table>
@@ -2655,7 +2956,7 @@ function ledgerQty(item) {
 }
 
 function typeLabel(type) {
-  return { in: "Inbound", out: "Outbound", move: "Move", count: "Stock Count", adjust: "Stock Adjustment", initial: "Initial Stock" }[type] || type;
+  return labels.type[type] || type;
 }
 
 function emptyHtml() {
@@ -2792,11 +3093,11 @@ function downloadBlob(blob, filename) {
 async function importInventory() {
   if (!isAdmin()) return showToast("No permission");
   const rows = await readSelectedRows("#inventoryFile");
-  if (!rows.length) return showToast("File has no import data");
+  if (!rows.length) return showToast(displayLanguage === "zh" ? "文件没有可导入数据" : "File has no import data");
   const report = validateInventoryRows(rows);
-  renderImportReport("Initial stock validation report", report);
-  if (!report.validRows) return showToast("No valid stock rows, please check the file");
-  if (!confirm(importConfirmText("Initial Stock", report))) return;
+  renderImportReport(displayLanguage === "zh" ? "期初库存校验报告" : "Initial stock validation report", report);
+  if (!report.validRows) return showToast(displayLanguage === "zh" ? "没有有效库存行，请检查文件" : "No valid stock rows, please check the file");
+  if (!confirm(importConfirmText(displayLanguage === "zh" ? "期初库存" : "Initial Stock", report))) return;
   try {
     const remote = await postMasterData("/api/import-inventory", { rows });
     if (remote) {
@@ -2851,11 +3152,11 @@ async function importInventory() {
 async function importMaterials() {
   if (!isAdmin()) return showToast("No permission");
   const rows = await readSelectedRows("#materialFile");
-  if (!rows.length) return showToast("File has no import data");
+  if (!rows.length) return showToast(displayLanguage === "zh" ? "文件没有可导入数据" : "File has no import data");
   const report = validateMaterialRows(rows);
-  renderImportReport("Material master validation report", report);
-  if (!report.validRows) return showToast("No valid material rows, please check the file");
-  if (!confirm(importConfirmText("Master Material", report))) return;
+  renderImportReport(displayLanguage === "zh" ? "物料主数据校验报告" : "Material master validation report", report);
+  if (!report.validRows) return showToast(displayLanguage === "zh" ? "没有有效物料行，请检查文件" : "No valid material rows, please check the file");
+  if (!confirm(importConfirmText(displayLanguage === "zh" ? "物料主数据" : "Master Material", report))) return;
   try {
     const remote = await postMasterData("/api/import-materials", { rows });
     if (remote) {
@@ -2882,11 +3183,11 @@ async function importMaterials() {
 async function importLocations() {
   if (!isAdmin()) return showToast("No permission");
   const rows = await readSelectedRows("#locationFile");
-  if (!rows.length) return showToast("File has no import data");
+  if (!rows.length) return showToast(displayLanguage === "zh" ? "文件没有可导入数据" : "File has no import data");
   const report = validateLocationRows(rows);
-  renderImportReport("Location master validation report", report);
-  if (!report.validRows) return showToast("No valid location rows, please check the file");
-  if (!confirm(importConfirmText("Location Master", report))) return;
+  renderImportReport(displayLanguage === "zh" ? "库位主数据校验报告" : "Location master validation report", report);
+  if (!report.validRows) return showToast(displayLanguage === "zh" ? "没有有效库位行，请检查文件" : "No valid location rows, please check the file");
+  if (!confirm(importConfirmText(displayLanguage === "zh" ? "库位主数据" : "Location Master", report))) return;
   try {
     const remote = await postMasterData("/api/import-locations", { rows });
     if (remote) {
@@ -3002,10 +3303,10 @@ function validateInventoryRows(rows) {
     const location = normalize(pickField(row, ["Location", "Location Code", "Warehouse Location", "Storage Location", "location"]));
     const status = String(pickField(row, ["Status", "stockStatus", "status"]) || getDefaultStockStatus()).trim();
     const reasons = [];
-    if (!sku) reasons.push("Material code missing");
-    if (!name) reasons.push("Material name missing");
-    if (!batch) reasons.push("Batch missing");
-    if (!location) reasons.push("Location missing");
+    if (!sku) reasons.push(displayLanguage === "zh" ? "物料编码为空" : "Material code missing");
+    if (!name) reasons.push(displayLanguage === "zh" ? "物料名称为空" : "Material name missing");
+    if (!batch) reasons.push(displayLanguage === "zh" ? "批号为空" : "Batch missing");
+    if (!location) reasons.push(displayLanguage === "zh" ? "库位为空" : "Location missing");
     if (qty === null) reasons.push(qtyErrorText(rawQty));
     if (reasons.length) return addInvalid(report, index, reasons);
     report.validRows += 1;
@@ -3025,8 +3326,8 @@ function validateMaterialRows(rows) {
     const sku = normalize(pickField(row, ["Material Code", "Item Code", "sku", "SKU"]));
     const name = String(pickField(row, ["Material Name", "Item Name", "name"]) || "").trim();
     const reasons = [];
-    if (!sku) reasons.push("Material code missing");
-    if (!name) reasons.push("Material name missing");
+    if (!sku) reasons.push(displayLanguage === "zh" ? "物料编码为空" : "Material code missing");
+    if (!name) reasons.push(displayLanguage === "zh" ? "物料名称为空" : "Material name missing");
     if (reasons.length) return addInvalid(report, index, reasons);
     report.validRows += 1;
     if (seen.has(sku)) report.duplicateRows += 1;
@@ -3041,7 +3342,7 @@ function validateLocationRows(rows) {
   const seen = new Set();
   rows.forEach((row, index) => {
     const code = normalize(pickField(row, ["Location", "Location Code", "Warehouse Location", "Storage Location", "location", "code"]));
-    if (!code) return addInvalid(report, index, ["Location code missing"]);
+    if (!code) return addInvalid(report, index, [displayLanguage === "zh" ? "库位编码为空" : "Location code missing"]);
     report.validRows += 1;
     if (seen.has(code)) report.duplicateRows += 1;
     seen.add(code);
@@ -3064,14 +3365,21 @@ function renderImportReport(title, report) {
   if (!target) return;
   target.classList.remove("hidden");
   const invalid = report.invalidSamples.length ? `<br>${report.invalidSamples.map(escapeHtml).join("<br>")}` : "";
+  const summary = displayLanguage === "zh"
+    ? `来源行数：${report.sourceRows}；有效：${report.validRows}；无效：${report.invalidRows}；重复合并：${report.duplicateRows}；最终导入：${report.mergedRows}。`
+    : `Source rows: ${report.sourceRows}; valid: ${report.validRows}; invalid: ${report.invalidRows}; duplicate merged: ${report.duplicateRows}; final import: ${report.mergedRows}.`;
+  const qtyText = displayLanguage === "zh" ? `有效数量合计：${report.totalQty}` : `Valid qty total: ${report.totalQty}`;
   target.innerHTML = `
     <strong>${escapeHtml(title)}</strong>
-    Source rows: ${report.sourceRows}; valid: ${report.validRows}; invalid: ${report.invalidRows}; duplicate merged: ${report.duplicateRows}; final import: ${report.mergedRows}.
-    ${report.totalQty ? `<br>Valid qty total: ${report.totalQty}` : ""}
+    ${escapeHtml(summary)}
+    ${report.totalQty ? `<br>${escapeHtml(qtyText)}` : ""}
     ${invalid}`;
 }
 
 function importConfirmText(title, report) {
+  if (displayLanguage === "zh") {
+    return `${title} 导入校验：\n来源行数：${report.sourceRows}\n有效行数：${report.validRows}\n无效行数：${report.invalidRows}\n重复合并：${report.duplicateRows}\n最终导入：${report.mergedRows}\n继续导入有效行？`;
+  }
   return `${title} import validation:\nSource rows: ${report.sourceRows}\nValid rows: ${report.validRows}\nInvalid rows: ${report.invalidRows}\nDuplicate merged: ${report.duplicateRows}\nFinal import: ${report.mergedRows}\nContinue importing valid rows?`;
 }
 
@@ -3459,6 +3767,31 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function hasGarbledText(value) {
+  const text = String(value ?? "");
+  if (!text) return false;
+  if (/[�]/.test(text)) return true;
+  if (/[^\x00-\x7F]{2,}\?/.test(text)) return true;
+  const questionCount = (text.match(/\?/g) || []).length;
+  return questionCount >= 3;
+}
+
+function cleanDisplayText(value, fallback = "-") {
+  const text = String(value ?? "").trim();
+  if (!text) return "";
+  if (!hasGarbledText(text)) return text;
+  const cleaned = text
+    .split(/\s+/)
+    .filter((part) => part && !hasGarbledText(part) && !/^\?+$/.test(part))
+    .join(" ")
+    .trim();
+  return cleaned || fallback;
+}
+
+function escapeDisplay(value, fallback = "-") {
+  return escapeHtml(cleanDisplayText(value, fallback));
 }
 
 function isStandaloneMode() {
