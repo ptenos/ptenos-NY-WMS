@@ -780,9 +780,9 @@ async function validateSessionAuth(auth = {}) {
   }
 }
 
-function requireLiveServer(action = "操作") {
+function requireLiveServer(action = "operation") {
   if (!serverRequired || apiAvailable) return true;
-  showToast(`Server belum tersambung, ${action} belum bisa dijalankan`);
+  showToast(displayLanguage === "zh" ? `服务器未连接，暂不能执行${action}` : `Server is not connected. ${action} cannot be performed.`);
   return false;
 }
 
@@ -932,7 +932,7 @@ function touchStock(row) {
 
 async function postOperation(payload) {
   if (!apiAvailable) {
-    if (serverRequired) throw new Error("Server belum tersambung, silakan coba lagi setelah jaringan kembali");
+    if (serverRequired) throw new Error(displayLanguage === "zh" ? "服务器未连接，请网络恢复后重试" : "Server is not connected. Try again after the network is restored.");
     return null;
   }
   const auth = currentAuthPayload();
@@ -942,7 +942,7 @@ async function postOperation(payload) {
     body: JSON.stringify({ ...payload, operatorId: auth.operatorId })
   });
   const data = await response.json();
-  if (handleExpiredSessionResponse(response, data)) throw new Error("Sesi login berakhir, silakan masuk lagi");
+  if (handleExpiredSessionResponse(response, data)) throw new Error(displayLanguage === "zh" ? "登录已过期，请重新登录" : "Login session expired. Please log in again.");
   if (!response.ok) throw new Error(apiErrorText(data, displayLanguage === "zh" ? "操作失败" : "Operation failed", "operation"));
   const currentUserId = state.currentUserId;
   Object.assign(state, migrateState({ ...defaultState(), ...data }));
@@ -953,7 +953,7 @@ async function postOperation(payload) {
 
 async function postOperationBatch(payload) {
   if (!apiAvailable) {
-    if (serverRequired) throw new Error("Server belum tersambung, silakan coba lagi setelah jaringan kembali");
+    if (serverRequired) throw new Error(displayLanguage === "zh" ? "服务器未连接，请网络恢复后重试" : "Server is not connected. Try again after the network is restored.");
     return null;
   }
   const auth = currentAuthPayload();
@@ -963,7 +963,7 @@ async function postOperationBatch(payload) {
     body: JSON.stringify({ ...payload, operatorId: auth.operatorId })
   });
   const data = await response.json();
-  if (handleExpiredSessionResponse(response, data)) throw new Error("Sesi login berakhir, silakan masuk lagi");
+  if (handleExpiredSessionResponse(response, data)) throw new Error(displayLanguage === "zh" ? "登录已过期，请重新登录" : "Login session expired. Please log in again.");
   if (!response.ok) throw new Error(apiErrorText(data, displayLanguage === "zh" ? "操作失败" : "Operation failed", "operation"));
   const currentUserId = state.currentUserId;
   Object.assign(state, migrateState({ ...defaultState(), ...data }));
@@ -974,7 +974,7 @@ async function postOperationBatch(payload) {
 
 async function postMasterData(path, payload) {
   if (!apiAvailable) {
-    if (serverRequired) throw new Error("Server belum tersambung, silakan coba lagi setelah jaringan kembali");
+    if (serverRequired) throw new Error(displayLanguage === "zh" ? "服务器未连接，请网络恢复后重试" : "Server is not connected. Try again after the network is restored.");
     return null;
   }
   const auth = currentAuthPayload();
@@ -984,7 +984,7 @@ async function postMasterData(path, payload) {
     body: JSON.stringify({ ...payload, operatorId: auth.operatorId })
   });
   const data = await response.json();
-  if (handleExpiredSessionResponse(response, data)) throw new Error("Sesi login berakhir, silakan masuk lagi");
+  if (handleExpiredSessionResponse(response, data)) throw new Error(displayLanguage === "zh" ? "登录已过期，请重新登录" : "Login session expired. Please log in again.");
   if (!response.ok) throw new Error(apiErrorText(data, "Save failed", "admin"));
   const currentUserId = state.currentUserId;
   if (data.materials || data.locations || data.stock) {
@@ -1001,7 +1001,7 @@ async function postMasterData(path, payload) {
 
 async function postUserData(path, payload) {
   if (!apiAvailable) {
-    if (serverRequired) throw new Error("Server belum tersambung, silakan coba lagi setelah jaringan kembali");
+    if (serverRequired) throw new Error(displayLanguage === "zh" ? "服务器未连接，请网络恢复后重试" : "Server is not connected. Try again after the network is restored.");
     return null;
   }
   const auth = currentAuthPayload();
@@ -1011,7 +1011,7 @@ async function postUserData(path, payload) {
     body: JSON.stringify({ ...payload, operatorId: auth.operatorId })
   });
   const data = await response.json();
-  if (handleExpiredSessionResponse(response, data)) throw new Error("Sesi login berakhir, silakan masuk lagi");
+  if (handleExpiredSessionResponse(response, data)) throw new Error(displayLanguage === "zh" ? "登录已过期，请重新登录" : "Login session expired. Please log in again.");
   if (!response.ok) throw new Error(apiErrorText(data, "Account save failed", "admin"));
   const currentUserId = state.currentUserId;
   Object.assign(state, migrateState({ ...defaultState(), ...data }));
@@ -2050,7 +2050,7 @@ function homeActionToView(action) {
 
 function selectHomeAction(action) {
   if (action === "move" && !canUseMoveOperation()) {
-    showToast("Hanya admin yang dapat memindahkan stok antar lokasi");
+    showToast("No permission to move stock between locations");
     return;
   }
   const view = homeActionToView(action);
