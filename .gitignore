@@ -1,2 +1,7 @@
 # Local Netlify folder
 .netlify
+
+# Local diagnostics and private model/router config
+litellm_config.yaml
+package-info.txt
+project-tree.txt
