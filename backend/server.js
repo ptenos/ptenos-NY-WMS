@@ -338,7 +338,7 @@ async function handleApi(req, res, url) {
       const location = normalizeCode(pickField(row, ["location", "库位", "库位编码", "仓库名称", "仓库"]));
       const qty = parseSystemQty(pickField(row, ["qty", "数量", "可用数量", "现存量"]));
       const status = String(pickField(row, ["status", "状态", "库存状态"]) || "可用").trim();
-      if (!sku || !name || !batch || !location || qty === null) continue;
+      if (!sku || !name || !batch || !location || qty === null || qty <= 0) continue;
       const key = `${sku}||${batch}||${location}||${status}`;
       const existing = groupedRows.get(key);
       if (existing) existing.qty = roundQty(existing.qty + qty);
@@ -355,7 +355,7 @@ async function handleApi(req, res, url) {
       type: "initial",
       operatorId: actor?.id || "",
       operatorName: actor?.name || "",
-      operator: actor ? `${actor.id} ${actor.name}` : body.operator || "system",
+      operator: actor ? [actor.id, actor.name].filter(Boolean).join(" ") : body.operator || "system",
       sku: "IMPORT",
       qty: imported,
       note: `导入期初库存 ${imported} 行`
@@ -383,8 +383,8 @@ function applyOperation(db, operation) {
   if (denied) return { error: denied };
   const logActor = {
     operatorId: actor.id,
-    operatorName: actor.name,
-    operator: `${actor.id} ${actor.name}`
+    operatorName: actor.name || "",
+    operator: [actor.id, actor.name].filter(Boolean).join(" ")
   };
   const sku = normalizeCode(operation.sku);
   const batch = normalizeCode(operation.batch);
@@ -405,7 +405,7 @@ function applyOperation(db, operation) {
     const row = findStock(db, { sku, batch, location, status });
     if (!row || row.qty < qty) return { error: "库存不足或状态不匹配" };
     const versionError = assertVersion(row, operation.expectedVersion);
-    if (versionError) return { error: versionError };
+    if (versionError) return versionError;
     row.qty = roundQty(row.qty - qty);
     touchStock(row);
   } else if (type === "move") {
@@ -416,7 +416,7 @@ function applyOperation(db, operation) {
     const row = findStock(db, { sku, batch, location, status });
     if (!row || row.qty < qty) return { error: "原库位库存不足" };
     const versionError = assertVersion(row, operation.expectedVersion);
-    if (versionError) return { error: versionError };
+    if (versionError) return versionError;
     row.qty = roundQty(row.qty - qty);
     touchStock(row);
     addStock(db, { sku, batch, location: targetLocation, status, qty });
@@ -425,7 +425,7 @@ function applyOperation(db, operation) {
     const beforeQty = row ? row.qty : 0;
     if (row) {
       const versionError = assertVersion(row, operation.expectedVersion);
-      if (versionError) return { error: versionError };
+      if (versionError) return versionError;
     }
     setStock(db, { sku, batch, location, status, qty });
     db.logs.unshift(makeLog({ ...operation, ...logActor, type: "adjust", sku, batch, location, status, qty, beforeQty }));
@@ -486,7 +486,9 @@ function touchStock(row) {
 
 function assertVersion(row, expectedVersion) {
   if (expectedVersion === undefined || expectedVersion === null || expectedVersion === "") return null;
-  return Number(row.version || 1) === Number(expectedVersion) ? null : "库存已被其他人更新，请刷新后重试";
+  return Number(row.version || 1) === Number(expectedVersion)
+    ? null
+    : { errorCode: "VERSION_CONFLICT", error: "库存已被其他人更新，请刷新后重试" };
 }
 
 function getActor(db, operatorId, password) {

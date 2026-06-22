@@ -273,7 +273,14 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
     const batchItems = Array.isArray(body.batchItems) ? body.batchItems : [];
     if (!batchItems.length) return json(422, { errorCode: "INVALID_QTY", error: "batchItems are required" });
     const working = await migrateDb(db);
+    const versionCheckedSourceKeys = new Set();
     for (const item of batchItems) {
+      const type = body.type;
+      const itemStatus = normalizeStockStatus(item.status || body.status || "available");
+      const sourceKey = `${normalizeCode(body.sku)}__${normalizeCode(item.batch)}__${normalizeCode(item.location)}__${itemStatus}`;
+      const expectedVersion = ["out", "move"].includes(type) && versionCheckedSourceKeys.has(sourceKey)
+        ? undefined
+        : item.expectedVersion;
       const result = await applyOperation(working, {
         ...body,
         batchItems: undefined,
@@ -282,10 +289,11 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
         targetLocation: item.targetLocation,
         qty: item.qty,
         status: item.status,
-        expectedVersion: item.expectedVersion,
+        expectedVersion,
         note: item.note
       }, authToken(body, headers));
       if (result.error) return json(422, { ...result, lineNo: item.lineNo });
+      if (["out", "move"].includes(type)) versionCheckedSourceKeys.add(sourceKey);
     }
     await storage.writeDb(working);
     return json(200, statePayload(headers, working));
@@ -442,7 +450,7 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
       const location = normalizeCode(pickField(row, ["location", "库位", "库位编码", "仓库名称", "仓库"]));
       const qty = parseSystemQty(pickField(row, ["qty", "数量", "可用数量", "现存量"]));
       const status = normalizeStockStatus(pickField(row, ["status", "状态", "库存状态"]) || "available");
-      if (!sku || !name || !batch || !location || qty === null) continue;
+      if (!sku || !name || !batch || !location || qty === null || qty <= 0) continue;
       const key = `${sku}||${batch}||${location}||${status}`;
       const existing = groupedRows.get(key);
       if (existing) existing.qty = roundQty(existing.qty + qty);
@@ -459,7 +467,7 @@ async function handleApiRequest({ method, pathname, query, headers = {}, body = 
       type: "initial",
       operatorId: actor?.id || "",
       operatorName: actor?.name || "",
-      operator: actor ? `${actor.id} ${actor.name}` : body.operator || "system",
+      operator: actor ? [actor.id, actor.name].filter(Boolean).join(" ") : body.operator || "system",
       sku: "IMPORT",
       qty: imported,
       note: `Imported ${imported} initial stock rows`
@@ -802,8 +810,8 @@ async function applyOperation(db, operation, token = "") {
   if (denied) return { error: denied };
   const logActor = {
     operatorId: actor.id,
-    operatorName: actor.name,
-    operator: `${actor.id} ${actor.name}`
+    operatorName: actor.name || "",
+    operator: [actor.id, actor.name].filter(Boolean).join(" ")
   };
   const sku = normalizeCode(operation.sku);
   const batch = normalizeCode(operation.batch);
@@ -825,7 +833,7 @@ async function applyOperation(db, operation, token = "") {
     if (!row) return { errorCode: "STOCK_NOT_ENOUGH", error: "Stock not found or status mismatch" };
     if (Number(row.qty || 0) < qty) return { errorCode: "STOCK_NOT_ENOUGH", error: "Stock not enough for outbound" };
     const versionError = assertVersion(row, operation.expectedVersion);
-    if (versionError) return { error: versionError };
+    if (versionError) return versionError;
     row.qty = roundQty(row.qty - qty);
     touchStock(row);
   } else if (type === "move") {
@@ -838,7 +846,7 @@ async function applyOperation(db, operation, token = "") {
     if (!row) return { errorCode: "STOCK_NOT_ENOUGH", error: "Source stock not found" };
     if (Number(row.qty || 0) < qty) return { errorCode: "STOCK_NOT_ENOUGH", error: "Source stock not enough for move" };
     const versionError = assertVersion(row, operation.expectedVersion);
-    if (versionError) return { error: versionError };
+    if (versionError) return versionError;
     row.qty = roundQty(row.qty - qty);
     touchStock(row);
     addStock(db, { sku, batch, location: targetLocation, status, qty });
@@ -855,7 +863,7 @@ async function applyOperation(db, operation, token = "") {
     if (!row) return { errorCode: "INVALID_QTY", error: "Select stock detail before count" };
     const beforeQty = row.qty;
     const versionError = assertVersion(row, operation.expectedVersion);
-    if (versionError) return { error: versionError };
+    if (versionError) return versionError;
     if (sourceLocation === location) {
       row.qty = roundQty(qty);
       touchStock(row);
@@ -927,7 +935,9 @@ function touchStock(row) {
 
 function assertVersion(row, expectedVersion) {
   if (expectedVersion === undefined || expectedVersion === null || expectedVersion === "") return null;
-  return Number(row.version || 1) === Number(expectedVersion) ? null : "Stock has changed. Refresh and try again.";
+  return Number(row.version || 1) === Number(expectedVersion)
+    ? null
+    : { errorCode: "VERSION_CONFLICT", error: "Stock has changed. Refresh and try again." };
 }
 
 async function getActor(db, operatorId, password, token = "") {

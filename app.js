@@ -251,7 +251,7 @@ function uiCopy() {
     notePlaceholder: "单号、客户、原因、盘点说明",
     batchMode: "批量模式",
     batchRows: "批量明细行",
-    batchRowsHint: "每行一条明细。入库/出库示例：`B20260528|A-01-01|120`。移库示例：`B20260528|A-01-01|120|B-02-01`。必要时可追加备注和状态。",
+    batchRowsHint: "每行一条明细。入库/出库示例：`B20260528|A-01-01|120`。移库示例：`B20260528|A-01-01|120|B-02-01`。同一库存明细可拆成多行分批处理；必要时可追加备注和状态。",
     countStockHint: "搜索并选择要盘点的库存。",
     currentBookQty: "当前账面数量",
     currentLocation: "当前库位",
@@ -308,7 +308,91 @@ function uiCopy() {
     rows: "行数",
     totalQty: "总数量",
     details: "明细",
-    batchModeLabel: "批量模式"
+    batchModeLabel: "批量模式",
+    noPermission: "无权限",
+    noMovePermission: "无权限执行跨库位移库",
+    stockChangedRefresh: "库存数据已变化，请刷新后重试。",
+    targetLocationFrozen: "目标库位已冻结",
+    targetLocationSame: "目标库位不能等于原库位",
+    selectStockFirst: "请先选择库存明细",
+    selectStockMove: "请选择要移库的库存明细。",
+    selectStockIssue: "请选择要出库的库存明细。",
+    qtyExceedsStock: "数量不能超过可用库存。",
+    selectValidTargetLocation: "请选择有效目标库位",
+    qtyPositiveInbound: "入库数量必须大于 0",
+    qtyPositiveOutbound: "出库数量必须大于 0",
+    qtyPositiveMove: "移库数量必须大于 0",
+    qtyPositive: "数量必须大于 0",
+    operationSubmitted: "作业已提交",
+    stockNotEnoughOrStatus: "库存不足或状态不匹配",
+    sourceStockNotEnough: "原库位库存不足",
+    materialRequired: "物料必须从主数据中选择",
+    skuRequired: "必须填写物料编码",
+    addBatchRow: "请至少添加一条批量明细",
+    rowInvalid: "第 {line} 行格式无效",
+    rowBatchRequired: "第 {line} 行必须填写批号",
+    rowLocationRequired: "第 {line} 行必须填写库位",
+    rowTargetRequired: "第 {line} 行必须填写目标库位",
+    rowInvalidLocation: "第 {line} 行库位无效",
+    rowInvalidTarget: "第 {line} 行目标库位无效",
+    rowTargetFrozen: "第 {line} 行目标库位已冻结",
+    rowTargetSame: "第 {line} 行目标库位不能等于原库位",
+    rowDuplicateStock: "第 {line} 行库存明细重复",
+    rowStockNotFound: "第 {line} 行未找到库存明细",
+    rowStockNotEnough: "第 {line} 行库存不足",
+    rowQtyPositive: "第 {line} 行数量必须大于 0",
+    batchModeUsesRowsBelow: "批量模式请在下方填写明细",
+    maxQtyPrefix: "最大",
+    stockSelectedAt: "已选择 {location} 的库存，请输入数量。",
+    qtyReduce: "数量超过可用库存，请减少数量。",
+    availableStockQty: "可用库存 {qty}，请继续输入数量。",
+    targetLocationChooseAnother: "目标库位已冻结，请选择其他库位。",
+    reviewBatchThenSubmit: "请检查批量明细，然后提交。",
+    selectSkuThenBatch: "请选择物料，再填写批量明细。",
+    readyInbound: "可以确认并提交入库。",
+    selectMaterialLocationThenQty: "请选择物料和库位，再输入数量。",
+    selectCountStatus: "请选择盘点状态",
+    countLocationRequired: "盘点库位必须从主数据中选择",
+    selectCountStockFirst: "请先选择要盘点的库存明细。",
+    countLocationFrozen: "盘点库位已冻结，请选择其他库位。",
+    countUpdated: "盘点已更新",
+    countChangedRefresh: "盘点库存明细已变化，请刷新后重新选择。",
+    stockImportSubmitted: "库存导入已提交",
+    materialImportSubmitted: "物料主数据导入已提交",
+    locationImportSubmitted: "库位主数据导入已提交",
+    importedRowsResult: "已导入 {imported} 行，拒绝 {rejected} 行",
+    importedMaterialRows: "已导入 {imported} 行物料",
+    importedLocationRows: "已导入 {imported} 行库位",
+    noValidStockRows: "没有有效库存行，请检查文件",
+    noValidMaterialRows: "没有有效物料行，请检查文件",
+    noValidLocationRows: "没有有效库位行，请检查文件",
+    backupReadError: "无法读取备份文件",
+    backupDownloaded: "备份已下载",
+    autoBackupDownloaded: "自动备份已下载",
+    selectBackupFile: "请选择备份 JSON 文件",
+    restoreBackupConfirm: "恢复备份将覆盖当前库存、主数据、账号和日志。是否继续？",
+    backupRestored: "备份已恢复",
+    materialCodeNameRequired: "必须填写物料编码和物料名称",
+    materialExistsSearchEdit: "物料编码已存在，请先搜索后修改。",
+    materialMasterSaved: "物料主数据已保存",
+    locationRequired: "库位必须从主数据中选择",
+    locationCodeRequired: "必须填写库位编码",
+    locationExistsSearchEdit: "库位编码已存在，请先搜索后修改。",
+    locationMasterSaved: "库位主数据已保存",
+    deleteAccountConfirm: "删除账号 {userId}？",
+    deleteAccountAfter: "删除后该账号将无法再登录。",
+    newAccountPasswordRequired: "新账号必须设置密码",
+    selectAccountFirst: "请先选择账号",
+    enterNewPassword: "请输入新密码",
+    passwordsMismatch: "两次输入的密码不一致",
+    changePasswordConfirm: "确认修改账号 {account} 的密码吗？",
+    passwordChanged: "密码已修改",
+    passwordChangeFailed: "修改密码失败",
+    defaultPasswordChangeFirst: "管理员仍在使用默认密码，请先修改。",
+    demoNotAllowed: "生产服务不允许加载演示数据",
+    adminOnly: "仅管理员可用",
+    demoLoaded: "演示数据已加载",
+    selectExcelOrCsv: "请选择 Excel 或 CSV 文件"
   } : {
     operationType: "Operation Type",
     availableStock: "Available Stock Details",
@@ -322,7 +406,7 @@ function uiCopy() {
     notePlaceholder: "Document number, customer, reason, count note",
     batchMode: "Batch mode",
     batchRows: "Batch rows",
-    batchRowsHint: "One row per detail. Inbound/outbound example: `B20260528|A-01-01|120`. Move example: `B20260528|A-01-01|120|B-02-01`. Add remark and status if needed.",
+    batchRowsHint: "One row per detail. Inbound/outbound example: `B20260528|A-01-01|120`. Move example: `B20260528|A-01-01|120|B-02-01`. One stock detail can be split across multiple rows; add remark and status if needed.",
     countStockHint: "Search and select stock to count.",
     currentBookQty: "Current Book Qty",
     currentLocation: "Current Location",
@@ -379,8 +463,100 @@ function uiCopy() {
     rows: "Rows",
     totalQty: "Total qty",
     details: "Details",
-    batchModeLabel: "Batch mode"
+    batchModeLabel: "Batch mode",
+    noPermission: "No permission",
+    noMovePermission: "No permission to move stock between locations",
+    stockChangedRefresh: "Stock data has changed. Refresh and try again.",
+    targetLocationFrozen: "Target location is frozen",
+    targetLocationSame: "Target location cannot equal source location",
+    selectStockFirst: "Select a stock detail first",
+    selectStockMove: "Select stock detail to move.",
+    selectStockIssue: "Select stock detail to issue.",
+    qtyExceedsStock: "Quantity cannot exceed available stock.",
+    selectValidTargetLocation: "Select a valid target location",
+    qtyPositiveInbound: "Inbound quantity must be greater than 0",
+    qtyPositiveOutbound: "Outbound quantity must be greater than 0",
+    qtyPositiveMove: "Move quantity must be greater than 0",
+    qtyPositive: "Quantity must be greater than 0",
+    operationSubmitted: "Operation submitted",
+    stockNotEnoughOrStatus: "Stock is not enough or status does not match",
+    sourceStockNotEnough: "Source location stock is not enough",
+    materialRequired: "Material must be selected from master data",
+    skuRequired: "SKU is required",
+    addBatchRow: "Add at least one batch row",
+    rowInvalid: "Row {line} is invalid",
+    rowBatchRequired: "Row {line}: batch is required",
+    rowLocationRequired: "Row {line}: location is required",
+    rowTargetRequired: "Row {line}: target location is required",
+    rowInvalidLocation: "Row {line}: invalid location",
+    rowInvalidTarget: "Row {line}: invalid target location",
+    rowTargetFrozen: "Row {line}: target location is frozen",
+    rowTargetSame: "Row {line}: target location cannot equal source location",
+    rowDuplicateStock: "Row {line}: duplicate stock detail",
+    rowStockNotFound: "Row {line}: stock detail not found",
+    rowStockNotEnough: "Row {line}: stock is not enough",
+    rowQtyPositive: "Row {line}: quantity must be greater than 0",
+    batchModeUsesRowsBelow: "Batch mode uses rows below",
+    maxQtyPrefix: "Max",
+    stockSelectedAt: "Stock at {location} is selected. Enter quantity.",
+    qtyReduce: "Quantity exceeds available stock. Reduce quantity.",
+    availableStockQty: "Available stock {qty}. Enter quantity.",
+    targetLocationChooseAnother: "Target location is frozen. Select another location.",
+    reviewBatchThenSubmit: "Review batch rows, then submit.",
+    selectSkuThenBatch: "Select SKU, then fill batch rows.",
+    readyInbound: "Ready to confirm and submit inbound.",
+    selectMaterialLocationThenQty: "Select material and location, then enter quantity.",
+    selectCountStatus: "Select count status",
+    countLocationRequired: "Count location must be selected from master data",
+    selectCountStockFirst: "Select stock detail for count first.",
+    countLocationFrozen: "Count location is frozen. Select another location.",
+    countUpdated: "Count updated",
+    countChangedRefresh: "Count stock detail has changed. Refresh and select again.",
+    stockImportSubmitted: "Stock import submitted",
+    materialImportSubmitted: "Material master import submitted",
+    locationImportSubmitted: "Location master import submitted",
+    importedRowsResult: "Imported {imported} rows, rejected {rejected} rows",
+    importedMaterialRows: "Imported {imported} material rows",
+    importedLocationRows: "Imported {imported} location rows",
+    noValidStockRows: "No valid stock rows, please check the file",
+    noValidMaterialRows: "No valid material rows, please check the file",
+    noValidLocationRows: "No valid location rows, please check the file",
+    backupReadError: "Backup file cannot be read",
+    backupDownloaded: "Backup downloaded",
+    autoBackupDownloaded: "Auto backup downloaded",
+    selectBackupFile: "Please select a backup JSON file",
+    restoreBackupConfirm: "Restoring backup will overwrite current stock, master data, accounts, and logs. Continue?",
+    backupRestored: "Backup restored",
+    materialCodeNameRequired: "Material code and name are required",
+    materialExistsSearchEdit: "Material code already exists. Search it, then edit.",
+    materialMasterSaved: "Material master saved",
+    locationRequired: "Location must be selected from master data",
+    locationCodeRequired: "Location code is required",
+    locationExistsSearchEdit: "Location code already exists. Search it, then edit.",
+    locationMasterSaved: "Location master saved",
+    deleteAccountConfirm: "Delete account {userId}?",
+    deleteAccountAfter: "This account will not be able to log in after deletion.",
+    newAccountPasswordRequired: "New account requires a password",
+    selectAccountFirst: "Select an account first",
+    enterNewPassword: "Enter a new password",
+    passwordsMismatch: "Passwords do not match",
+    changePasswordConfirm: "Change password for account {account}?",
+    passwordChanged: "Password changed",
+    passwordChangeFailed: "Failed to change password",
+    defaultPasswordChangeFirst: "Administrator is still using the default password. Change it first.",
+    demoNotAllowed: "Demo data is not allowed on production service",
+    adminOnly: "Admin only",
+    demoLoaded: "Demo data loaded",
+    selectExcelOrCsv: "Please select an Excel or CSV file"
   };
+}
+
+function copyText(key, replacements = {}) {
+  let text = uiCopy()[key] || "";
+  for (const [name, value] of Object.entries(replacements)) {
+    text = text.replaceAll(`{${name}}`, String(value));
+  }
+  return text;
 }
 
 let sessionAuth = loadSessionAuth();
@@ -1374,33 +1550,39 @@ function applyBatchOperationLocally(payload) {
   const draft = cloneBatchState();
   const user = currentUser();
   const batchItems = Array.isArray(payload.batchItems) ? payload.batchItems : [];
+  const versionCheckedSourceKeys = new Set();
   for (const item of batchItems) {
     const qty = Number(item.qty);
     const status = normalizeStockStatus(item.status || getDefaultStockStatus());
     const sourceKey = { sku: payload.sku, batch: item.batch, location: item.location, status };
+    const sourceKeyText = `${sourceKey.sku}__${sourceKey.batch}__${sourceKey.location}__${sourceKey.status}`;
     const sourceRow = findStockInData(draft, sourceKey) || (item.location ? (draft.stock || []).filter((stock) => stock.sku === payload.sku && stock.batch === item.batch && stock.location === item.location).length === 1 ? (draft.stock || []).find((stock) => stock.sku === payload.sku && stock.batch === item.batch && stock.location === item.location) : null : null);
     if (payload.type === "in") {
       upsertStockInData(draft, { sku: payload.sku, batch: item.batch, location: item.location, status, qty });
     } else if (payload.type === "out") {
-      if (!sourceRow || Number(sourceRow.qty || 0) < qty) return { error: `Row ${item.lineNo}: stock is not enough` };
-      const versionError = sourceRow && item.expectedVersion !== undefined && item.expectedVersion !== null && item.expectedVersion !== "" && Number(sourceRow.version || 1) !== Number(item.expectedVersion)
-        ? "Stock data has changed. Refresh and try again."
+      if (!sourceRow || Number(sourceRow.qty || 0) < qty) return { error: copyText("rowStockNotEnough", { line: item.lineNo }) };
+      const shouldCheckVersion = !versionCheckedSourceKeys.has(sourceKeyText);
+      const versionError = shouldCheckVersion && sourceRow && item.expectedVersion !== undefined && item.expectedVersion !== null && item.expectedVersion !== "" && Number(sourceRow.version || 1) !== Number(item.expectedVersion)
+        ? copyText("stockChangedRefresh")
         : null;
       if (versionError) return { error: versionError };
+      versionCheckedSourceKeys.add(sourceKeyText);
       sourceRow.qty = roundQty(Number(sourceRow.qty || 0) - qty);
       sourceRow.version = Number(sourceRow.version || 0) + 1;
       sourceRow.updatedAt = new Date().toISOString();
     } else if (payload.type === "move") {
       const targetLocation = item.targetLocation;
       const target = (draft.locations || []).find((location) => location.code === targetLocation);
-      if (!sourceRow || Number(sourceRow.qty || 0) < qty) return { error: `Row ${item.lineNo}: stock is not enough` };
-      const versionError = sourceRow && item.expectedVersion !== undefined && item.expectedVersion !== null && item.expectedVersion !== "" && Number(sourceRow.version || 1) !== Number(item.expectedVersion)
-        ? "Stock data has changed. Refresh and try again."
+      if (!sourceRow || Number(sourceRow.qty || 0) < qty) return { error: copyText("rowStockNotEnough", { line: item.lineNo }) };
+      const shouldCheckVersion = !versionCheckedSourceKeys.has(sourceKeyText);
+      const versionError = shouldCheckVersion && sourceRow && item.expectedVersion !== undefined && item.expectedVersion !== null && item.expectedVersion !== "" && Number(sourceRow.version || 1) !== Number(item.expectedVersion)
+        ? copyText("stockChangedRefresh")
         : null;
       if (versionError) return { error: versionError };
-      if (!target) return { error: `Row ${item.lineNo}: invalid target location` };
-      if (isFrozenLocationStatus(target.status)) return { error: `Row ${item.lineNo}: target location is frozen` };
-      if (targetLocation === item.location) return { error: `Row ${item.lineNo}: target location cannot equal source location` };
+      versionCheckedSourceKeys.add(sourceKeyText);
+      if (!target) return { error: copyText("rowInvalidTarget", { line: item.lineNo }) };
+      if (isFrozenLocationStatus(target.status)) return { error: copyText("rowTargetFrozen", { line: item.lineNo }) };
+      if (targetLocation === item.location) return { error: copyText("rowTargetSame", { line: item.lineNo }) };
       sourceRow.qty = roundQty(Number(sourceRow.qty || 0) - qty);
       sourceRow.version = Number(sourceRow.version || 0) + 1;
       sourceRow.updatedAt = new Date().toISOString();
@@ -1479,19 +1661,19 @@ async function submitOperation(event, overridePayload = null) {
   const status = normalizeStockStatus($("#statusInput").value || getDefaultStockStatus());
   const note = $("#noteInput").value.trim();
 
-  if (!material) return showToast("Material must be selected from master data");
-  if (!findLocation(location)) return showToast("Location must be selected from master data");
+  if (!material) return showToast(copyText("materialRequired"));
+  if (!findLocation(location)) return showToast(copyText("locationRequired"));
   if (!batch || qty === null) return showToast(qtyErrorText(rawQty));
-  if (qty <= 0) return showToast(operationType === "in" ? "Inbound quantity must be greater than 0" : "Quantity must be greater than 0");
+  if (qty <= 0) return showToast(operationType === "in" ? copyText("qtyPositiveInbound") : copyText("qtyPositive"));
   const selectedRow = selectedOperationSourceMatches(sku, batch, status) ? selectedOperationStock : null;
   if (["out", "move"].includes(operationType)) {
-    if (!selectedRow) return showToast("Select a stock detail first");
-    if (qty > Number(selectedRow.qty || 0)) return showToast("Quantity cannot exceed available stock");
+    if (!selectedRow) return showToast(copyText("selectStockFirst"));
+    if (qty > Number(selectedRow.qty || 0)) return showToast(copyText("qtyExceedsStock"));
   }
   if (operationType === "move") {
-    if (!targetLocation || !findLocation(targetLocation)) return showToast("Select a valid target location");
-    if (isFrozenLocationStatus(findLocation(targetLocation)?.status)) return showToast("Target location is frozen");
-    if (targetLocation === (selectedRow?.location || location)) return showToast("Target location cannot equal source location");
+    if (!targetLocation || !findLocation(targetLocation)) return showToast(copyText("selectValidTargetLocation"));
+    if (isFrozenLocationStatus(findLocation(targetLocation)?.status)) return showToast(copyText("targetLocationFrozen"));
+    if (targetLocation === (selectedRow?.location || location)) return showToast(copyText("targetLocationSame"));
   }
 
   const sourceLocation = selectedRow?.location || location;
@@ -1514,29 +1696,29 @@ async function submitOperation(event, overridePayload = null) {
         selectedOperationVersion = null;
         selectedOperationStock = null;
         render();
-        return showToast("Operation submitted");
+        return showToast(copyText("operationSubmitted"));
       }
     } catch (error) {
       return showToast(error.message);
     }
 
     if (operationType === "in") {
-      if (qty <= 0) return showToast("Inbound quantity must be greater than 0");
+      if (qty <= 0) return showToast(copyText("qtyPositiveInbound"));
       upsertStock({ sku, batch, location, status, qty });
     }
 
     if (operationType === "out") {
-      if (qty <= 0) return showToast("Outbound quantity must be greater than 0");
+      if (qty <= 0) return showToast(copyText("qtyPositiveOutbound"));
       const row = findStock(sku, batch, selectedRow?.location || location, status);
-      if (!row || row.qty < qty) return showToast("Stock is not enough or status does not match");
+      if (!row || row.qty < qty) return showToast(copyText("stockNotEnoughOrStatus"));
       row.qty = roundQty(row.qty - qty);
       touchStock(row);
     }
 
     if (operationType === "move") {
-      if (qty <= 0) return showToast("Move quantity must be greater than 0");
+      if (qty <= 0) return showToast(copyText("qtyPositiveMove"));
       const row = findStock(sku, batch, selectedRow?.location || location, status);
-      if (!row || row.qty < qty) return showToast("Source location stock is not enough");
+      if (!row || row.qty < qty) return showToast(copyText("sourceStockNotEnough"));
       row.qty = roundQty(row.qty - qty);
       touchStock(row);
       upsertStock({ sku, batch, location: targetLocation, status, qty });
@@ -1550,7 +1732,7 @@ async function submitOperation(event, overridePayload = null) {
     selectedOperationVersion = null;
     selectedOperationStock = null;
     render();
-    showToast("Operation submitted");
+    showToast(copyText("operationSubmitted"));
   } finally {
     setFormSubmitting(event.target, false);
   }
@@ -1561,17 +1743,17 @@ function buildBatchOperationPayload() {
   const material = findMaterial($("#skuInput").value);
   const batchRows = parseBatchOperationRows($("#batchRowsInput").value);
   const note = $("#noteInput").value.trim();
-  if (!material) return { error: "Material must be selected from master data" };
-  if (!sku) return { error: "SKU is required" };
-  if (!batchRows.length) return { error: "Add at least one batch row" };
+  if (!material) return { error: copyText("materialRequired") };
+  if (!sku) return { error: copyText("skuRequired") };
+  if (!batchRows.length) return { error: copyText("addBatchRow") };
 
   const batchItems = [];
-  const seenKeys = new Set();
+  const sourceDemand = new Map();
   for (const row of batchRows) {
     if (operationType === "move") {
-      if (row.parts.length < 4) return { error: `Row ${row.lineNo} is invalid` };
+      if (row.parts.length < 4) return { error: copyText("rowInvalid", { line: row.lineNo }) };
     } else {
-      if (row.parts.length < 3) return { error: `Row ${row.lineNo} is invalid` };
+      if (row.parts.length < 3) return { error: copyText("rowInvalid", { line: row.lineNo }) };
     }
     const [batch, location, qtyText, targetLocation = "", rowNote = "", rowStatus = ""] = row.parts;
     const normalizedBatch = normalize(batch);
@@ -1579,30 +1761,29 @@ function buildBatchOperationPayload() {
     const normalizedTarget = normalize(targetLocation);
     const qty = parseSystemQty(qtyText);
     const status = rowStatus ? normalizeStockStatus(rowStatus) : getDefaultStockStatus();
-    if (!normalizedBatch) return { error: `Row ${row.lineNo}: batch is required` };
-    if (!normalizedLocation) return { error: `Row ${row.lineNo}: location is required` };
+    if (!normalizedBatch) return { error: copyText("rowBatchRequired", { line: row.lineNo }) };
+    if (!normalizedLocation) return { error: copyText("rowLocationRequired", { line: row.lineNo }) };
     if (qty === null) return { error: `Row ${row.lineNo}: ${qtyErrorText(qtyText)}` };
-    if (operationType !== "count" && qty <= 0) return { error: `Row ${row.lineNo}: quantity must be greater than 0` };
-    if (operationType === "in" && !findLocation(normalizedLocation)) return { error: `Row ${row.lineNo}: invalid location` };
+    if (operationType !== "count" && qty <= 0) return { error: copyText("rowQtyPositive", { line: row.lineNo }) };
+    if (operationType === "in" && !findLocation(normalizedLocation)) return { error: copyText("rowInvalidLocation", { line: row.lineNo }) };
     if (operationType === "move") {
-      if (!normalizedTarget) return { error: `Row ${row.lineNo}: target location is required` };
-      if (!findLocation(normalizedTarget)) return { error: `Row ${row.lineNo}: invalid target location` };
-      if (isFrozenLocationStatus(findLocation(normalizedTarget)?.status)) return { error: `Row ${row.lineNo}: target location is frozen` };
-      if (normalizedTarget === normalizedLocation) return { error: `Row ${row.lineNo}: target location cannot equal source location` };
+      if (!normalizedTarget) return { error: copyText("rowTargetRequired", { line: row.lineNo }) };
+      if (!findLocation(normalizedTarget)) return { error: copyText("rowInvalidTarget", { line: row.lineNo }) };
+      if (isFrozenLocationStatus(findLocation(normalizedTarget)?.status)) return { error: copyText("rowTargetFrozen", { line: row.lineNo }) };
+      if (normalizedTarget === normalizedLocation) return { error: copyText("rowTargetSame", { line: row.lineNo }) };
     }
-
-    const key = `${sku}__${normalizedBatch}__${normalizedLocation}__${status}`;
-    if (seenKeys.has(key)) return { error: `Row ${row.lineNo}: duplicate stock detail` };
-    seenKeys.add(key);
 
     const sourceRow = operationType === "in"
       ? null
       : findStock(sku, normalizedBatch, normalizedLocation, status) || findUniqueStockRow(sku, normalizedBatch, normalizedLocation);
     if (["out", "move"].includes(operationType) && !sourceRow) {
-      return { error: `Row ${row.lineNo}: stock detail not found` };
+      return { error: copyText("rowStockNotFound", { line: row.lineNo }) };
     }
-    if (["out", "move"].includes(operationType) && qty > Number(sourceRow.qty || 0)) {
-      return { error: `Row ${row.lineNo}: stock is not enough` };
+    if (["out", "move"].includes(operationType)) {
+      const sourceKey = `${sku}__${normalizedBatch}__${sourceRow.location}__${sourceRow.status}`;
+      const nextDemand = roundQty((sourceDemand.get(sourceKey) || 0) + qty);
+      sourceDemand.set(sourceKey, nextDemand);
+      if (nextDemand > Number(sourceRow.qty || 0)) return { error: copyText("rowStockNotEnough", { line: row.lineNo }) };
     }
 
     batchItems.push({
@@ -1636,7 +1817,7 @@ async function submitBatchOperation(event, payload) {
       selectedOperationVersion = null;
       selectedOperationStock = null;
       render();
-      showToast("Operation submitted");
+      showToast(copyText("operationSubmitted"));
       return;
     }
     const localResult = applyBatchOperationLocally(payload);
@@ -1645,7 +1826,7 @@ async function submitBatchOperation(event, payload) {
     selectedOperationVersion = null;
     selectedOperationStock = null;
     render();
-    showToast("Operation submitted");
+    showToast(copyText("operationSubmitted"));
   } finally {
     setFormSubmitting(event.target, false);
   }
@@ -1676,7 +1857,7 @@ function updateOperationStockList() {
   $$(".operation-field").forEach((item) => item.classList.toggle("hidden", useStockPicker));
   $("#operationStatusWrap")?.classList.add("hidden");
   $("#targetLocationWrap").classList.toggle("hidden", operationType !== "move");
-  $("#operationStockHint").textContent = operationType === "move" ? "Search and select stock to move." : "Search and select stock to issue.";
+  $("#operationStockHint").textContent = operationType === "move" ? copyText("selectStockMove") : copyText("selectStockIssue");
   updateOperationHelper();
   if (!useStockPicker) return;
   syncOperationSelection();
@@ -1857,8 +2038,8 @@ function updateOperationHelper() {
     ready = skuReady && rows.length > 0;
     nextText = displayLanguage === "zh"
       ? (ready ? "请检查批量明细，然后提交。" : "请选择物料，再填写批量明细。")
-      : (ready ? "Review batch rows, then submit." : "Select SKU, then fill batch rows.");
-    qtyInput.placeholder = "Batch mode uses rows below";
+      : (ready ? copyText("reviewBatchThenSubmit") : copyText("selectSkuThenBatch"));
+    qtyInput.placeholder = copyText("batchModeUsesRowsBelow");
   } else if (operationType === "in") {
     if (findMaterial($("#skuInput").value)) activeStep = 1;
     if (findLocation(location)) activeStep = 2;
@@ -1868,35 +2049,35 @@ function updateOperationHelper() {
     ready = !!findMaterial($("#skuInput").value) && !!findLocation(location) && !!batch && qty !== null && qty > 0;
     nextText = displayLanguage === "zh"
       ? (ready ? "可以确认并提交入库。" : "请选择物料和库位，再输入数量。")
-      : (ready ? "Ready to confirm and submit inbound." : "Select material and location, then enter quantity.");
+      : (ready ? copyText("readyInbound") : copyText("selectMaterialLocationThenQty"));
   } else {
     if (selectedRow) activeStep = 1;
     if (qty !== null && qty > 0 && selectedRow && qty <= Number(selectedRow.qty || 0)) activeStep = 2;
     if (operationType === "move" && findLocation(targetLocation) && targetLocation !== location) activeStep = 3;
     if (selectedRow) {
       qtyInput.dataset.maxQty = selectedRow.qty;
-      qtyInput.placeholder = `Maks ${selectedRow.qty}`;
+      qtyInput.placeholder = `${copyText("maxQtyPrefix")} ${selectedRow.qty}`;
       if (selectedRow.location !== location) {
-        nextText = displayLanguage === "zh" ? `已选择 ${selectedRow.location} 的库存，请输入数量。` : `Stock at ${selectedRow.location} is selected. Enter quantity.`;
+        nextText = copyText("stockSelectedAt", { location: selectedRow.location });
       } else if (qty !== null && qty > Number(selectedRow.qty || 0)) {
-        nextText = displayLanguage === "zh" ? "数量超过可用库存，请减少数量。" : "Quantity exceeds available stock. Reduce quantity.";
+        nextText = copyText("qtyReduce");
       } else if (operationType === "move" && targetLocation && targetLocation === location) {
-        nextText = displayLanguage === "zh" ? "目标库位不能等于原库位。" : "Target location cannot equal source location.";
+        nextText = copyText("targetLocationSame");
       } else {
-        nextText = displayLanguage === "zh" ? `可用库存 ${selectedRow.qty}，请继续输入数量。` : `Available stock ${selectedRow.qty}. Enter quantity.`;
+        nextText = copyText("availableStockQty", { qty: selectedRow.qty });
       }
     } else {
       delete qtyInput.dataset.maxQty;
-      qtyInput.placeholder = displayLanguage === "zh" ? "请先选择库存明细" : "Select stock detail first";
+      qtyInput.placeholder = copyText("selectStockFirst");
       nextText = operationType === "move"
-        ? (displayLanguage === "zh" ? "请选择要移库的库存明细。" : "Select stock detail to move.")
-        : (displayLanguage === "zh" ? "请选择要出库的库存明细。" : "Select stock detail to issue.");
+        ? copyText("selectStockMove")
+        : copyText("selectStockIssue");
     }
     ready = !!selectedRow && qty !== null && qty > 0 && qty <= Number(selectedRow.qty || 0);
     if (operationType === "move") {
       const target = findLocation(targetLocation);
       ready = ready && !!target && targetLocation !== location && !isFrozenLocationStatus(target.status);
-      if (isFrozenLocationStatus(target?.status)) nextText = displayLanguage === "zh" ? "目标库位已冻结，请选择其他库位。" : "Target location is frozen. Select another location.";
+      if (isFrozenLocationStatus(target?.status)) nextText = copyText("targetLocationChooseAnother");
     }
   }
 
@@ -1963,16 +2144,16 @@ async function submitCount(event) {
   const location = normalize($("#countLocationInput").value);
   const note = $("#countNoteInput").value.trim();
 
-  if (!material) return showToast("Material must be selected from master data");
+  if (!material) return showToast(copyText("materialRequired"));
   if (!batch || qty === null) return showToast(qtyErrorText(rawQty));
-  if (!status) return showToast("Select count status");
-  if (!findLocation(location)) return showToast("Count location must be selected from master data");
+  if (!status) return showToast(copyText("selectCountStatus"));
+  if (!findLocation(location)) return showToast(copyText("countLocationRequired"));
   if (!selectedCountStock || selectedCountStock.sku !== sku || selectedCountStock.batch !== batch || selectedCountStock.status !== status) {
-    return showToast("Select stock detail for count first");
+    return showToast(copyText("selectCountStockFirst"));
   }
   const targetLocation = findLocation(location);
   if (selectedCountStock.location !== location && isFrozenLocationStatus(targetLocation?.status)) {
-    return showToast("Count location is frozen. Select another location.");
+    return showToast(copyText("countLocationFrozen"));
   }
 
   setFormSubmitting(event.target, true);
@@ -2000,7 +2181,7 @@ async function submitCount(event) {
       $("#selectedCountInfo").classList.add("hidden");
       $("#selectedCountInfo").innerHTML = "";
       render();
-      return showToast("Count updated");
+      return showToast(copyText("countUpdated"));
     }
 
     const sourceRow = findStock(
@@ -2009,7 +2190,7 @@ async function submitCount(event) {
       selectedCountStock.location,
       selectedCountStock.status
     );
-    if (!sourceRow) return showToast("Count stock detail has changed. Refresh and select again.");
+    if (!sourceRow) return showToast(copyText("countChangedRefresh"));
     const beforeQty = sourceRow.qty;
     if (selectedCountStock.location === location) {
       sourceRow.qty = qty;
@@ -2042,7 +2223,7 @@ async function submitCount(event) {
     $("#selectedCountInfo").innerHTML = "";
     render();
     updateCountPreview();
-    showToast("Count updated");
+    showToast(copyText("countUpdated"));
   } catch (error) {
     return showToast(error.message);
   } finally {
@@ -2257,8 +2438,8 @@ function resetOperationForm(form) {
 }
 
 function seedDemo() {
-  if (serverRequired) return showToast("Demo data is not allowed on production service");
-  if (!isAdmin()) return showToast("Admin only");
+  if (serverRequired) return showToast(copyText("demoNotAllowed"));
+  if (!isAdmin()) return showToast(copyText("adminOnly"));
   state.materials = [
     { sku: "RM-1001", name: "Glycerin" },
     { sku: "PK-2030", name: "Outer Carton" },
@@ -2280,7 +2461,7 @@ function seedDemo() {
   refreshLocationUsage();
   saveState();
   render();
-  showToast("Demo data loaded");
+  showToast(copyText("demoLoaded"));
 }
 
 function renderPermissions() {
@@ -2335,7 +2516,7 @@ function homeActionToView(action) {
 
 function selectHomeAction(action) {
   if (action === "move" && !canUseMoveOperation()) {
-    showToast("No permission to move stock between locations");
+    showToast(copyText("noMovePermission"));
     return;
   }
   const view = homeActionToView(action);
@@ -3091,18 +3272,18 @@ function downloadBlob(blob, filename) {
 }
 
 async function importInventory() {
-  if (!isAdmin()) return showToast("No permission");
+  if (!isAdmin()) return showToast(copyText("noPermission"));
   const rows = await readSelectedRows("#inventoryFile");
   if (!rows.length) return showToast(displayLanguage === "zh" ? "文件没有可导入数据" : "File has no import data");
   const report = validateInventoryRows(rows);
   renderImportReport(displayLanguage === "zh" ? "期初库存校验报告" : "Initial stock validation report", report);
-  if (!report.validRows) return showToast(displayLanguage === "zh" ? "没有有效库存行，请检查文件" : "No valid stock rows, please check the file");
+  if (!report.validRows) return showToast(copyText("noValidStockRows"));
   if (!confirm(importConfirmText(displayLanguage === "zh" ? "期初库存" : "Initial Stock", report))) return;
   try {
     const remote = await postMasterData("/api/import-inventory", { rows });
     if (remote) {
       render();
-      return showToast("Stock import submitted");
+      return showToast(copyText("stockImportSubmitted"));
     }
   } catch (error) {
     return showToast(error.message);
@@ -3146,22 +3327,22 @@ async function importInventory() {
   addAuditLog({ action: "Import Initial Stock", entity: "Stock Import", key: "IMPORT", before: null, after: { imported, rejected, sourceRows: rows.length }, note: `Imported initial stock ${imported} rows, rejected ${rejected} rows` });
   saveState();
   render();
-  showToast(`Imported ${imported} rows, rejected ${rejected} rows`);
+  showToast(copyText("importedRowsResult", { imported, rejected }));
 }
 
 async function importMaterials() {
-  if (!isAdmin()) return showToast("No permission");
+  if (!isAdmin()) return showToast(copyText("noPermission"));
   const rows = await readSelectedRows("#materialFile");
   if (!rows.length) return showToast(displayLanguage === "zh" ? "文件没有可导入数据" : "File has no import data");
   const report = validateMaterialRows(rows);
   renderImportReport(displayLanguage === "zh" ? "物料主数据校验报告" : "Material master validation report", report);
-  if (!report.validRows) return showToast(displayLanguage === "zh" ? "没有有效物料行，请检查文件" : "No valid material rows, please check the file");
+  if (!report.validRows) return showToast(copyText("noValidMaterialRows"));
   if (!confirm(importConfirmText(displayLanguage === "zh" ? "物料主数据" : "Master Material", report))) return;
   try {
     const remote = await postMasterData("/api/import-materials", { rows });
     if (remote) {
       render();
-      return showToast("Material master import submitted");
+      return showToast(copyText("materialImportSubmitted"));
     }
   } catch (error) {
     return showToast(error.message);
@@ -3177,22 +3358,22 @@ async function importMaterials() {
   addAuditLog({ action: "Import Material Master", entity: "Material Master Data", key: "IMPORT", before: null, after: { imported }, note: `Imported ${imported} material rows` });
   saveState();
   render();
-  showToast(`Imported ${imported} material rows`);
+  showToast(copyText("importedMaterialRows", { imported }));
 }
 
 async function importLocations() {
-  if (!isAdmin()) return showToast("No permission");
+  if (!isAdmin()) return showToast(copyText("noPermission"));
   const rows = await readSelectedRows("#locationFile");
   if (!rows.length) return showToast(displayLanguage === "zh" ? "文件没有可导入数据" : "File has no import data");
   const report = validateLocationRows(rows);
   renderImportReport(displayLanguage === "zh" ? "库位主数据校验报告" : "Location master validation report", report);
-  if (!report.validRows) return showToast(displayLanguage === "zh" ? "没有有效库位行，请检查文件" : "No valid location rows, please check the file");
+  if (!report.validRows) return showToast(copyText("noValidLocationRows"));
   if (!confirm(importConfirmText(displayLanguage === "zh" ? "库位主数据" : "Location Master", report))) return;
   try {
     const remote = await postMasterData("/api/import-locations", { rows });
     if (remote) {
       render();
-      return showToast("Location master import submitted");
+      return showToast(copyText("locationImportSubmitted"));
     }
   } catch (error) {
     return showToast(error.message);
@@ -3211,11 +3392,11 @@ async function importLocations() {
   addAuditLog({ action: "Import Location Master", entity: "Location Master Data", key: "IMPORT", before: null, after: { imported }, note: `Imported ${imported} location rows` });
   saveState();
   render();
-  showToast(`Imported ${imported} location rows`);
+  showToast(copyText("importedLocationRows", { imported }));
 }
 
 async function downloadBackup() {
-  if (!isAdmin()) return showToast("No permission");
+  if (!isAdmin()) return showToast(copyText("noPermission"));
   const auth = currentAuthPayload();
   try {
     const response = await fetch("/api/backup", {
@@ -3228,14 +3409,14 @@ async function downloadBackup() {
     if (!response.ok) throw new Error(apiErrorText(data, "Backup failed", "admin"));
     const filename = `wms-backup-${new Date().toISOString().slice(0, 10)}.json`;
     downloadBlob(new Blob([JSON.stringify(data.data, null, 2)], { type: "application/json;charset=utf-8" }), filename);
-    showToast("Backup downloaded");
+    showToast(copyText("backupDownloaded"));
   } catch (error) {
     showToast(error.message);
   }
 }
 
 async function downloadAutoBackup() {
-  if (!isAdmin()) return showToast("No permission");
+  if (!isAdmin()) return showToast(copyText("noPermission"));
   const auth = currentAuthPayload();
   try {
     const response = await fetch("/api/auto-backup", {
@@ -3248,18 +3429,18 @@ async function downloadAutoBackup() {
     if (!response.ok) throw new Error(apiErrorText(data, "Auto backup download failed", "admin"));
     const filename = `wms-auto-backup-${new Date().toISOString().slice(0, 10)}.json`;
     downloadBlob(new Blob([JSON.stringify(data, null, 2)], { type: "application/json;charset=utf-8" }), filename);
-    showToast("Auto backup downloaded");
+    showToast(copyText("autoBackupDownloaded"));
   } catch (error) {
     showToast(error.message);
   }
 }
 
 async function restoreBackup() {
-  if (!isAdmin()) return showToast("No permission");
+  if (!isAdmin()) return showToast(copyText("noPermission"));
   if (!requireLiveServer("restore backup")) return;
   const file = $("#restoreFile").files[0];
-  if (!file) return showToast("Please select a backup JSON file");
-  if (!confirm("Restoring backup will overwrite current stock, master data, accounts, and logs. Continue?")) return;
+  if (!file) return showToast(copyText("selectBackupFile"));
+  if (!confirm(copyText("restoreBackupConfirm"))) return;
   try {
     const backup = JSON.parse(await readTextFile(file));
     const auth = currentAuthPayload();
@@ -3276,9 +3457,9 @@ async function restoreBackup() {
     wmsLocalStorage.setItem(storeKey, JSON.stringify(state));
     $("#restoreFile").value = "";
     render();
-    showToast("Backup restored");
+    showToast(copyText("backupRestored"));
   } catch (error) {
-    showToast(error.message || "Backup file cannot be read");
+    showToast(error.message || copyText("backupReadError"));
   }
 }
 
@@ -3386,7 +3567,7 @@ function importConfirmText(title, report) {
 async function readSelectedRows(selector) {
   const file = $(selector).files[0];
   if (!file) {
-    showToast("Please select an Excel or CSV file");
+    showToast(copyText("selectExcelOrCsv"));
     return [];
   }
   return readRows(file);
@@ -3486,13 +3667,13 @@ function upsertMaterial(material) {
 
 async function addMaterial(event) {
   event.preventDefault();
-  if (!isAdmin()) return showToast("No permission");
+  if (!isAdmin()) return showToast(copyText("noPermission"));
   const sku = normalize($("#newSku").value);
   const name = $("#newName").value.trim();
   const previousSku = editingMaterialSku;
-  if (!sku || !name) return showToast("Material code and name are required");
-  if (!previousSku && state.materials.some((item) => item.sku === sku)) return showToast("Material code already exists. Search it, then edit.");
-  if (previousSku && previousSku !== sku && state.materials.some((item) => item.sku === sku)) return showToast("Material code already exists");
+  if (!sku || !name) return showToast(copyText("materialCodeNameRequired"));
+  if (!previousSku && state.materials.some((item) => item.sku === sku)) return showToast(copyText("materialExistsSearchEdit"));
+  if (previousSku && previousSku !== sku && state.materials.some((item) => item.sku === sku)) return showToast(labels.errors.MATERIAL_EXISTS.admin);
   try {
     const remote = await postMasterData("/api/materials", { previousSku, sku, name });
     if (!remote) {
@@ -3516,18 +3697,18 @@ async function addMaterial(event) {
   materialPage.page = 1;
   resetMaterialEdit();
   render();
-  showToast("Material master saved");
+  showToast(copyText("materialMasterSaved"));
 }
 
 async function addLocation(event) {
   event.preventDefault();
-  if (!isAdmin()) return showToast("No permission");
+  if (!isAdmin()) return showToast(copyText("noPermission"));
   const code = normalize($("#newLocation").value);
   const previousCode = editingLocationCode;
   const status = $("#newLocationStatus").value;
-  if (!code) return showToast("Location code is required");
-  if (!previousCode && state.locations.some((item) => item.code === code)) return showToast("Location code already exists. Search it, then edit.");
-  if (previousCode && previousCode !== code && state.locations.some((item) => item.code === code)) return showToast("Location code already exists");
+  if (!code) return showToast(copyText("locationCodeRequired"));
+  if (!previousCode && state.locations.some((item) => item.code === code)) return showToast(copyText("locationExistsSearchEdit"));
+  if (previousCode && previousCode !== code && state.locations.some((item) => item.code === code)) return showToast(labels.errors.LOCATION_EXISTS.admin);
   try {
     const remote = await postMasterData("/api/locations", { previousCode, code, status });
     if (!remote) {
@@ -3553,7 +3734,7 @@ async function addLocation(event) {
   locationPage.page = 1;
   resetLocationEdit();
   render();
-  showToast("Location master saved");
+  showToast(copyText("locationMasterSaved"));
 }
 
 function editMaterial(sku) {
@@ -3594,14 +3775,14 @@ function resetLocationEdit() {
 
 async function addUser(event) {
   event.preventDefault();
-  if (!isAdmin()) return showToast("No permission");
+  if (!isAdmin()) return showToast(copyText("noPermission"));
   const id = normalize($("#newUserId").value);
   const existing = state.users.find((user) => user.id === id);
   const password = $("#newUserPassword").value.trim();
   const role = $("#newUserRole").value;
   const modules = normalizeModules($("#newUserModules").value);
   const user = { id, role, modules: modules.length ? modules : defaultModulesForRole(role) };
-  if (!existing && !password) return showToast("New account requires a password");
+  if (!existing && !password) return showToast(copyText("newAccountPasswordRequired"));
   try {
     const remote = await postUserData("/api/users", { id, role: user.role, modules: user.modules, userPassword: password });
     if (!remote) {
@@ -3644,15 +3825,15 @@ function closePasswordDialog() {
 }
 
 async function submitPasswordChange() {
-  if (!isAdmin()) return showToast("No permission");
-  if (!pendingPasswordUserId) return showToast("Select an account first");
+  if (!isAdmin()) return showToast(copyText("noPermission"));
+  if (!pendingPasswordUserId) return showToast(copyText("selectAccountFirst"));
   const newPassword = $("#passwordDialogNew").value.trim();
   const confirmPassword = $("#passwordDialogConfirm").value.trim();
-  if (!newPassword) return showToast("Enter a new password");
-  if (newPassword.length < 6) return showToast("Password must be at least 6 characters");
-  if (newPassword !== confirmPassword) return showToast("Passwords do not match");
+  if (!newPassword) return showToast(copyText("enterNewPassword"));
+  if (newPassword.length < 6) return showToast(labels.errors.PASSWORD_TOO_SHORT.admin);
+  if (newPassword !== confirmPassword) return showToast(copyText("passwordsMismatch"));
   const account = pendingPasswordUserId;
-  if (!confirm(`Change password for account ${account}?`)) return;
+  if (!confirm(copyText("changePasswordConfirm", { account }))) return;
   try {
     await postUserData("/api/users/password", {
       targetId: account,
@@ -3661,11 +3842,11 @@ async function submitPasswordChange() {
     if (account.toLowerCase() === "admin" && sessionAuth.userId?.toLowerCase() === "admin") {
       saveSessionAuth(sessionAuth.userId, sessionAuth.token, sessionAuth.expiresAt, false);
     }
-    showToast("Password changed");
+    showToast(copyText("passwordChanged"));
     closePasswordDialog();
     render();
   } catch (error) {
-    showToast(error.message || "Failed to change password");
+    showToast(error.message || copyText("passwordChangeFailed"));
   }
 }
 
@@ -3705,7 +3886,7 @@ async function loginAsync() {
     debugLogin("render called after login");
     if (data.mustChangePassword) {
       activateView("users");
-      showToast("Administrator is still using the default password. Change it first.");
+      showToast(copyText("defaultPasswordChangeFirst"));
     }
   } catch (error) {
     debugLogin(`login error ${error?.message || "unknown"}`);
@@ -3732,10 +3913,10 @@ function logout() {
 }
 
 async function deleteUser(userId) {
-  if (!isAdmin()) return showToast("No permission");
+  if (!isAdmin()) return showToast(copyText("noPermission"));
   const target = state.users.find((user) => user.id === userId);
-  if (target?.role === "admin") return showToast("Admin account cannot be deleted");
-  if (!confirm(`Delete account ${userId}?\nThis account will not be able to log in after deletion.`)) return;
+  if (target?.role === "admin") return showToast(labels.errors.ADMIN_CANNOT_BE_DELETED.admin);
+  if (!confirm(`${copyText("deleteAccountConfirm", { userId })}\n${copyText("deleteAccountAfter")}`)) return;
   try {
     const remote = await postUserData("/api/users/delete", { targetId: userId });
     if (!remote) {
@@ -3830,15 +4011,15 @@ function registerServiceWorker() {
 
 $$(".tab").forEach((button) => {
   button.addEventListener("click", () => {
-    if (!isAdmin() && !["operate", "count", "stock"].includes(button.dataset.view)) return showToast("No permission");
-    if (!canOpenView(button.dataset.view)) return showToast("No permission");
+    if (!isAdmin() && !["operate", "count", "stock"].includes(button.dataset.view)) return showToast(copyText("noPermission"));
+    if (!canOpenView(button.dataset.view)) return showToast(copyText("noPermission"));
     activateView(button.dataset.view);
   });
 });
 
 $("#operationTypeInput").addEventListener("change", (event) => {
   if (event.target.value === "move" && !canUseMoveOperation()) {
-    showToast("No permission to move stock between locations");
+    showToast(copyText("noMovePermission"));
     event.target.value = "in";
   }
   operationType = event.target.value;
@@ -3891,7 +4072,7 @@ $("#qtyInput").addEventListener("blur", (event) => {
   if (event.target.value && parseSystemQty(event.target.value) === null) showToast(qtyErrorText(event.target.value));
   const qty = parseSystemQty(event.target.value);
   const maxQty = Number(event.target.dataset.maxQty || 0);
-  if (qty !== null && maxQty && qty > maxQty) showToast("Quantity cannot exceed available stock");
+  if (qty !== null && maxQty && qty > maxQty) showToast(copyText("qtyExceedsStock"));
 });
 $("#qtyInput").addEventListener("input", updateOperationHelper);
 $("#operationForm").addEventListener("submit", submitOperation);
