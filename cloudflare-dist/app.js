@@ -261,7 +261,7 @@ function uiCopy() {
     stockSearch: "搜索库位、物料编码、名称、批号",
     exportCurrentStock: "导出当前库存",
     importTitle: "期初库存导入",
-    importDesc: "仅管理员使用。字段：Material Code, Material Name, Batch No., Qty, Location Code, Status。每一行对应一个批号-库位-状态。",
+    importDesc: "仅管理员使用。字段：物料编码、物料名称、批号、数量、库位编码、状态。每一行对应一个批号-库位-状态。",
     importStock: "导入库存",
     downloadStockTemplate: "下载库存模板",
     downloadBackup: "下载备份",
