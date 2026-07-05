@@ -18,20 +18,30 @@ test("WMS Lite smoke flow", async ({ page }) => {
 
   await page.goto(baseUrl, { waitUntil: "networkidle" });
   await page.screenshot({ path: "tests/e2e/artifacts/login-page.png", fullPage: true });
-  await expect(page.getByLabel("账号")).toBeVisible();
-  await page.getByLabel("账号").fill(userId);
-  await page.getByLabel("密码").fill(password);
-  await page.getByRole("button", { name: "登录" }).click();
+
+  await expect(page.getByLabel("Display language")).toBeVisible();
+  await expect(page.getByText("Username")).toBeVisible();
+  await expect(page.getByText("Password")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Login" })).toBeVisible();
+
+  await page.locator("#displayLanguageSelect").selectOption("zh");
+  await expect(page.getByText("账号")).toBeVisible();
+  await expect(page.getByText("密码")).toBeVisible();
+  await expect(page.getByRole("button", { name: "登录" })).toBeVisible();
+
+  await page.locator("#loginUserInput").fill(userId);
+  await page.locator("#loginPasswordInput").fill(password);
+  await page.locator("#loginButton").click();
 
   await expect(page.getByText("管理员").or(page.getByText("admin"))).toBeVisible();
-  await expect(page.getByText("作业")).toBeVisible();
-  await expect(page.getByText("盘点")).toBeVisible();
-  await expect(page.getByText("库存")).toBeVisible();
-  await expect(page.getByText("导入")).toBeVisible();
-  await expect(page.getByText("主数据")).toBeVisible();
-  await expect(page.getByText("账号权限")).toBeVisible();
-  await expect(page.getByText("流水账")).toBeVisible();
-  await expect(page.getByText("修改记录")).toBeVisible();
+  await expect(page.getByRole("button", { name: "作业" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "盘点" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "库存" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "导入" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "主数据" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "账号权限" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "流水账" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "修改记录" })).toBeVisible();
   await expect(page.getByText("服务器未连接")).toHaveCount(0);
   await expect(page.getByText("runtime.js not executed")).toHaveCount(0);
 
@@ -46,6 +56,16 @@ test("WMS Lite smoke flow", async ({ page }) => {
   await page.getByRole("button", { name: "流水账" }).click();
   await expect(page.getByRole("heading", { name: "出入库流水账" })).toBeVisible();
   await page.screenshot({ path: "tests/e2e/artifacts/logs-page.png", fullPage: true });
+
+  await page.locator("#displayLanguageSelect").selectOption("en");
+  await expect(page.getByRole("button", { name: "Operation" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Stock Count" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Stock" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Import" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Master Data" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Account Permissions" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Transaction Log" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Change Log" })).toBeVisible();
 
   await page.screenshot({ path: "tests/e2e/artifacts/after-login.png", fullPage: true });
 
