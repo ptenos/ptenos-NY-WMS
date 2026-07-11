@@ -54,7 +54,7 @@ test("WMS Lite smoke flow", async ({ page }) => {
   await page.screenshot({ path: "tests/e2e/artifacts/operation-page.png", fullPage: true });
 
   await page.getByRole("button", { name: "流水账" }).click();
-  await expect(page.getByRole("heading", { name: "出入库流水账" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "流水账" })).toBeVisible();
   await page.screenshot({ path: "tests/e2e/artifacts/logs-page.png", fullPage: true });
 
   await page.locator("#displayLanguageSelect").selectOption("en");
